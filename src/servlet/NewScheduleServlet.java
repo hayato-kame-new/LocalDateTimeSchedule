@@ -36,6 +36,14 @@ public class NewScheduleServlet extends HttpServlet {
         int day = Integer.parseInt(request.getParameter("day"));
 
 
+     // リクエストスコープに保存する。リクエストスコープは、フォワードできる(リダイレクトはできない)
+        // リクエストスコープに保存できるのは、参照型 クラス型のインスタンスだけ。自分で作ったクラスは、JavaBeansのクラスにすること
+      request.setAttribute("year", year);
+
+
+
+
+
 
 
 

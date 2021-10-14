@@ -63,6 +63,7 @@ public class MonthDisplayServlet extends HttpServlet {
      // リクエストスコープに保存する。リクエストスコープは、フォワードできる(リダイレクトはできない)
         // リクエストスコープに保存できるのは、参照型 クラス型のインスタンスだけ。自分で作ったクラスは、JavaBeansのクラスにすること
         request.setAttribute("monthBean", monthBean);
+        request.setAttribute("mon", mon);
 
         //   フォワードする
         RequestDispatcher dispatcher = request.getRequestDispatcher("display.jsp");
