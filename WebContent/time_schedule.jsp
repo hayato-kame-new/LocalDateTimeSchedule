@@ -1,5 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="model.TimeScheduleBean" %>
+
+<%
+// 文字化け対策
+request.setCharacterEncoding("UTF-8");
+// リクエストスコープから取り出す
+TimeScheduleBean timeBean = (TimeScheduleBean)request.getAttribute("timeBean");
+int year = timeBean.getYear();
+int month = timeBean.getMonth();
+int day = timeBean.getDay();
+
+
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -91,15 +104,20 @@ p{font-size:0.75em;}
 <form method="post" action="">
 <table>
 <tr>
-<td nowrap>���t</td><td>
+<td nowrap>日付</td><td>
 <select name="YEAR">
-<option value="2005">2005�N
-<option value="2006" selected>2006�N
-<option value="2007">2007�N
-<option value="2008">2008�N
-<option value="2009">2009�N
-<option value="2010">2010�N
+<% for (int i = year-1 ; i <= year+1 ; i++){
+  if(i == year) {
+%>
+<option value=<%=i %> selected><%=i %>
+<% } else { %>
+<option value=<%=i %> ><%=i %>
+<%
+}
+}
+%>
 </select>
+
 <select name="MONTH">
 <option value="1" selected>1��
 <option value="2">2��
@@ -148,7 +166,7 @@ p{font-size:0.75em;}
 <option value="31">31��
 </select>
 </td></tr>
-<tr><td nowrap>����</td><td>
+<tr><td nowrap>時刻</td><td>
 <select name="SHOUR">
 <option value="0">0��
 <option value="1">1��
@@ -217,19 +235,20 @@ p{font-size:0.75em;}
 </td></tr>
 
 <tr>
-<td nowrap>�\��</td>
+<td nowrap>予定</td>
 <td><input type="text" name="PLAN" value="" size="30" maxlength="100">
 </td>
 </tr>
 
 <tr>
-<td valign="top" nowrap>����</td>
+<td valign="top" nowrap>メモ</td>
 <td><textarea name="MEMO" cols="30" rows="10" wrap="virtual"></textarea></td>
 </tr>
 </table>
 
 <p>
-<input type="submit" name="Register" value="�o�^����"> <input type="reset" value="���͂�����">
+<input type="submit" name="Register" value="送信">
+<input type="reset" value="キャンセル">
 <p>
 </form>
 

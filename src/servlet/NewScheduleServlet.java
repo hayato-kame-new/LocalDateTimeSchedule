@@ -2,11 +2,14 @@ package servlet;
 
 import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import model.TimeScheduleBean;
 
 /**
  * Servlet implementation class NewScheduleServlet
@@ -35,10 +38,15 @@ public class NewScheduleServlet extends HttpServlet {
         int month = Integer.parseInt(request.getParameter("month"));
         int day = Integer.parseInt(request.getParameter("day"));
 
+        TimeScheduleBean timeBean = new TimeScheduleBean(year, month, day);
 
      // リクエストスコープに保存する。リクエストスコープは、フォワードできる(リダイレクトはできない)
         // リクエストスコープに保存できるのは、参照型 クラス型のインスタンスだけ。自分で作ったクラスは、JavaBeansのクラスにすること
-      request.setAttribute("year", year);
+        request.setAttribute("timeBean", timeBean);
+
+   //   フォワードする
+        RequestDispatcher dispatcher = request.getRequestDispatcher("time_schedule.jsp");
+        dispatcher.forward(request, response);
 
 
 
