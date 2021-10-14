@@ -1,6 +1,8 @@
 package model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 
 public class TimeScheduleBean implements Serializable {
 
@@ -14,20 +16,20 @@ public class TimeScheduleBean implements Serializable {
     int day;
     int hour;
     int minute;
+     private int thisMonthlastDay;  // 今月が何日までか
 
 
 
     public TimeScheduleBean() {
         super();
-        // TODO 自動生成されたコンストラクター・スタブ
     }
 
 
     public TimeScheduleBean(int year, int month, int day) {
-        super();
         this.year = year;
         this.month = month;
         this.day = day;
+        this.thisMonthlastDay = LocalDate.of(this.year, this.month, this.day).with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
     }
 
 
@@ -60,6 +62,14 @@ public class TimeScheduleBean implements Serializable {
     }
     public void setMinute(int minute) {
         this.minute = minute;
+    }
+
+    public int getThisMonthlastDay() {
+        return thisMonthlastDay;
+    }
+
+    public void setThisMonthlastDay(int thisMonthlastDay) {
+        this.thisMonthlastDay = thisMonthlastDay;
     }
 
 

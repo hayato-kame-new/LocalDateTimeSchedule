@@ -10,7 +10,7 @@ TimeScheduleBean timeBean = (TimeScheduleBean)request.getAttribute("timeBean");
 int year = timeBean.getYear();
 int month = timeBean.getMonth();
 int day = timeBean.getDay();
- int thisMonthlastDay =  timeBean.getThisMonthlastDay();
+// int thisMonthlastDay =  timeBean.getThisMonthlastDay();
 
 %>
 <!DOCTYPE html>
@@ -136,8 +136,8 @@ p{font-size:0.75em;}
 %>
 </select>
 
-<select name="day" id="day">
-<% for (int i = 1 ; i <= thisMonthlastDay ; i++){
+<%-- <select name="day" id="day">
+<% for (int i = 1 ; i <= 31 ; i++){
   if(i == day) {
 %>
 <option value=<%=i %> selected><%=i %>
@@ -148,6 +148,10 @@ p{font-size:0.75em;}
 }
   %>
 </select>
+ --%>
+
+ <selet name="day" id="day"></select>
+  <input type="button" value="日にち選択" onclick="createSelectBox();" />
 
 </td></tr>
 
@@ -240,6 +244,39 @@ p{font-size:0.75em;}
 </div>
 
 </div>
+<script>
+function createSelectBox() {
+  const yearSelect = document.year
+  const monthSelect = document.month
+
+  // 値(数値)を取得
+  const yearNum = yearSelect.selectedIndex;
+  // const yearNum = document.year.selectedIndex;
+
+  const monthNum = monthSelect.selectedIndex;
+  // const monthNum = document.month.selectedIndex;
+
+  //  値(数値)から値(value値)を取得
+  const strY = yearSelect.options[yearNum].value;
+  //const strY = document.year.options[yearNum].value;
+
+  const strM = monthSelect.options[monthNum].value;
+  //const strM = document.month.options[monthNum].value;
+
+  // その年のその月が何日あるのかを取得する
+  var days_count = new Date(parseInt(Number(strY), 10), parseInt(Number(strM), 10), 0).getDate();
+
+  for (var i = 1; i <= days_count; i++) {
+    let op = document.createElement("option");
+      op.value = i;  // value値
+      op.text = i;   // テキスト値
+      if(i == day) {
+        op.selected = true;
+      }
+      document.getElementById("day").appendChild(op);
+  }
+};
+</script>
 
 </body>
 </html>

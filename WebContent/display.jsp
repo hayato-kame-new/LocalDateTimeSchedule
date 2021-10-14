@@ -31,7 +31,7 @@ int now_minute = now.getMinute();
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title><%=year%>年<%=month%>月</title>
 <style>
 table {
   border: 1px solid #a9a9a9;
@@ -91,6 +91,18 @@ p {
 </style>
 </head>
 <body>
+ <!--  aリンクだと、インスタンスを送りたい時には、セッションスコープへ入れないとダメ session は、JSPで使える暗黙オブジェクト
+上のスクリプトレットでセッションに保存している session.setAttribute("monthBean", monthBean); -->
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before">&lang;&lang;
+    前月表示</a>
+  <small>&emsp;</small>
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next">翌月表示
+    &rang;&rang;</a>
+  <br />
+  <% if(!mon.equals("current")){%>
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current">今月の表示に戻る</a>
+  <% } %>
+<hr />
 
   <h3><%=year%>年<%=month%>月のカレンダー
   </h3>
@@ -164,15 +176,6 @@ p {
     %>
   </table>
 
-  <!--  aリンクだと、インスタンスを送りたい時には、セッションスコープへ入れないとダメ session は、JSPで使える暗黙オブジェクト
-上のスクリプトレットでセッションに保存している session.setAttribute("monthBean", monthBean); -->
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before">&lang;&lang;
-    前月表示</a>
-  <small>&emsp;</small>
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next">翌月表示
-    &rang;&rang;</a>
-  <br />
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current">今月の表示に戻る</a>
   <!-- Font Awesomeのための -->
   <script defer
     src="https://use.fontawesome.com/releases/v5.7.2/js/all.js"></script>
