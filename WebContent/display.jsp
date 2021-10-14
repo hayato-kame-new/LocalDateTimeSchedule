@@ -64,20 +64,20 @@ String time = "";
 for (int i = 0 ; i < weekCount ; i++){
     for (int j = i * 7 ; j < i * 7 + 7 ; j += 7){
 
-      if (i == 0 && calendarDay[j] > 7 ) {
-        css = "otherday";
-      }else if(i == weekCount - 1 && calendarDay[j] < 22) {
-        css = "otherday";
-      }else {
-        css = "day";
-      }
-
-
 %>
 
 
 <tr>
-<%for (int k = 0 ; k < 7 ; k++){  %>
+<%for (int k = 0 ; k < 7 ; k++){
+
+ if (i == 0 && calendarDay[j+k] > 7 ) {
+        css = "otherday";
+      }else if(i == weekCount - 1 && calendarDay[j+k] < 22) {
+        css = "otherday";
+      }else {
+        css = "day";
+      }
+ %>
    <td class=<%=css %>>
     <%=calendarDay[j + k] %><img src="./img/IMG.JPG" width="14" height="14"><br />
     <a href="/LocalDateTimeSchedule/NewScheduleServlet"><i class="fas fa-clipboard-list"></i></a>
@@ -87,7 +87,7 @@ for (int i = 0 ; i < weekCount ; i++){
 
 
 
-<tr>
+<%-- <tr>
   <td class=<%=css %>>
     <%=calendarDay[j] %><img src="./img/IMG.JPG" width="14" height="14"><br />
     <a href="/LocalDateTimeSchedule/NewScheduleServlet"><i class="fas fa-clipboard-list"></i></a>
@@ -116,7 +116,7 @@ for (int i = 0 ; i < weekCount ; i++){
     <%=calendarDay[j+6] %><img src="./img/IMG.JPG" width="14" height="14"><br />
     <i class="fas fa-clipboard-list"></i>
   </td>
-</tr>
+</tr> --%>
 
 <tr>
   <td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td>
