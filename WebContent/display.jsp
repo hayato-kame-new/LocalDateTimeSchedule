@@ -57,38 +57,30 @@ p{font-size:0.75em;}
 <h3><%=year %>年<%=month %>月のカレンダー</h3>
 <table>
 <tr><td class="week">日</td><td class="week">月</td><td class="week">火</td><td class="week">水</td><td class="week">木</td><td class="week">金</td><td class="week">土</td></tr>
+
 <%
 boolean other = false;  // 他の月かどうか
 String css = "day"; // 後で条件分岐させて、表示をかえる
-String time_link = "";
-String img_link = "";
 for (int i = 0 ; i < weekCount ; i++){
     for (int j = i * 7 ; j < i * 7 + 7 ; j += 7){
-
 %>
-
 
 <tr>
 <%for (int k = 0 ; k < 7 ; k++){
 // 今月分だけ表示するものと、区別してる タイムスケジュールのリンクや画像リンクは、今月のだけに表示する 日付は今月だけ黒にする
  if (i == 0 && calendarDay[j+k] > 7 ) {
         css = "otherday";
-        time_link = "";
-        img_link = "";
       }else if(i == weekCount - 1 && calendarDay[j+k] < 22) {
         css = "otherday";
-        time_link = "";
-        img_link = "";
       }else {
         css = "day";
-        time_link = "/LocalDateTimeSchedule/NewScheduleServlet";
-        img_link = "./img/IMG_1044.JPG";
       }
  %>
    <td class=<%=css %>>
-    <%=calendarDay[j + k] %><img src="./img/IMG.JPG" width="14" height="14"><br />
-   <%--  <a href=<%=time_link %>><i class=<%=font_awesome %>></i></a> --%>
-    <a href=<%=time_link %>><img src=<%=img_link %> width="14" height="14"></i></a>
+     <%=calendarDay[j + k] %><img src="./img/IMG.JPG" width="14" height="14"><br />
+     <% if(css.equals("day") ) {%>
+    <a href="/LocalDateTimeSchedule/NewScheduleServlet?year=<%=year %>&month=<%=month %>&day=<%= calendarDay[j + k] %>"><i class="fas fa-clipboard-list"></i></a>
+    <% } %>
   </td>
 <% } %>
 </tr>

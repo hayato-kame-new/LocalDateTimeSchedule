@@ -30,6 +30,12 @@ public class NewScheduleServlet extends HttpServlet {
 
         // 文字化け対策
         request.setCharacterEncoding("UTF-8");
+        // aリンクの ?以降のクエリーパラメーターから取得する
+        int year = Integer.parseInt(request.getParameter("year"));
+        int month = Integer.parseInt(request.getParameter("month"));
+        int day = Integer.parseInt(request.getParameter("day"));
+
+
 
 
 
