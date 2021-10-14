@@ -59,25 +59,68 @@ p{font-size:0.75em;}
 <tr><td class="week">日</td><td class="week">月</td><td class="week">火</td><td class="week">水</td><td class="week">木</td><td class="week">金</td><td class="week">土</td></tr>
 <%
 boolean other = false;  // 他の月かどうか
-String css = "";
+String css = "day"; // 後で条件分岐させて、表示をかえる
+String time = "";
 for (int i = 0 ; i < weekCount ; i++){
     for (int j = i * 7 ; j < i * 7 + 7 ; j += 7){
+
+      if (i == 0 && calendarDay[j] > 7 ) {
+        css = "otherday";
+      }else if(i == weekCount - 1 && calendarDay[j] < 22) {
+        css = "otherday";
+      }else {
+        css = "day";
+      }
+
+
 %>
-<tr>
-<td class=<%=css %>><%=calendarDay[j] %><img src="./img/IMG.JPG" width="14" height="14"></td>
-<td class=<%=css %>><%=calendarDay[j+1] %><img src="./img/IMG.JPG" width="14" height="14"></td>
-<td class=<%=css %>><%=calendarDay[j+2] %><img src="./img/IMG.JPG" width="14" height="14"></td>
-<td class=<%=css %>><%=calendarDay[j+3] %><img src="./img/IMG.JPG" width="14" height="14"></td>
-<td class=<%=css %>><%=calendarDay[j+4] %><img src="./img/IMG.JPG" width="14" height="14"></td>
-<td class=<%=css %>><%=calendarDay[j+5] %><img src="./img/IMG.JPG" width="14" height="14"></td>
-<td class=<%=css %>><%=calendarDay[j+6] %><img src="./img/IMG.JPG" width="14" height="14"></td>
-</tr>
+
+
 <tr>
 <%for (int k = 0 ; k < 7 ; k++){  %>
-  <td class="stamp"><i class="fas fa-clipboard-list"></i></td>
+   <td class=<%=css %>>
+    <%=calendarDay[j + k] %><img src="./img/IMG.JPG" width="14" height="14"><br />
+    <a href="/LocalDateTimeSchedule/NewScheduleServlet"><i class="fas fa-clipboard-list"></i></a>
+  </td>
 <% } %>
 </tr>
-<tr><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td></tr>
+
+
+
+<tr>
+  <td class=<%=css %>>
+    <%=calendarDay[j] %><img src="./img/IMG.JPG" width="14" height="14"><br />
+    <a href="/LocalDateTimeSchedule/NewScheduleServlet"><i class="fas fa-clipboard-list"></i></a>
+  </td>
+  <td class=<%=css %>>
+    <%=calendarDay[j+1] %><img src="./img/IMG.JPG" width="14" height="14"><br />
+    <i class="fas fa-clipboard-list"></i>
+  </td>
+  <td class=<%=css %>>
+    <%=calendarDay[j+2] %><img src="./img/IMG.JPG" width="14" height="14"><br />
+    <i class="fas fa-clipboard-list"></i>
+  </td>
+  <td class=<%=css %>>
+    <%=calendarDay[j+3] %><img src="./img/IMG.JPG" width="14" height="14"><br />
+    <i class="fas fa-clipboard-list"></i>
+  </td>
+  <td class=<%=css %>>
+    <%=calendarDay[j+4] %><img src="./img/IMG.JPG" width="14" height="14"><br />
+    <i class="fas fa-clipboard-list"></i>
+  </td>
+  <td class=<%=css %>>
+    <%=calendarDay[j+5] %><img src="./img/IMG.JPG" width="14" height="14"><br />
+    <i class="fas fa-clipboard-list"></i>
+  </td>
+  <td class=<%=css %>>
+    <%=calendarDay[j+6] %><img src="./img/IMG.JPG" width="14" height="14"><br />
+    <i class="fas fa-clipboard-list"></i>
+  </td>
+</tr>
+
+<tr>
+  <td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td>
+</tr>
 <%
             }
         }

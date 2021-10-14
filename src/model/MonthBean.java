@@ -3,7 +3,7 @@ package model;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MonthBean implements Serializable {  //  自分で作成したクラスのインスタンスをスコープにおくには、Beanのクラスにして作らないとだめ
@@ -75,7 +75,7 @@ public class MonthBean implements Serializable {  //  自分で作成したク�
      * @return Map<Integer, int[]>    Integer: weekCount<br /> int[]: calendarDay
      */
     public Map<Integer, int[]> creatCalendarDay(int startWeek, int beforeMonthlastDay, int thisMonthlastDay) {
-        Map<Integer, int[]> map = new HashMap<>();
+        Map<Integer, int[]> map = new LinkedHashMap<>(); // 格納した順番を守る LinkedHashMapを使う
         int weekCount = 0;
         int[] calendarDay = new int[42];  //  最大で7日×6週
         int count = 0;

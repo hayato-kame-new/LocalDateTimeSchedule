@@ -42,9 +42,6 @@ public class MonthDisplayServlet extends HttpServlet {
         // 自分で作成したクラスのインスタンスをスコープにおくには、Beanのクラスにして作らないとだめ
         MonthBean monthBean = (MonthBean) session.getAttribute("monthBean"); // "current"の時は nullになってるはずだが、セッションが残ってるとある
 
-        // 後でこれ直す
-        // MonthBean monthBean = null;
-
         switch(mon) {
         case "current":
             monthBean = new MonthBean();  // セッションで残ってるので、ここでnewして今月のインスタンスにする
