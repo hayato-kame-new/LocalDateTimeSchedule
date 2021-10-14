@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -39,19 +40,27 @@ public class MonthDisplayServlet extends HttpServlet {
         HttpSession session = request.getSession();
         // aリンクでは、?以降のクエリーパラメータではオブジェクトは送れないから セッションにBeanとしてインスタンスを保存してる
         // 自分で作成したクラスのインスタンスをスコープにおくには、Beanのクラスにして作らないとだめ
+        MonthBean monthBean = (MonthBean) session.getAttribute("monthBean"); // "current"の時は nullになってるはずだが、セッションが残ってるとある
+
         // 後でこれ直す
-        MonthBean monthBean = null;
+        // MonthBean monthBean = null;
 
         switch(mon) {
         case "current":
-            monthBean = new MonthBean();
+            monthBean = new MonthBean();  // セッションで残ってるので、ここでnewして今月のインスタンスにする
             break; // switch文抜ける
         case "before":
-
-            break;
+            // セッションから取得したBeanインスタンスを使う   １ヶ月前にする
+            LocalDate before = LocalDate.of(monthBean.getYear(), monthBean.getMonth(), 1).minusMonths(1);
+            // 引数ありのコンストラクタをよぶ １ヶ月前に変更したlocaldateインスタンスを実引数にする
+            monthBean = new MonthBean(before);
+            break; // switch文抜ける
         case "next":
-
-            break;
+             // セッションから取得したBeanインスタンスを使う  １ヶ月後にする
+            LocalDate next = LocalDate.of(monthBean.getYear(), monthBean.getMonth(), 1).plusMonths(1);
+            // 引数ありのコンストラクタをよぶ １ヶ月後に変更したlocaldateインスタンスを実引数にする
+            monthBean = new MonthBean(next);
+            break; // switch文抜ける
         }
 
      // リクエストスコープに保存する。リクエストスコープは、フォワードできる(リダイレクトはできない)

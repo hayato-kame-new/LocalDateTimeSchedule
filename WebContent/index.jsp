@@ -12,7 +12,7 @@
 
 <!-- <a href="./display.jsp" >月一覧表の表示</a> -->
 <!-- JSPからサーブレットへ呼び出しも aリンクでできます ?以降のクエリーパラメータも使える  "/プロジェクト名/サーブレット名" -->
-<a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current" >今月表示サーブレットへ行く</a>
+<a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current" >今月表示</a>
 
 
 </body>

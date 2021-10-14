@@ -21,18 +21,37 @@ public class MonthBean implements Serializable {  //  自分で作成したク�
     private int startWeek; // 今月が何曜日から開始されているか
     private int beforeMonthlastDay;  // 先月が何日までだったか
     private int thisMonthlastDay;  // 今月が何日までか
-    private int[] calendarDay;  // カレンダーに載せる日数
+    private int[] calendarDay;  // カレンダーに載せる日数   最大で7日×6週 要素は最大で42個 最大で [0]から[41]まで
     private int weekCount; // 今月は何週あるか
 
 
     /**
-     * コンストラクタ Beanになるには明示的に 引数なしのコンストラクタが必要 フィールドを初期化する
+     * コンストラクタ Beanになるには明示的に 引数なしのコンストラクタが必要
+     * 現在の日時を基準にしてフィールドを初期化する
      */
     public MonthBean() {
         LocalDate localdate = LocalDate.now();
        // System.out.println(LocalDate.of(localdate.getYear(), localdate.getMonthValue(), 1).getDayOfWeek().getValue());
 //        System.out.println(localdate.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth());
 //        System.out.println(localdate.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth());
+        this.year = localdate.getYear();
+        this.month = localdate.getMonthValue();
+        this.day = localdate.getDayOfMonth();
+        this.startWeek = LocalDate.of(this.year, this.month, 1).getDayOfWeek().getValue();
+        this.beforeMonthlastDay = localdate.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+        this.thisMonthlastDay = localdate.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+        Map<Integer, int[]> map = this.creatCalendarDay( this.startWeek,  this.beforeMonthlastDay,  this.thisMonthlastDay);
+        for(Map.Entry<Integer, int[]> entry : map.entrySet()) {
+            this.calendarDay = entry.getValue();
+            this.weekCount = entry.getKey();
+        }
+    }
+
+    /**
+     * 引数ありコンストラクタ 先月 翌月のインスタンスを作成するために使うコンストラクタ
+     * @param localdate １ヶ月前のLocalDateインスタンスや、１ヶ月後のLocalDateインスタンスが引数として渡ってくる
+     */
+    public MonthBean(LocalDate localdate) {
         this.year = localdate.getYear();
         this.month = localdate.getMonthValue();
         this.day = localdate.getDayOfMonth();

@@ -11,7 +11,7 @@ int weekCount = monthBean.getWeekCount();
 int[] calendarDay = monthBean.getCalendarDay();
 
 // セッションに保存しないとだめ、リクエストスコープでは、aリンク越しに渡せないので 先月 翌月 のために
-// セッションスコープを使う session は、JSPで使える暗黙オブジェクト
+// セッションスコープを使う session は、JSPで使える暗黙オブジェクト セッションは、後で明示的に消すことが大事残ってるから
 session.setAttribute("monthBean", monthBean);
 
 
@@ -42,8 +42,11 @@ background-color:#f5f5f5;text-align:right;font-size:0.75em;
 td.otherday{
 background-color:#f5f5f5;color:#d3d3d3;text-align:right;font-size:0.75em;
 }
+td.stamp{
+background-color:#fffffff;text-align:left;height:17px;
+}
 td.sche{
-background-color:#fffffff;text-align:left;height:80px;
+background-color:#fffffff;text-align:left;height:80px; border-top:none;
 }
 img{border:0px;}
 p{font-size:0.75em;}
@@ -58,21 +61,23 @@ p{font-size:0.75em;}
 boolean other = false;  // 他の月かどうか
 String css = "";
 for (int i = 0 ; i < weekCount ; i++){
-   if(i == 0 && calendarDay[i] > 7){
-         other = true;
-         css = "otherday";
-       } else {
-         css = "day";
-       }
-            for (int j = i * 7 ; j < i * 7 + 7 ; j += 7){
-
+    for (int j = i * 7 ; j < i * 7 + 7 ; j += 7){
 %>
-<tr><td class=<%=css %>><%=calendarDay[j] %></td><td class=<%=css %>><%=calendarDay[j+1] %></td><td class=<%=css %>><%=calendarDay[j+2] %></td><td class=<%=css %>><%=calendarDay[j+3] %></td><td class=<%=css %>><%=calendarDay[j+4] %></td><td class=<%=css %>><%=calendarDay[j+5] %></td><td class=<%=css %>><%=calendarDay[j+6] %></td></tr>
+<tr>
+<td class=<%=css %>><%=calendarDay[j] %><img src="./img/IMG.JPG" width="14" height="14"></td>
+<td class=<%=css %>><%=calendarDay[j+1] %><img src="./img/IMG.JPG" width="14" height="14"></td>
+<td class=<%=css %>><%=calendarDay[j+2] %><img src="./img/IMG.JPG" width="14" height="14"></td>
+<td class=<%=css %>><%=calendarDay[j+3] %><img src="./img/IMG.JPG" width="14" height="14"></td>
+<td class=<%=css %>><%=calendarDay[j+4] %><img src="./img/IMG.JPG" width="14" height="14"></td>
+<td class=<%=css %>><%=calendarDay[j+5] %><img src="./img/IMG.JPG" width="14" height="14"></td>
+<td class=<%=css %>><%=calendarDay[j+6] %><img src="./img/IMG.JPG" width="14" height="14"></td>
+</tr>
 <tr>
 <%for (int k = 0 ; k < 7 ; k++){  %>
-  <td class="sche"><img src="./img/IMG_1044.JPG" width="14" height="16"></td>
+  <td class="stamp"><i class="fas fa-clipboard-list"></i></td>
 <% } %>
 </tr>
+<tr><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td><td class="sche"></td></tr>
 <%
             }
         }
@@ -81,7 +86,9 @@ for (int i = 0 ; i < weekCount ; i++){
 
 <!--  aリンクだと、インスタンスを送りたい時には、セッションスコープへ入れないとダメ session は、JSPで使える暗黙オブジェクト
 上のスクリプトレットでセッションに保存している session.setAttribute("monthBean", monthBean); -->
-<a href="/Schedule/MonthDisplayServlet?mon=before">前月</a>
-<a href="/Schedule/MonthDisplayServlet?mon=next">翌月</a>
+<a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before">前月</a>
+<a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next">翌月</a>
+<!-- Font Awesomeのための -->
+<script defer src="https://use.fontawesome.com/releases/v5.7.2/js/all.js"></script>
 </body>
 </html>
