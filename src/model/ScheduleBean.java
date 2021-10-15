@@ -24,7 +24,8 @@ public class ScheduleBean implements Serializable {
         // TODO 自動生成されたコンストラクター・スタブ
     }
 
-    public ScheduleBean(int id, int userId, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime,
+    // 引数にidはいらない 自動採番なので、データベースに登録されるときに自動で生成されるので
+    public ScheduleBean( int userId, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime,
             String schedule, String scheduleMemo) {
         super();
         this.id = id;

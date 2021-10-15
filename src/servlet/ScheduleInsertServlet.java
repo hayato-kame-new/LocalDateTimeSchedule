@@ -9,6 +9,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import dao.ScheduleDao;
+import model.ScheduleBean;
 
 /**
  * Servlet implementation class ScheduleInsertServlet
@@ -57,9 +61,31 @@ public class ScheduleInsertServlet extends HttpServlet {
         LocalTime endTime = LocalTime.of(e_hour, e_minute);
 
 
-        // まだid userId を用意してないから
+        // idは、自動採番です  userId を用意してないから仮に 1 で練習に登録する
+        int userId = 1;  // 仮に練習のために
         // 引数ありのコンストラクタをよぶ
-        // ScheduleBean scheBean = new ScheduleBean(id, userId, scheduleDate, startTime, endTime, schedule, scheduleMemo);
+         ScheduleBean scheBean = new ScheduleBean( userId, scheduleDate, startTime, endTime, schedule, scheduleMemo);
+
+         ScheduleDao scheDao = new ScheduleDao();
+         String msg = "スケジュールを登録しました。";
+         boolean success = true; // trueならデータベース処理が成功
+         success = scheDao.addSchedule(scheBean);
+         if(!success) {  // falseだったら失敗
+             msg = "スケジュールを登録できませんでした。";
+         }
+         // MonthDisplayServletへリダイレクトします。リダイレクトの際に、year month dayの情報が必要なので、ScheduleBeanインスタンスをセッションスコープに保存します。
+         // リダイレクトの時には、リクエストスコープ使えないので、セッションスコープを使う
+         // セッションは、requestから呼び出します。 サーブレットでは、セッションは明示的に破棄することが大切　(SpringBootだと自動でフレームワークが行ってくれてるが、明示的に破棄することが大切)
+         // スコープに置けるのはインスタンスのみです。Stringなどの参照型のインスタンスは置ける。プリミティブ型は置けない。
+         // クラス型のインスタンスは置けるが、自分で作ったクラスのインスタンスをスコープへ置けるようにするには、Beanとして作らないといけない。Beanを作るルール
+         HttpSession session = request.getSession();
+         session.setAttribute("msg", msg);
+         session.setAttribute("scheBean", scheBean);
+         session.setAttribute("result", "result");  // Switch文で必要どの月を表示するのかcaseで切り替えるのに必要
+
+         response.sendRedirect("/MonthDisplayServlet");
+         // クエリーパラメータとして、クエリー文字列を送ってもいい  こっちでもできることを確認すること
+         // response.sendRedirect("/MonthDisplayServlet?year=year&month=month&day=day&result=result");
 
 
     }

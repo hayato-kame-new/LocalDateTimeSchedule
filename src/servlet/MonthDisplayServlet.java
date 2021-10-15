@@ -58,6 +58,11 @@ public class MonthDisplayServlet extends HttpServlet {
             // 引数ありのコンストラクタをよぶ １ヶ月後に変更したlocaldateインスタンスを実引数にする
             monthBean = new MonthBean(next);
             break; // switch文抜ける
+        case "result":
+            // リダイレクトした後に、このサーブレットに来て、スケジュール登録した月のカレンダーを表示するようにする セッションから取り出すか、クエリーパラメータから取り出すのか
+            // スケジュール登録成功したのか、失敗したのかのmsgも渡ってくるので取得して、"display.jsp"で表示をさせてください。
+            //
+            break;
         }
 
      // リクエストスコープに保存する。リクエストスコープは、フォワードできる(リダイレクトはできない)
