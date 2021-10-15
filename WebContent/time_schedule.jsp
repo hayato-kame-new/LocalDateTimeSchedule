@@ -1,16 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="model.TimeScheduleBean" %>
+<%@ page import="model.DayBean" %>
 
 <%
 // 文字化け対策
 request.setCharacterEncoding("UTF-8");
 // リクエストスコープから取り出す
-TimeScheduleBean timeBean = (TimeScheduleBean)request.getAttribute("timeBean");
-int year = timeBean.getYear();
-int month = timeBean.getMonth();
-int day = timeBean.getDay();
- int thisMonthlastDay =  timeBean.getThisMonthlastDay();
+DayBean dayBean = (DayBean)request.getAttribute("dayBean");
+int year = dayBean.getYear();
+int month = dayBean.getMonth();
+int day = dayBean.getDay();
+int thisMonthlastDay =  dayBean.getThisMonthlastDay();
 
 %>
 <!DOCTYPE html>
@@ -50,7 +50,7 @@ p{font-size:0.75em;}
 <div id="left">
 
 <table class="sche">
-<tr><td class="top" style="width:80px">����</td><td class="top" style="width:300px">�\��</td></tr>
+<tr><td class="top" style="width:80px">時刻</td><td class="top" style="width:300px">予定</td></tr>
 <tr><td class="time">00:00</td><td class="contents"></td></tr>
 <tr><td class="timeb"></td><td class="contentsb"></td></tr>
 <tr><td class="time">01:00</td><td class="contents"></td></tr>
@@ -106,7 +106,9 @@ p{font-size:0.75em;}
 
 <div id="right">
 
-<form method="post" action="">
+
+
+<form method="post" action="ScheduleInsertServlet">
 <table>
 <tr>
 <td nowrap>日付</td><td>
@@ -152,82 +154,45 @@ p{font-size:0.75em;}
 </td></tr>
 
 <tr><td nowrap>時刻</td><td>
-<select name="SHOUR">
-<option value="0">0��
-<option value="1">1��
-<option value="2">2��
-<option value="3">3��
-<option value="4">4��
-<option value="5">5��
-<option value="6">6��
-<option value="7">7��
-<option value="" selected>--��
-<option value="8">8��
-<option value="9">9��
-<option value="10">10��
-<option value="11">11��
-<option value="12">12��
-<option value="13">13��
-<option value="14">14��
-<option value="15">15��
-<option value="16">16��
-<option value="17">17��
-<option value="18">18��
-<option value="19">19��
-<option value="20">20��
-<option value="21">21��
-<option value="22">22��
-<option value="23">23��
+<select name="s_hour">
+<option value="" selected>--時
+<% for (int i = 0 ; i <= 23 ; i++){
+%>
+<option value="<%=i %>"><%=i %>時
+<% } %>
 </select>
-<select name="SMINUTE">
-<option value="0">00��
-<option value="30">30��
+
+<select name="s_minute">
+<option value="">--分
+<option value="0">00分
+<option value="30">30分
 </select>
-�`
-<select name="EHOUR">
-<option value="">--��
-<option value="0">0��
-<option value="1">1��
-<option value="2">2��
-<option value="3">3��
-<option value="4">4��
-<option value="5">5��
-<option value="6">6��
-<option value="7">7��
-<option value="" selected>--��
-<option value="8">8��
-<option value="9">9��
-<option value="10">10��
-<option value="11">11��
-<option value="12">12��
-<option value="13">13��
-<option value="14">14��
-<option value="15">15��
-<option value="16">16��
-<option value="17">17��
-<option value="18">18��
-<option value="19">19��
-<option value="20">20��
-<option value="21">21��
-<option value="22">22��
-<option value="23">23��
+
+<select name="e_hour">
+<option value="" selected>--時
+<% for (int i = 0 ; i <= 23 ; i++){
+%>
+<option value="<%=i %>"><%=i %>時
+<% } %>
 </select>
-<select name="EMINUTE">
-<option value="">--��
-<option value="0">00��
-<option value="30">30��
+
+
+<select name="e_minute">
+<option value="">--分
+<option value="0">00分
+<option value="30">30分
 </select>
 </td></tr>
 
 <tr>
 <td nowrap>予定</td>
-<td><input type="text" name="PLAN" value="" size="30" maxlength="100">
+<td><input type="text" name="schedule" value="" size="30" maxlength="100">
 </td>
 </tr>
 
 <tr>
 <td valign="top" nowrap>メモ</td>
-<td><textarea name="MEMO" cols="30" rows="10" wrap="virtual"></textarea></td>
+<td><textarea name="scheduleMemo" cols="30" rows="10" wrap="virtual"></textarea></td>
 </tr>
 </table>
 
