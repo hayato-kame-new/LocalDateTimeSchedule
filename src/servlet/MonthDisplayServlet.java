@@ -39,8 +39,17 @@ public class MonthDisplayServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         // aリンクのについてた?以降のクエリーパラメータからの取り出し リクエストスコープから取り出す
         String mon = request.getParameter("mon");
+
+        // ここで、リクエストパラメータから送ってきたのが、current next before だったら、
+        // セッションが始まってるか調べて、破棄してください
+        // まず、調べてください　current next before だったら、　新しくセッションをスターとさせな行くてもいいと思う　リクエストスコープに入れるから
+
+
+
         // セッションスコープからの取り出しには、requestから、セッションを呼び出して使う
         // すでにある場合もあるので、引数に trueを指定すること  引数のセッション生成フラグにtrueを指定すると、現在セッションが存在しない場合は、生成して返します。
+
+
         HttpSession session = request.getSession(true);
         // aリンクでは、?以降のクエリーパラメータではオブジェクトは送れないから セッションにBeanとしてインスタンスを保存してる
         // 自分で作成したクラスのインスタンスをスコープにおくには、Beanのクラスにして作らないとだめ
@@ -53,6 +62,9 @@ public class MonthDisplayServlet extends HttpServlet {
         if(session.getAttribute("mon") != null  &&  session.getAttribute("mon").equals("scheduleResult")) {
             mon = (String)session.getAttribute("mon");  // "scheduleResult"  が入ってる
             msg = (String) session.getAttribute("msg");
+
+
+
         }
         // そして、月カレンダーのセルに、スケジュールの全件を表示する
         Map<Integer, String> scheduleMap = new HashMap();  // 登録順じゃないのでLinkedHashMapじゃない
@@ -82,6 +94,8 @@ public class MonthDisplayServlet extends HttpServlet {
             LocalDate scheduleResultLocalDate = LocalDate.of(scheBean.getScheduleDate().getYear(), scheBean.getScheduleDate().getMonthValue(), scheBean.getScheduleDate().getDayOfMonth());
 
             monthBean = new MonthBean(scheduleResultLocalDate);
+            // ここで明示的にセッションを破棄しておかないと、次回アクセスした時に、セッションが残ってて、今月表示できなくなる
+           // ここで破棄するのが正しいと思う、次はリクエストスコープにbeanを入れて、表示するだけだし。
 
             break;
         }
