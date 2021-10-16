@@ -4,9 +4,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import model.ScheduleBean;
-
+/*
+  WebContent   WEB-INF  libフォルダの中に、ドライバー入れたら、ビルドパス構成で適用しないといけません。
+ 右クリックで ビルドパス ビルドパスの構成 ライブラリタグ クラスパス  JARファイルの追加 で、postgresql-4.2.23.jarを
+ 今のプロジェクトの中のlibフォルダに入れて適用してください
+  /Applications/Eclipse_2020_12.app/Contents/workspace/LocalDateTimeSchedule/Webcontent/WEB-INF/lib
+    にして 適用する
+*/
 public class ScheduleDao {
 
     final String DRIVER_NAME = "org.postgresql.Driver";
@@ -27,7 +34,11 @@ public class ScheduleDao {
             // PostgreSQLだと、全部小文字でカラム名やテーブル名を書くこと
             String sql = "insert into schedule (userid, scheduledate, starttime, endtime, schedule, schedulememo) values (?::integer, ?::date, ?::time, ?::time, ?, ?)";
 
-            pstmt = conn.prepareStatement(sql);
+            // pstmt = conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            int userId = scheBean.getUserId();
+
             // LocalDate を java.sql.Dateに変換する
             java.sql.Date sqlScheduleDate = java.sql.Date.valueOf(scheBean.getScheduleDate());
             // LocalDateTime を java.sql.Timeに変換する   java.sql.Timeには、LocalTimeとの間で変換を行うメソッドがあります
@@ -35,13 +46,16 @@ public class ScheduleDao {
             java.sql.Time sqlStartTime = java.sql.Time.valueOf(scheBean.getStartTime());
             java.sql.Time sqlEndTime = java.sql.Time.valueOf(scheBean.getEndTime());
 
+            String schedule = scheBean.getSchedule();
+            String scheduleMemo = scheBean.getScheduleMemo();
+
             // ? のパラメータにセットする
-            pstmt.setInt(1, scheBean.getUserId());
+            pstmt.setInt(1, userId);
             pstmt.setDate(2, sqlScheduleDate);
             pstmt.setTime(3, sqlStartTime);
             pstmt.setTime(4, sqlEndTime);
-            pstmt.setString(5, scheBean.getSchedule());
-            pstmt.setString(6, scheBean.getScheduleMemo());
+            pstmt.setString(5, schedule);
+            pstmt.setString(6,scheduleMemo);
 
             // executeUpdateメソッドの戻り値は、更新された行数を表します
             int result = pstmt.executeUpdate();

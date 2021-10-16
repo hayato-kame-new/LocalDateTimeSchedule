@@ -67,8 +67,9 @@ public class ScheduleInsertServlet extends HttpServlet {
          ScheduleBean scheBean = new ScheduleBean( userId, scheduleDate, startTime, endTime, schedule, scheduleMemo);
 
          ScheduleDao scheDao = new ScheduleDao();
-         String msg = "スケジュールを登録しました。";
+         String msg = year + "年" + month + "月" + day + "日" + "のスケジュールを登録しました。";
          boolean success = true; // trueならデータベース処理が成功
+         // データベースに新規登録
          success = scheDao.addSchedule(scheBean);
          if(!success) {  // falseだったら失敗
              msg = "スケジュールを登録できませんでした。";
@@ -81,11 +82,11 @@ public class ScheduleInsertServlet extends HttpServlet {
          HttpSession session = request.getSession();
          session.setAttribute("msg", msg);
          session.setAttribute("scheBean", scheBean);
-         session.setAttribute("result", "result");  // Switch文で必要どの月を表示するのかcaseで切り替えるのに必要
+         session.setAttribute("mon", "scheduleResult");  // switch文で必要どの月を表示するのかcaseで切り替えるのに必要
 
-         response.sendRedirect("/MonthDisplayServlet");
+         response.sendRedirect("/LocalDateTimeSchedule/MonthDisplayServlet");
          // クエリーパラメータとして、クエリー文字列を送ってもいい  こっちでもできることを確認すること
-         // response.sendRedirect("/MonthDisplayServlet?year=year&month=month&day=day&result=result");
+         // response.sendRedirect("/MonthDisplayServlet?year=year&month=month&day=day&mon=scheduleResult");
 
 
     }

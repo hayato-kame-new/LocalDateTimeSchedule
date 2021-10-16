@@ -7,9 +7,11 @@ request.setCharacterEncoding("UTF-8");
 // リクエストスコープから取り出す
 MonthBean monthBean = (MonthBean) request.getAttribute("monthBean");
 String mon = (String) request.getAttribute("mon");
+String msg = (String)request.getAttribute("msg");
 
 int weekCount = monthBean.getWeekCount();
 int[] calendarDay = monthBean.getCalendarDay();
+
 
 // セッションに保存しないとだめ、リクエストスコープでは、aリンク越しに渡せないので 先月 翌月 のために
 // セッションスコープを使う session は、JSPで使える暗黙オブジェクト セッションは、後で明示的に消すことが大事残ってるから
@@ -88,6 +90,10 @@ img {
 p {
   font-size: 0.75em;
 }
+
+.msg {
+color: orange;
+}
 </style>
 </head>
 <body>
@@ -106,7 +112,11 @@ p {
 
   <h3><%=year%>年<%=month%>月のカレンダー
   </h3>
-
+  <% if(msg != null){%>
+   <p class="msg">
+     <%=msg %>
+   </p>
+<% } %>
   <p>
     現在は<%=now_year%>年<%=now_month%>月<%=now_day%>日<%=now_hour%>時<%=now_minute%>分です
   </p>

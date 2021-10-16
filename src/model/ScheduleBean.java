@@ -28,7 +28,7 @@ public class ScheduleBean implements Serializable {
     public ScheduleBean( int userId, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime,
             String schedule, String scheduleMemo) {
         super();
-        this.id = id;
+
         this.userId = userId;
         this.scheduleDate = scheduleDate;
         this.startTime = startTime;
