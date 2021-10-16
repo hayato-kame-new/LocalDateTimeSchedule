@@ -14,7 +14,7 @@ int[] calendarDay = monthBean.getCalendarDay();
 
 
 // セッションに保存しないとだめ、リクエストスコープでは、aリンク越しに渡せないので 先月 翌月 のために
-// セッションスコープを使う session は、JSPで使える暗黙オブジェクト セッションは、後で明示的に消すことが大事残ってるから
+// 翌月の翌月も表示させるために 表示してるインスタンスを送る セッションスコープを使う session は、JSPで使える暗黙オブジェクト セッションは、後で明示的に消すことが大事残ってるから
 session.setAttribute("monthBean", monthBean);
 
 int year = monthBean.getYear();

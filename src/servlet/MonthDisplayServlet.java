@@ -37,35 +37,25 @@ public class MonthDisplayServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 文字化け対策
         request.setCharacterEncoding("UTF-8");
-        // aリンクのについてた?以降のクエリーパラメータからの取り出し リクエストスコープから取り出す
+
+        // aリンクのについてた?以降のクエリーパラメータからの取り出し リクエストスコープから取り出す "current" "next" "before" どれかが入ってる
         String mon = request.getParameter("mon");
 
-        // ここで、リクエストパラメータから送ってきたのが、current next before だったら、
-        // セッションが始まってるか調べて、破棄してください
-        // まず、調べてください　current next before だったら、　新しくセッションをスターとさせな行くてもいいと思う　リクエストスコープに入れるから
-
-
-
-        // セッションスコープからの取り出しには、requestから、セッションを呼び出して使う
-        // すでにある場合もあるので、引数に trueを指定すること  引数のセッション生成フラグにtrueを指定すると、現在セッションが存在しない場合は、生成して返します。
-
-
-        HttpSession session = request.getSession(true);
-        // aリンクでは、?以降のクエリーパラメータではオブジェクトは送れないから セッションにBeanとしてインスタンスを保存してる
-        // 自分で作成したクラスのインスタンスをスコープにおくには、Beanのクラスにして作らないとだめ
-        MonthBean monthBean = (MonthBean) session.getAttribute("monthBean"); // "current"の時は nullになってるはずだが、セッションが残ってるとある
-
-        // スケジュール登録した後のリダイレクトではセッションに保存して送ってくる つまりすでにセッションはあるから、上では request.getSession(true);でセッションを生成してる
-        ScheduleBean scheBean = (ScheduleBean) session.getAttribute("scheBean") ;
         String msg = "";
-        // "scheduleResult"  が入ってるなら switch文で処理する
-        if(session.getAttribute("mon") != null  &&  session.getAttribute("mon").equals("scheduleResult")) {
-            mon = (String)session.getAttribute("mon");  // "scheduleResult"  が入ってる
-            msg = (String) session.getAttribute("msg");
 
+        //  MonthBeanのBeanは、セッションスコープから取り出す、次の次の次の月など使うため  スケジュール登録してリダイレクトしてきたあともセッションスコープから取得する
+        HttpSession session = request.getSession(true);  // 引数のセッション生成フラグにtrueを指定すると、現在セッションが存在しない場合は、生成して返します
+        MonthBean monthBean = (MonthBean) session.getAttribute("monthBean");
+        session.removeAttribute("monthBean");  // 取り出したら、消しておくセッションから
 
+        // スケジュール登録したあとにリダイレクトしてきた セッションスコープから取得する
+           ScheduleBean scheBean = (ScheduleBean) session.getAttribute("scheBean") ;
+           if(scheBean != null ) {
+               mon = (String) session.getAttribute("mon");  // "scheduleResult"が入ってる
+               msg = (String) session.getAttribute("msg");
+               session.removeAttribute("scheBean");  // 取り出したら、消しておくセッションから
+           }
 
-        }
         // そして、月カレンダーのセルに、スケジュールの全件を表示する
         Map<Integer, String> scheduleMap = new HashMap();  // 登録順じゃないのでLinkedHashMapじゃない
 
@@ -73,29 +63,26 @@ public class MonthDisplayServlet extends HttpServlet {
 
         switch(mon) {
         case "current":
-            monthBean = new MonthBean();  // セッションで残ってるので、ここでnewして今月のインスタンスにする
+            // 新しくインスタンスを生成する
+            monthBean = new MonthBean();  // newして現在日付の月のインスタンス生成
             break; // switch文抜ける
         case "before":
-            // セッションから取得したBeanインスタンスを使う   １ヶ月前にする
+            // セッションから取得したBeanインスタンスを利用する   １ヶ月前にする
             LocalDate beforeLocalDate = LocalDate.of(monthBean.getYear(), monthBean.getMonth(), 1).minusMonths(1);
-            // 引数ありのコンストラクタをよぶ １ヶ月前に変更したlocaldateインスタンスを実引数にする
+            // 新しくインスタンスを生成する 引数ありのコンストラクタをよぶ １ヶ月前に変更したlocaldateインスタンスを実引数にする
             monthBean = new MonthBean(beforeLocalDate);
             break; // switch文抜ける
         case "next":
-             // セッションから取得したBeanインスタンスを使う  １ヶ月後にする
+             // セッションから取得したBeanインスタンスを利用する １ヶ月後にする
             LocalDate nextLocalDate = LocalDate.of(monthBean.getYear(), monthBean.getMonth(), 1).plusMonths(1);
-            // 引数ありのコンストラクタをよぶ １ヶ月後に変更したlocaldateインスタンスを実引数にする
+            // 新しくインスタンスを生成する引数ありのコンストラクタをよぶ １ヶ月後に変更したlocaldateインスタンスを実引数にする
             monthBean = new MonthBean(nextLocalDate);
             break; // switch文抜ける
         case "scheduleResult":
-            // リダイレクトした後に、このサーブレットに来て、スケジュール登録した月のカレンダーを表示するようにする セッションから取り出すか、クエリーパラメータから取り出すのか
-            // スケジュール登録成功したのか、失敗したのかのmsgも渡ってくるので取得して、"display.jsp"で表示をさせる
-            // セッションスコープを使って取得したscheBeanを元にして、月表示のための MonthBeanインスタンスを生成する
-            LocalDate scheduleResultLocalDate = LocalDate.of(scheBean.getScheduleDate().getYear(), scheBean.getScheduleDate().getMonthValue(), scheBean.getScheduleDate().getDayOfMonth());
 
+            LocalDate scheduleResultLocalDate = LocalDate.of(scheBean.getScheduleDate().getYear(), scheBean.getScheduleDate().getMonthValue(), scheBean.getScheduleDate().getDayOfMonth());
+            // 新しいインスタンスを生成する
             monthBean = new MonthBean(scheduleResultLocalDate);
-            // ここで明示的にセッションを破棄しておかないと、次回アクセスした時に、セッションが残ってて、今月表示できなくなる
-           // ここで破棄するのが正しいと思う、次はリクエストスコープにbeanを入れて、表示するだけだし。
 
             break;
         }

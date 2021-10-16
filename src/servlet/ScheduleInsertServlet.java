@@ -79,7 +79,7 @@ public class ScheduleInsertServlet extends HttpServlet {
          // セッションは、requestから呼び出します。 サーブレットでは、セッションは明示的に破棄することが大切　(SpringBootだと自動でフレームワークが行ってくれてるが、明示的に破棄することが大切)
          // スコープに置けるのはインスタンスのみです。Stringなどの参照型のインスタンスは置ける。プリミティブ型は置けない。
          // クラス型のインスタンスは置けるが、自分で作ったクラスのインスタンスをスコープへ置けるようにするには、Beanとして作らないといけない。Beanを作るルール
-         HttpSession session = request.getSession();
+         HttpSession session = request.getSession(true);
          session.setAttribute("msg", msg);
          session.setAttribute("scheBean", scheBean);
          session.setAttribute("mon", "scheduleResult");  // switch文で必要どの月を表示するのかcaseで切り替えるのに必要
