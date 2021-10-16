@@ -85,7 +85,7 @@ public class ScheduleInsertServlet extends HttpServlet {
          session.setAttribute("mon", "scheduleResult");  // switch文で必要どの月を表示するのかcaseで切り替えるのに必要
 
          response.sendRedirect("/LocalDateTimeSchedule/MonthDisplayServlet");
-         // クエリーパラメータとして、クエリー文字列を送ってもいい  こっちでもできることを確認すること
+         // クエリーパラメータとして、クエリー文字列を送ってもいい
          // response.sendRedirect("/MonthDisplayServlet?year=year&month=month&day=day&mon=scheduleResult");
 
 

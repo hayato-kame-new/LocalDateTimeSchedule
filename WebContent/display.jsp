@@ -81,6 +81,7 @@ td.sche {
   text-align: left;
   height: 80px;
   border-top: none;
+  color: darkgreen;
 }
 
 img {
@@ -133,11 +134,11 @@ color: orange;
     </tr>
 
     <%
-    // boolean other = false;  // 他の月かどうか
-    String css = "day"; // 後で条件分岐させて、表示をかえる
+   // 今月のものだけを表示したい
+    String cssDisplay = "day";
 
     for (int i = 0; i < weekCount; i++) {
-      for (int j = i * 7; j < i * 7 + 7; j += 7) {
+      for (int j = i * 7; j < i * 7 + 7; j += 7) {  // ２重ループ
     %>
 
     <tr>
@@ -145,45 +146,61 @@ color: orange;
       for (int k = 0; k < 7; k++) {
         // 今月分だけ表示するものと、区別してる タイムスケジュールのリンクや画像リンクは、今月のだけに表示する 日付は今月だけ黒にする
         if (i == 0 && calendarDay[j + k] > 7) {
-          css = "otherday";
+          cssDisplay = "otherday";
         } else if (i == weekCount - 1 && calendarDay[j + k] < 22) {
-          css = "otherday";
+          cssDisplay = "otherday";
         } else {
-          css = "day";
+          cssDisplay = "day";
         }
 
       %>
-      <td class=<%=css%>><%=calendarDay[j + k]%>
+      <td class=<%=cssDisplay%>><%=calendarDay[j + k]%>
       <% if (now_year == year && now_month == month && now_day == calendarDay[j + k]){ %>
       <img src="./img/IMG_1044.JPG" width="14" height="14" style="border-radius: 50%"><br />
       <%} %>
 
-<%
- if (css.equals("day")) {
- %>
-        <a
-        href="/LocalDateTimeSchedule/NewScheduleServlet?year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>"><i
-          class="fas fa-clipboard-list"></i></a> <%
- }
- %></td>
-      <%
-      }
-      %>
+    <%
+     if (cssDisplay.equals("day")) {
+     %>
+            <a
+          href="/LocalDateTimeSchedule/NewScheduleServlet?year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>"><i
+            class="fas fa-clipboard-list"></i></a>
+         <%
+     }
+     %></td>
+        <%
+        }
+        %>
     </tr>
 
+
     <tr>
-      <td class="sche"></td>
-      <td class="sche"></td>
-      <td class="sche"></td>
-      <td class="sche"></td>
-      <td class="sche"></td>
-      <td class="sche"></td>
-      <td class="sche"></td>
+     <%
+      for (int k = 0; k < 7; k++) {
+        // 今月分だけ表示するものと、区別してる タイムスケジュールのリンクや画像リンクは、今月のだけに表示する 日付は今月だけ黒にする
+        if (i == 0 && calendarDay[j + k] > 7) {
+          cssDisplay = "otherday";
+        } else if (i == weekCount - 1 && calendarDay[j + k] < 22) {
+          cssDisplay = "otherday";
+        } else {
+          cssDisplay = "day";
+        }
+%>
+        <td class="sche">
+      <%
+        if (cssDisplay.equals("day")) {
+          %>
+          <pre class=<%=cssDisplay%>>今月のスケジュールです</pre>
+     <%} %>
+        </td>
+  <%
+
+     }
+      }
+      }
+     %>
     </tr>
-    <%
-    }
-    }
-    %>
+
   </table>
 
   <!-- Font Awesomeのための -->
