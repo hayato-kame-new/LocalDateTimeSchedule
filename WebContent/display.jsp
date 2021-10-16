@@ -1,17 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
   pageEncoding="UTF-8"%>
-<%@ page import="model.MonthBean, java.util.*, java.time.LocalDateTime"%>
+<%@ page
+  import="model.MonthBean, java.util.*, java.time.LocalDateTime , model.ScheduleBean"%>
 <%
 // 文字化け対策
 request.setCharacterEncoding("UTF-8");
 // リクエストスコープから取り出す
 MonthBean monthBean = (MonthBean) request.getAttribute("monthBean");
 String mon = (String) request.getAttribute("mon");
-String msg = (String)request.getAttribute("msg");
+String msg = (String) request.getAttribute("msg");
+// dayScheduleListもリクエストスコープから取り出す
+List<ScheduleBean> dayScheduleList = new ArrayList<ScheduleBean>();
+dayScheduleList = (List<ScheduleBean>) request.getAttribute("dayScheduleList");
 
 int weekCount = monthBean.getWeekCount();
 int[] calendarDay = monthBean.getCalendarDay();
-
 
 // セッションに保存しないとだめ、リクエストスコープでは、aリンク越しに渡せないので 先月 翌月 のために
 // 翌月の翌月も表示させるために 表示してるインスタンスを送る セッションスコープを使う session は、JSPで使える暗黙オブジェクト セッションは、後で明示的に消すことが大事残ってるから
@@ -91,14 +94,20 @@ img {
 p {
   font-size: 0.75em;
 }
+ul {padding: 0; margin: 0;}
+li {
+  list-style:none;
+
+}
 
 .msg {
-color: orange;
+  color: orange;
 }
+span {color: #333; font-size: 80%;}
 </style>
 </head>
 <body>
- <!--  aリンクだと、インスタンスを送りたい時には、セッションスコープへ入れないとダメ session は、JSPで使える暗黙オブジェクト
+  <!--  aリンクだと、インスタンスを送りたい時には、セッションスコープへ入れないとダメ session は、JSPで使える暗黙オブジェクト
 上のスクリプトレットでセッションに保存している session.setAttribute("monthBean", monthBean); -->
   <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before">&lang;&lang;
     前月表示</a>
@@ -106,18 +115,26 @@ color: orange;
   <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next">翌月表示
     &rang;&rang;</a>
   <br />
-  <% if(!mon.equals("current")){%>
+  <%
+  if (!mon.equals("current")) {
+  %>
   <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current">今月の表示に戻る</a>
-  <% } %>
-<hr />
+  <%
+  }
+  %>
+  <hr />
 
   <h3><%=year%>年<%=month%>月のカレンダー
   </h3>
-  <% if(msg != null){%>
-   <p class="msg">
-     <%=msg %>
-   </p>
-<% } %>
+  <%
+  if (msg != null) {
+  %>
+  <p class="msg">
+    <%=msg%>
+  </p>
+  <%
+  }
+  %>
   <p>
     現在は<%=now_year%>年<%=now_month%>月<%=now_day%>日<%=now_hour%>時<%=now_minute%>分です
   </p>
@@ -134,11 +151,11 @@ color: orange;
     </tr>
 
     <%
-   // 今月のものだけを表示したい
+    // 今月のものだけを表示したい
     String cssDisplay = "day";
 
     for (int i = 0; i < weekCount; i++) {
-      for (int j = i * 7; j < i * 7 + 7; j += 7) {  // ２重ループ
+      for (int j = i * 7; j < i * 7 + 7; j += 7) { // ２重ループ
     %>
 
     <tr>
@@ -152,30 +169,28 @@ color: orange;
         } else {
           cssDisplay = "day";
         }
-
       %>
-      <td class=<%=cssDisplay%>><%=calendarDay[j + k]%>
-      <% if (now_year == year && now_month == month && now_day == calendarDay[j + k]){ %>
-      <img src="./img/IMG_1044.JPG" width="14" height="14" style="border-radius: 50%"><br />
-      <%} %>
-
-    <%
-     if (cssDisplay.equals("day")) {
-     %>
-            <a
-          href="/LocalDateTimeSchedule/NewScheduleServlet?year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>"><i
-            class="fas fa-clipboard-list"></i></a>
-         <%
-     }
-     %></td>
-        <%
-        }
-        %>
+      <td class=<%=cssDisplay%>><%=calendarDay[j + k]%> <%
+ if (now_year == year && now_month == month && now_day == calendarDay[j + k]) {
+ %>
+        <img src="./img/IMG_1044.JPG" width="14" height="14"
+        style="border-radius: 50%"><br /> <%
+ }
+ %> <%
+ if (cssDisplay.equals("day")) {
+ %> <a
+        href="/LocalDateTimeSchedule/NewScheduleServlet?year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>"><i
+          class="fas fa-clipboard-list"></i></a> <%
+ }
+ %></td>
+      <%
+      }
+      %>
     </tr>
 
 
     <tr>
-     <%
+      <%
       for (int k = 0; k < 7; k++) {
         // 今月分だけ表示するものと、区別してる タイムスケジュールのリンクや画像リンクは、今月のだけに表示する 日付は今月だけ黒にする
         if (i == 0 && calendarDay[j + k] > 7) {
@@ -185,20 +200,40 @@ color: orange;
         } else {
           cssDisplay = "day";
         }
-%>
-        <td class="sche">
-      <%
-        if (cssDisplay.equals("day")) {
-          %>
-          <pre class=<%=cssDisplay%>>今月のスケジュールです</pre>
-     <%} %>
-        </td>
-  <%
+      %>
+      <td class="sche">
+        <%
+        if (cssDisplay.equals("day") && dayScheduleList.size() != 0) {
+        %>
+        <ul class=<%=cssDisplay%>>
+          <%
+          for (ScheduleBean scheBean : dayScheduleList) {
+            if (scheBean.getScheduleDate().getDayOfMonth() == calendarDay[j + k]) {
+              String schedule = scheBean.getSchedule();
+              if(schedule.length() >= 12 ) {
+                schedule = schedule.substring(0,13) + "...";
+              }
+              String scheduleMemo = scheBean.getScheduleMemo();
+              if(scheduleMemo.length() >= 19 ) {
+                scheduleMemo = scheduleMemo.substring(0,20) + "...";
+              }
 
+          %>
+          <li><small><%=schedule%>:&nbsp;<span><%=scheduleMemo%></span></small></li>
+          <%
+          }
+          }
+          %>
+        </ul>
+        <%
      }
-      }
-      }
      %>
+      </td>
+      <%
+      }
+      }
+      }
+      %>
     </tr>
 
   </table>

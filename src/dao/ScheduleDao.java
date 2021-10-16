@@ -3,10 +3,16 @@ package dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import model.ScheduleBean;
+
 /*
   WebContent   WEB-INF  libフォルダの中に、ドライバー入れたら、ビルドパス構成で適用しないといけません。
  右クリックで ビルドパス ビルドパスの構成 ライブラリタグ クラスパス  JARファイルの追加 で、postgresql-4.2.23.jarを
@@ -27,7 +33,7 @@ public class ScheduleDao {
         PreparedStatement pstmt = null;
 
         try {
-             // JDBCドライバを読み込み
+            // JDBCドライバを読み込み
             Class.forName(DRIVER_NAME);
             // データベースへ接続
             conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
@@ -55,11 +61,11 @@ public class ScheduleDao {
             pstmt.setTime(3, sqlStartTime);
             pstmt.setTime(4, sqlEndTime);
             pstmt.setString(5, schedule);
-            pstmt.setString(6,scheduleMemo);
+            pstmt.setString(6, scheduleMemo);
 
             // executeUpdateメソッドの戻り値は、更新された行数を表します
             int result = pstmt.executeUpdate();
-            if(result != 1) {
+            if (result != 1) {
                 return false; // 失敗したら false返す
             }
 
@@ -92,4 +98,131 @@ public class ScheduleDao {
         }
         return true;
     }
+
+    // 一人のユーザの一日のスケジュールをリストにして取得するには
+    //    public ArrayList<ScheduleBean> getOneDayList(int userId, int year, int month, int[] CalendarDay) {
+    //        ArrayList<ScheduleBean> oneDayList = new ArrayList<ScheduleBean>();
+    //        ScheduleBean scheBean = null;
+    //        Connection conn = null;
+    //      PreparedStatement pstmt = null;
+    //      ResultSet rs = null;
+    //
+    //      try {
+    //          Class.forName(DRIVER_NAME);
+    //          conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+    //
+    //          for(int i = 0; i < CalendarDay.length; i++) {
+    //              // PostgreSQLだと、order by  が無いと、データ更新すると、一番後ろになってしまうので、order by必要
+    //              String sql = "select * from schedule where userid = ?::integer and scheduledate = ?::date order by starttime";  // テーブル名カラム名小文字で
+    //              pstmt = conn.prepareStatement(sql);
+    //              pstmt.setInt(1, userId);
+    //            LocalDate localdate = LocalDate.of(year, month, CalendarDay[i]);
+    //            java.sql.Date sqlDate = java.sql.Date.valueOf(localdate);
+    //
+    //            pstmt.setDate(2, sqlDate);
+    //
+    //             rs = pstmt.executeQuery();
+    //
+    //          }
+    //
+    //      }catch() {
+    //
+    //      }finally {
+    //
+    //      }
+    //    }
+
+    //    public Map<Integer, ScheduleBean> getDayScheduleList(int userId, int year, int month, int[] CalendarDay) {
+    //        Map<Integer, ArrayList<ScheduleBean>> map = new LinkedHashMap<Integer, ArrayList<ScheduleBean>>();  // LinkedHashMap 格納した順を覚えてる
+    //    }
+
+
+    // 一人のユーザーのひと月分が取れた
+    public List<ScheduleBean> getDayScheduleList(int userId, int year, int month, int thisMonthlastDay) {
+        
+        List<ScheduleBean> list = new ArrayList<ScheduleBean>();
+        ScheduleBean scheBean = null;
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            Class.forName(DRIVER_NAME);
+            conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+            // PostgreSQLだと、order by  が無いと、データ更新すると、一番後ろになってしまうので、必要
+
+            for (int i = 1; i <= thisMonthlastDay; i++) {
+                //ここに描かないとだめ
+                String sql = "select * from schedule where userid = ?::integer and scheduledate = ?::date order by starttime"; // テーブル名カラム名小文字で
+                pstmt = conn.prepareStatement(sql); // これここ
+                pstmt.setInt(1, userId);
+
+                // java.sql.Date型にしてセットしないといけないので ループを使い
+                LocalDate localdate = LocalDate.of(year, month, i);
+                java.sql.Date sqlDate = java.sql.Date.valueOf(localdate);
+
+                pstmt.setDate(2, sqlDate);
+
+                rs = pstmt.executeQuery();
+
+                LocalDate localdateScheduleDate = null;
+                LocalTime localTimeStartTime = null;
+                LocalTime localTimeEndTime = null;
+                String schedule = null;
+                String scheduleMemo = null;
+
+                while (rs.next()) {
+                    // int id = rs.getInt("id");
+                    //int userId = rs.getInt("userid");
+
+                    // java.sql.Dateから LocalDateに変換が必要です
+                    localdateScheduleDate = rs.getDate("scheduledate").toLocalDate();
+
+                    // java.sql.Timeから LocalTimeに変換が必要です
+                    localTimeStartTime = rs.getTime("starttime").toLocalTime();
+                    localTimeEndTime = rs.getTime("endtime").toLocalTime();
+
+                    schedule = rs.getString("schedule");
+                    scheduleMemo = rs.getString("schedulememo");
+                    scheBean = new ScheduleBean(userId, localdateScheduleDate, localTimeStartTime, localTimeEndTime,
+                            schedule, scheduleMemo);
+                    list.add(scheBean); //ここかも
+                }
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null; // エラーの時は、nullを返すようにする。
+        } finally {
+            if (rs != null) { //close()する順番は、逆からする
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    return null; // エラーの時は、nullを返すようにする。
+                }
+            }
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    return null; // エラーの時は、nullを返すようにする。
+                }
+            }
+            // データベース切断
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    return null; // エラーの時は、nullを返すようにする。
+                }
+            }
+        }
+        return list;
+
+    }
+
 }

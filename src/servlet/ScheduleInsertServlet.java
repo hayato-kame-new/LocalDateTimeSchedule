@@ -56,7 +56,7 @@ public class ScheduleInsertServlet extends HttpServlet {
         String schedule = request.getParameter("schedule");
         String scheduleMemo = request.getParameter("scheduleMemo");
 
-        LocalDate scheduleDate = LocalDate.of(year, month, month);
+        LocalDate scheduleDate = LocalDate.of(year, month, day);
         LocalTime startTime = LocalTime.of(s_hour, s_minute);
         LocalTime endTime = LocalTime.of(e_hour, e_minute);
 

@@ -21,7 +21,7 @@ public class MonthBean implements Serializable {  //  自分で作成したク�
     private int startWeek; // 今月が何曜日から開始されているか
     private int beforeMonthlastDay;  // 先月が何日までだったか
     private int thisMonthlastDay;  // 今月が何日までか
-    private int[] calendarDay;  // カレンダーに載せる日数   最大で7日×6週 要素は最大で42個 最大で [0]から[41]まで
+    private int[] calendarDay;  // カレンダーに載せる日数   最大で7日×6週 要素は最大で42個 最大で [0]から[41]まで    [26, 27, 28, 29, 30, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 1, 2, 3, 4, 5, 6]
     private int weekCount; // 今月は何週あるか
 
 
@@ -96,6 +96,8 @@ public class MonthBean implements Serializable {  //  自分で作成したク�
        map.put(weekCount, calendarDay);
         return map;
     }
+
+
 
 
 

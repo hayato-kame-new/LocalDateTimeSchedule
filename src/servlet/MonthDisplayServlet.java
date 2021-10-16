@@ -2,8 +2,8 @@ package servlet;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import dao.ScheduleDao;
 import model.MonthBean;
 import model.ScheduleBean;
 
@@ -42,6 +43,7 @@ public class MonthDisplayServlet extends HttpServlet {
         String mon = request.getParameter("mon");
 
         String msg = "";
+        // この辺で ログインしてきたユーザのuserIdを取得したい
 
         //  MonthBeanのBeanは、セッションスコープから取り出す、次の次の次の月など使うため  スケジュール登録してリダイレクトしてきたあともセッションスコープから取得する
         HttpSession session = request.getSession(true);  // 引数のセッション生成フラグにtrueを指定すると、現在セッションが存在しない場合は、生成して返します
@@ -56,15 +58,27 @@ public class MonthDisplayServlet extends HttpServlet {
                session.removeAttribute("scheBean");  // 取り出したら、消しておくセッションから
            }
 
-        // そして、月カレンダーのセルに、スケジュールの全件を表示する
-        Map<Integer, String> scheduleMap = new HashMap();  // 登録順じゃないのでLinkedHashMapじゃない
+        // そして、月カレンダーのセルに、その日のスケジュールの全件を表示するためのリストを
+           // でもリストジャなくてMapにするかも
+           List<ScheduleBean> dayScheduleList = new ArrayList<ScheduleBean>(); // まずnewして確保
 
-
+           ScheduleDao scheDao = new ScheduleDao();
 
         switch(mon) {
         case "current":
-            // 新しくインスタンスを生成する
+            // 今月を表示するために新しくインスタンスを生成する 今月は、引数なしのコンストラクタを呼ぶ
             monthBean = new MonthBean();  // newして現在日付の月のインスタンス生成
+            //今月のリストを取得する 引数に必要なものに useridもある とりあえず、 1にしてテストする
+           //  int[] CalendarDay = monthBean.getCalendarDay();  // [26, 27, 28, 29, 30, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 1, 2, 3, 4, 5, 6]
+            int year = monthBean.getYear();
+            int month = monthBean.getMonth();
+            // その月が何日あるのか
+            int thisMonthlastDay = monthBean.getThisMonthlastDay();
+
+
+             dayScheduleList = scheDao.getDayScheduleList(1 , year,  month , thisMonthlastDay);
+
+
             break; // switch文抜ける
         case "before":
             // セッションから取得したBeanインスタンスを利用する   １ヶ月前にする
@@ -91,6 +105,10 @@ public class MonthDisplayServlet extends HttpServlet {
         // リクエストスコープに保存できるのは、参照型 クラス型のインスタンスだけ。自分で作ったクラスは、JavaBeansのクラスにすること
         request.setAttribute("monthBean", monthBean);
         request.setAttribute("mon", mon);
+
+        // dayScheduleListも保存
+        request.setAttribute("dayScheduleList", dayScheduleList);
+
 
         // スケジュール登録した後にリダイレクトしてくる時のメッセージを表示するため
         request.setAttribute("msg", msg);
