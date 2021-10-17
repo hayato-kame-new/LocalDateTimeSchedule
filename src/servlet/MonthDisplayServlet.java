@@ -114,7 +114,8 @@ public class MonthDisplayServlet extends HttpServlet {
         request.setAttribute("msg", msg);
 
         //   フォワードする
-        RequestDispatcher dispatcher = request.getRequestDispatcher("display.jsp");
+   //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/display.jsp");
         dispatcher.forward(request, response);
 
 

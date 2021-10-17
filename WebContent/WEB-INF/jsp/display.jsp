@@ -44,6 +44,7 @@ table {
   padding: 0px;
   margin: 0px;
   border-collapse: collapse;
+
 }
 
 td {
@@ -53,6 +54,7 @@ td {
   vertical-align: top;
   margin: 0px;
   padding: 2px;
+  overflow: scroll;
 }
 
 td.week {
@@ -85,6 +87,8 @@ td.sche {
   height: 80px;
   border-top: none;
   color: darkgreen;
+  /* 追加 */
+ line-height: 1.1;
 }
 
 img {
@@ -97,13 +101,18 @@ p {
 ul {padding: 0; margin: 0;}
 li {
   list-style:none;
-
 }
-
 .msg {
-  color: orange;
+  color: orange; font-weight:bold;
 }
 span {color: #333; font-size: 80%;}
+.schedule {
+  font-weight:bold;
+}
+.count {
+  font-size: 70%;
+  color: font-style:bold;
+}
 </style>
 </head>
 <body>
@@ -205,27 +214,32 @@ span {color: #333; font-size: 80%;}
         <%
         if (cssDisplay.equals("day") && dayScheduleList.size() != 0) {
         %>
-        <ul class=<%=cssDisplay%>>
+
+        <ul class=<%=cssDisplay%> >
           <%
+          int count = 0;
           for (ScheduleBean scheBean : dayScheduleList) {
             if (scheBean.getScheduleDate().getDayOfMonth() == calendarDay[j + k]) {
               String schedule = scheBean.getSchedule();
-              if(schedule.length() >= 12 ) {
-                schedule = schedule.substring(0,13) + "...";
+              count++;
+              if(schedule.length() >= 7 ) {
+                schedule = schedule.substring(0,8) + "...";
               }
               String scheduleMemo = scheBean.getScheduleMemo();
-              if(scheduleMemo.length() >= 19 ) {
-                scheduleMemo = scheduleMemo.substring(0,20) + "...";
+              if(scheduleMemo.length() >= 7 ) {
+                scheduleMemo = scheduleMemo.substring(0,8) + "...";
               }
-
           %>
-          <li><small><%=schedule%>:&nbsp;<span><%=scheduleMemo%></span></small></li>
+          <li ><small class="schedule"><%=schedule%>:&nbsp;<span><%=scheduleMemo%></span></small></li>
           <%
           }
           }
           %>
         </ul>
+        <%if(count != 0) { %>
+         <span class="count">&lang;<%= count%>件です&rang;</span>
         <%
+        }
      }
      %>
       </td>

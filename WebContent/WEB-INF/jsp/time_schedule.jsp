@@ -186,13 +186,13 @@ p{font-size:0.75em;}
 
 <tr>
 <td nowrap>予定</td>
-<td><input type="text" name="schedule" value="" size="25" maxlength="50">
+<td><input type="text" name="schedule" value="" size="30" maxlength="70">
 </td>
 </tr>
 
 <tr>
 <td valign="top" nowrap>メモ</td>
-<td><textarea name="scheduleMemo" cols="25" rows="6" wrap="virtual"></textarea></td>
+<td><textarea name="scheduleMemo" cols="30" rows="8" wrap="virtual"></textarea></td>
 </tr>
 </table>
 
