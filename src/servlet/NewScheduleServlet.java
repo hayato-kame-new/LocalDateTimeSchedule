@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import dao.ScheduleDao;
 import model.DayBean;
 import model.ScheduleBean;
+import viewComposer.TimeScheduleView;
 
 /**
  * Servlet implementation class NewScheduleServlet
@@ -48,11 +49,16 @@ public class NewScheduleServlet extends HttpServlet {
         // ユーザIDはとりあえず 1として呼び出しています。。後で、修正します。そのユーザの指定した日の一日分のスケジュールのリスト取得
         List<ScheduleBean> oneDayScheduleList = scheDao.GetOneDaySchedule(1, year, month, day);
 
+        // ビューを作るためのクラス TimeScheduleView からメソッドを呼び出し
+        String[] halfTimeArray = TimeScheduleView.createHalfTime(); // 失敗見直し
+
+
 
      // リクエストスコープに保存する。リクエストスコープは、フォワードできる(リダイレクトはできない)
         // リクエストスコープに保存できるのは、参照型 クラス型のインスタンスだけ。自分で作ったクラスは、JavaBeansのクラスにすること
         request.setAttribute("dayBean", dayBean);
         request.setAttribute("oneDayScheduleList", oneDayScheduleList);
+        request.setAttribute("halfTimeArray", halfTimeArray);  // 失敗
 
    //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/time_schedule.jsp");

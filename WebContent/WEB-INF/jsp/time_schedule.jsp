@@ -14,7 +14,7 @@ int thisMonthlastDay =  dayBean.getThisMonthlastDay();  // その月が何日あ
 
 // リクエストスコープから取り出す もし、リストの要素が 0でなかったら、表示する
 List<ScheduleBean> oneDayScheduleList = (List<ScheduleBean>)request.getAttribute("oneDayScheduleList");
-
+String[] halfTimeArray = (String[])request.getAttribute("halfTimeArray");
 
 
 %>
@@ -58,20 +58,30 @@ p{font-size:0.75em;}
 
 <tr><td class="top" style="width:80px">時刻</td><td class="top" style="width:300px">予定</td></tr>
 
-<%-- <tr><td class="timeb">未定</td><td class="contentsb">
+ <%-- <tr>
+ <td class="timeb">未定</td><td class="contentsb">
 <%  if (widthArray[0] == 1){
  %>
  scheduleArray[0]
 <% } %>
-</td></tr> --%>
+</td>
+</tr> --%>
 
-
+<tr>
+<%
+  for(int i = 0; i > halfTimeArray.length; i++ ){
+%>
+ <td class="timeb"><%=halfTimeArray[i] %></td>
+ <td class="contentsb"></td>
+<%
+  }
+%>
 <tr><td class="time">00:00</td><td class="contents"></td></tr>
 <tr><td class="timeb"></td><td class="contentsb"></td></tr>
 
 
 
-
+<!--
 <tr><td class="time">01:00</td><td class="contents"></td></tr>
 <tr><td class="timeb"></td><td class="contentsb"></td></tr>
 <tr><td class="time">02:00</td><td class="contents"></td></tr>
@@ -118,7 +128,7 @@ p{font-size:0.75em;}
 <tr><td class="timeb"></td><td class="contentsb"></td></tr>
 <tr><td class="time">23:00</td><td class="contents"></td></tr>
 <tr><td class="timeb"></td><td class="contentsb"></td></tr>
-
+ -->
 </table>
 
 </div>
