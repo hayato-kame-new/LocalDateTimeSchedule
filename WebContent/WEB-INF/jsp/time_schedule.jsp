@@ -1,16 +1,21 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="model.DayBean" %>
+<%@ page import="model.ScheduleBean, model.DayBean , java.util.List" %>
 
 <%
 // 文字化け対策
 request.setCharacterEncoding("UTF-8");
-// リクエストスコープから取り出す
-DayBean dayBean = (DayBean)request.getAttribute("dayBean");
+// リクエストスコープから取り出す 表示に必要
+ DayBean dayBean = (DayBean)request.getAttribute("dayBean");  // 年月日の情報 と その月が何日あるかが格納されてます。
 int year = dayBean.getYear();
 int month = dayBean.getMonth();
 int day = dayBean.getDay();
-int thisMonthlastDay =  dayBean.getThisMonthlastDay();
+int thisMonthlastDay =  dayBean.getThisMonthlastDay();  // その月が何日あるのか
+
+// リクエストスコープから取り出す もし、リストの要素が 0でなかったら、表示する
+List<ScheduleBean> oneDayScheduleList = (List<ScheduleBean>)request.getAttribute("oneDayScheduleList");
+
+
 
 %>
 <!DOCTYPE html>
@@ -50,9 +55,23 @@ p{font-size:0.75em;}
 <div id="left">
 
 <table class="sche">
+
 <tr><td class="top" style="width:80px">時刻</td><td class="top" style="width:300px">予定</td></tr>
+
+<%-- <tr><td class="timeb">未定</td><td class="contentsb">
+<%  if (widthArray[0] == 1){
+ %>
+ scheduleArray[0]
+<% } %>
+</td></tr> --%>
+
+
 <tr><td class="time">00:00</td><td class="contents"></td></tr>
 <tr><td class="timeb"></td><td class="contentsb"></td></tr>
+
+
+
+
 <tr><td class="time">01:00</td><td class="contents"></td></tr>
 <tr><td class="timeb"></td><td class="contentsb"></td></tr>
 <tr><td class="time">02:00</td><td class="contents"></td></tr>

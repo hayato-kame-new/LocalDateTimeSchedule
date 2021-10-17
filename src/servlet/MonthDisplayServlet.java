@@ -76,7 +76,7 @@ public class MonthDisplayServlet extends HttpServlet {
             int thisMonthlastDay = monthBean.getThisMonthlastDay();
 
 
-             dayScheduleList = scheDao.getDayScheduleList(1 , year,  month , thisMonthlastDay);
+             dayScheduleList = scheDao.getMonthScheduleList(1 , year,  month , thisMonthlastDay);
 
 
             break; // switch文抜ける

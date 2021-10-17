@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -9,7 +10,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import dao.ScheduleDao;
 import model.DayBean;
+import model.ScheduleBean;
 
 /**
  * Servlet implementation class NewScheduleServlet
@@ -33,16 +36,23 @@ public class NewScheduleServlet extends HttpServlet {
 
         // 文字化け対策
         request.setCharacterEncoding("UTF-8");
-        // aリンクの ?以降のクエリーパラメーターから取得する
+        // display.jspの画面のaリンク(HTTPメソッドはGET)でアクセスしてくるので ?以降のクエリーパラメーターから取得する  年月日が取れる
         int year = Integer.parseInt(request.getParameter("year"));
         int month = Integer.parseInt(request.getParameter("month"));
         int day = Integer.parseInt(request.getParameter("day"));
-
+        // 年月日をBeanインスタンスに格納 スケジュールのまだ一件もない日でも、表示のために必要
         DayBean dayBean = new DayBean(year, month, day);
+
+        // さらに、そのユーザーのその一日のスケジュールをリクエストスコープに格納すればいい
+        ScheduleDao scheDao = new ScheduleDao();
+        // ユーザIDはとりあえず 1として呼び出しています。。後で、修正します。そのユーザの指定した日の一日分のスケジュールのリスト取得
+        List<ScheduleBean> oneDayScheduleList = scheDao.GetOneDaySchedule(1, year, month, day);
+
 
      // リクエストスコープに保存する。リクエストスコープは、フォワードできる(リダイレクトはできない)
         // リクエストスコープに保存できるのは、参照型 クラス型のインスタンスだけ。自分で作ったクラスは、JavaBeansのクラスにすること
         request.setAttribute("dayBean", dayBean);
+        request.setAttribute("oneDayScheduleList", oneDayScheduleList);
 
    //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/time_schedule.jsp");

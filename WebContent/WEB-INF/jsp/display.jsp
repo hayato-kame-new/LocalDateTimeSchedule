@@ -113,6 +113,9 @@ span {color: #333; font-size: 80%;}
   font-size: 70%;
   color: font-style:bold;
 }
+.fontAwesome a {
+  font-size: 120%;
+}
 </style>
 </head>
 <body>
@@ -167,7 +170,7 @@ span {color: #333; font-size: 80%;}
       for (int j = i * 7; j < i * 7 + 7; j += 7) { // ２重ループ
     %>
 
-    <tr>
+    <tr class="fontAwesome">
       <%
       for (int k = 0; k < 7; k++) {
         // 今月分だけ表示するものと、区別してる タイムスケジュールのリンクや画像リンクは、今月のだけに表示する 日付は今月だけ黒にする
