@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="model.ScheduleBean, model.DayBean , java.util.List" %>
+<%@ page import="model.ScheduleBean, model.DayBean , java.util.List, java.util.LinkedList" %>
 
 <%
 // 文字化け対策
@@ -14,7 +14,7 @@ int thisMonthlastDay =  dayBean.getThisMonthlastDay();  // その月が何日あ
 
 // リクエストスコープから取り出す もし、リストの要素が 0でなかったら、表示する
 List<ScheduleBean> oneDayScheduleList = (List<ScheduleBean>)request.getAttribute("oneDayScheduleList");
-String[] halfTimeArray = (String[])request.getAttribute("halfTimeArray");
+LinkedList<String> timeStack = (LinkedList<String>)request.getAttribute("timeStack");
 
 
 %>
@@ -67,17 +67,17 @@ p{font-size:0.75em;}
 </td>
 </tr> --%>
 
-<tr>
 <%
-  for(int i = 0; i > halfTimeArray.length; i++ ){
+  for(int i = 0; i < timeStack.size(); i++ ){
 %>
- <td class="timeb"><%=halfTimeArray[i] %></td>
- <td class="contentsb"></td>
+<tr>
+ <td class="timeb"><%=timeStack.get(i) %></td><td class="contents">あああ</td></tr>
+<tr><td class="timeb">eeee<td class="contentsb">sssss</td></tr>
 <%
   }
 %>
-<tr><td class="time">00:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
+<!-- <tr><td class="time">00:00</td><td class="contents"></td></tr>
+<tr><td class="timeb"></td><td class="contentsb"></td></tr> -->
 
 
 

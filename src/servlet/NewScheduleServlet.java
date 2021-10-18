@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -50,7 +51,7 @@ public class NewScheduleServlet extends HttpServlet {
         List<ScheduleBean> oneDayScheduleList = scheDao.GetOneDaySchedule(1, year, month, day);
 
         // ビューを作るためのクラス TimeScheduleView からメソッドを呼び出し
-        String[] halfTimeArray = TimeScheduleView.createHalfTime(); // 失敗見直し
+        LinkedList<String> timeStack = TimeScheduleView.makeTimeStack();
 
 
 
@@ -58,7 +59,7 @@ public class NewScheduleServlet extends HttpServlet {
         // リクエストスコープに保存できるのは、参照型 クラス型のインスタンスだけ。自分で作ったクラスは、JavaBeansのクラスにすること
         request.setAttribute("dayBean", dayBean);
         request.setAttribute("oneDayScheduleList", oneDayScheduleList);
-        request.setAttribute("halfTimeArray", halfTimeArray);  // 失敗
+        request.setAttribute("timeStack", timeStack);  // 失敗
 
    //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/time_schedule.jsp");
