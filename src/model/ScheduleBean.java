@@ -37,6 +37,20 @@ public class ScheduleBean implements Serializable {
         this.scheduleMemo = scheduleMemo;
     }
 
+    // startTimeを文字列にする 引数なしです 自分自身のインスタンスのフィールドの値を使います
+    public String createStrStartTime() {
+        int hour = this.startTime.getHour(); // 0 とか  17 とかが取れる 自分自身のインスタンスのフィールドの値を使います
+        int minute = this.startTime.getMinute(); // 0  とか  30
+        return String.valueOf(hour) + ":" + String.valueOf(minute);  // 0:00 とか 17:30
+    }
+
+ // endTimeを文字列にする 引数なしです 自分自身のインスタンスのフィールドの値を使います
+    public String createStrEndTime() {
+        int hour = this.endTime.getHour();
+        int minute =  this.endTime.getMinute();
+        return String.valueOf(hour) + ":" + String.valueOf(minute);
+    }
+
     public int getId() {
         return id;
     }

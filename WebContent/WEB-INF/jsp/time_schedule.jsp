@@ -28,18 +28,22 @@ LinkedList<String> timeStack = (LinkedList<String>)request.getAttribute("timeSta
 table.sche{border:1px solid #a9a9a9;padding:0px;margin:0px;border-collapse:collapse;}
 td{vertical-align:top;margin:0px;padding:2px;font-size:0.75em;height:20px;}
 td.top{border-bottom:1px solid #a9a9a9;text-align:center;}
-td.time{background-color:#f0f8ff;text-align:right;border-right:1px double #a9a9a9;padding-right:5px;}
-td.timeb{background-color:#f0f8ff;border-bottom:1px solid #a9a9a9;border-right:1px double #a9a9a9;}
-td.contents{background-color:#ffffff;border-bottom:1px dotted #a9a9a9;}
-td.contentsb{background-color:#ffffff;border-bottom:1px solid #a9a9a9;}
+td.time{background-color:#f0f8ff;text-align:right;border-bottom:1px solid #a9a9a9;border-right:1px double #a9a9a9;padding-right:5px;}
+
+
+/*  td.timeb{background-color:#f0f8ff;border-bottom:1px solid #a9a9a9;border-right:1px double #a9a9a9;} */
+td.contents{background-color:#ffffff;border-bottom:1px solid #a9a9a9;}
+ /* td.contentsb{background-color:#ffffff;border-bottom:1px solid #a9a9a9;} */
 td.ex{background-color:#ffebcd;border:1px solid #8b0000;}
 img{border:0px;}
 p{font-size:0.75em;}
 
-#contents{margin:0;padding:0;width:710px;}
+#contents{margin:0;padding:0;width:710px; }
 #left{margin:0;padding:0;float:left;width:400px;}
 #right{margin:0;padding:0;float:right;width:300px;background-color:#ffffff;}
 #contents:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
+#contents span {color: darkgreen; font-weight:bold;}
+.memo {color:#444;}
 </style>
 
 </head>
@@ -57,78 +61,29 @@ p{font-size:0.75em;}
 <table class="sche">
 
 <tr><td class="top" style="width:80px">時刻</td><td class="top" style="width:300px">予定</td></tr>
-
- <%-- <tr>
- <td class="timeb">未定</td><td class="contentsb">
-<%  if (widthArray[0] == 1){
- %>
- scheduleArray[0]
-<% } %>
-</td>
-</tr> --%>
+<%= oneDayScheduleList.get(0).createStrStartTime() %>
+<%=timeStack.get(0) %>
 
 <%
   for(int i = 0; i < timeStack.size(); i++ ){
-%>
+ %>
 <tr>
- <td class="timeb"><%=timeStack.get(i) %></td><td class="contents">あああ</td></tr>
-<tr><td class="timeb">eeee<td class="contentsb">sssss</td></tr>
-<%
+  <td class="time"><%=timeStack.get(i) %></td>
+  <td class="contents">
+ <% for(int j = 0; j < oneDayScheduleList.size(); j++) {
+ if(timeStack.get(i).equals(oneDayScheduleList.get(j).createStrStartTime() )){%>
+  [<%= oneDayScheduleList.get(j).createStrStartTime()%>-<%= oneDayScheduleList.get(j).createStrEndTime()%>]
+  <span><%= oneDayScheduleList.get(j).getSchedule() %></span><br />
+  <small class="memo">メモ: <%= oneDayScheduleList.get(j).getScheduleMemo() %></small><br />
+  <%
   }
+ }
+ %>
+  </td>
+</tr>
+<%
+    }
 %>
-<!-- <tr><td class="time">00:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr> -->
-
-
-
-<!--
-<tr><td class="time">01:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">02:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">03:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">04:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">05:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">06:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">07:00</td><td class="ex" rowspan="3"></td></tr>
-<tr><td class="timeb"></td></tr>
-<tr><td class="time">08:00</td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">09:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">10:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">11:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">12:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">13:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">14:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">15:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">16:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">17:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">18:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">19:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">20:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">21:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">22:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
-<tr><td class="time">23:00</td><td class="contents"></td></tr>
-<tr><td class="timeb"></td><td class="contentsb"></td></tr>
- -->
 </table>
 
 </div>
