@@ -81,7 +81,10 @@ public class ScheduleInsertServlet extends HttpServlet {
          // クラス型のインスタンスは置けるが、自分で作ったクラスのインスタンスをスコープへ置けるようにするには、Beanとして作らないといけない。Beanを作るルール
          HttpSession session = request.getSession(true);
          session.setAttribute("msg", msg);
+
+         // 下のこれじゃなくて、一覧が表示できるといいかな
          session.setAttribute("scheBean", scheBean);
+
          session.setAttribute("mon", "scheduleResult");  // switch文で必要どの月を表示するのかcaseで切り替えるのに必要
 
          response.sendRedirect("/LocalDateTimeSchedule/MonthDisplayServlet");

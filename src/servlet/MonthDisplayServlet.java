@@ -58,25 +58,30 @@ public class MonthDisplayServlet extends HttpServlet {
                session.removeAttribute("scheBean");  // 取り出したら、消しておくセッションから
            }
 
-        // そして、月カレンダーのセルに、その日のスケジュールの全件を表示するためのリストを
-           // でもリストジャなくてMapにするかも
-           List<ScheduleBean> dayScheduleList = new ArrayList<ScheduleBean>(); // まずnewして確保
+       // そのユーザのその月にあるスケジュール全てをリストにして取得
+           List<ScheduleBean> monthScheduleList = new ArrayList<ScheduleBean>(); // まずnewして確保
 
            ScheduleDao scheDao = new ScheduleDao();
+           int year = 0;
+           int month = 0;
+           // その月が何日あるのか
+           int thisMonthlastDay = 0;
+
 
         switch(mon) {
         case "current":
             // 今月を表示するために新しくインスタンスを生成する 今月は、引数なしのコンストラクタを呼ぶ
             monthBean = new MonthBean();  // newして現在日付の月のインスタンス生成
             //今月のリストを取得する 引数に必要なものに useridもある とりあえず、 1にしてテストする
+            // CalendarDay は、使わない
            //  int[] CalendarDay = monthBean.getCalendarDay();  // [26, 27, 28, 29, 30, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 1, 2, 3, 4, 5, 6]
-            int year = monthBean.getYear();
-            int month = monthBean.getMonth();
+             year = monthBean.getYear();
+            month = monthBean.getMonth();
             // その月が何日あるのか
-            int thisMonthlastDay = monthBean.getThisMonthlastDay();
+             thisMonthlastDay = monthBean.getThisMonthlastDay();
 
-
-             dayScheduleList = scheDao.getMonthScheduleList(1 , year,  month , thisMonthlastDay);
+            // そのユーザのその月にあるスケジュール全てをリストにして取得
+            monthScheduleList = scheDao.getMonthScheduleList(1 , year,  month , thisMonthlastDay);
 
 
             break; // switch文抜ける
@@ -85,18 +90,44 @@ public class MonthDisplayServlet extends HttpServlet {
             LocalDate beforeLocalDate = LocalDate.of(monthBean.getYear(), monthBean.getMonth(), 1).minusMonths(1);
             // 新しくインスタンスを生成する 引数ありのコンストラクタをよぶ １ヶ月前に変更したlocaldateインスタンスを実引数にする
             monthBean = new MonthBean(beforeLocalDate);
+
+            year = monthBean.getYear();
+            month = monthBean.getMonth();
+            // その月が何日あるのか
+             thisMonthlastDay = monthBean.getThisMonthlastDay();
+
+
+             //前の月のリストを取得する 引数に必要なものに useridもある とりあえず、 1にしてテストする
+         // そのユーザのその月にあるスケジュール全てをリストにして取得
+            monthScheduleList = scheDao.getMonthScheduleList(1 , year,  month , thisMonthlastDay);
             break; // switch文抜ける
         case "next":
              // セッションから取得したBeanインスタンスを利用する １ヶ月後にする
             LocalDate nextLocalDate = LocalDate.of(monthBean.getYear(), monthBean.getMonth(), 1).plusMonths(1);
             // 新しくインスタンスを生成する引数ありのコンストラクタをよぶ １ヶ月後に変更したlocaldateインスタンスを実引数にする
             monthBean = new MonthBean(nextLocalDate);
+
+            year = monthBean.getYear();
+            month = monthBean.getMonth();
+            // その月が何日あるのか
+             thisMonthlastDay = monthBean.getThisMonthlastDay();
+
+         // そのユーザのその月にあるスケジュール全てをリストにして取得
+            monthScheduleList = scheDao.getMonthScheduleList(1 , year,  month , thisMonthlastDay);
             break; // switch文抜ける
         case "scheduleResult":
 
             LocalDate scheduleResultLocalDate = LocalDate.of(scheBean.getScheduleDate().getYear(), scheBean.getScheduleDate().getMonthValue(), scheBean.getScheduleDate().getDayOfMonth());
             // 新しいインスタンスを生成する
             monthBean = new MonthBean(scheduleResultLocalDate);
+
+            year = monthBean.getYear();
+            month = monthBean.getMonth();
+            // その月が何日あるのか
+             thisMonthlastDay = monthBean.getThisMonthlastDay();
+
+         // そのユーザのその月にあるスケジュール全てをリストにして取得
+            monthScheduleList = scheDao.getMonthScheduleList(1 , year,  month , thisMonthlastDay);
 
             break;
         }
@@ -107,7 +138,7 @@ public class MonthDisplayServlet extends HttpServlet {
         request.setAttribute("mon", mon);
 
         // dayScheduleListも保存
-        request.setAttribute("dayScheduleList", dayScheduleList);
+        request.setAttribute("monthScheduleList", monthScheduleList);
 
 
         // スケジュール登録した後にリダイレクトしてくる時のメッセージを表示するため

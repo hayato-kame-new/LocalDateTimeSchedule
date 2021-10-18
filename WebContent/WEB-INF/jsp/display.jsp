@@ -9,9 +9,9 @@ request.setCharacterEncoding("UTF-8");
 MonthBean monthBean = (MonthBean) request.getAttribute("monthBean");
 String mon = (String) request.getAttribute("mon");
 String msg = (String) request.getAttribute("msg");
-// dayScheduleListもリクエストスコープから取り出す
-List<ScheduleBean> dayScheduleList = new ArrayList<ScheduleBean>();
-dayScheduleList = (List<ScheduleBean>) request.getAttribute("dayScheduleList");
+// monthScheduleListもリクエストスコープから取り出す そのユーザのその表示したい月のスケジュールの全件が入ったリストを MonthDisplayServletでリクエストスコープに保存して送ってきてる
+List<ScheduleBean> monthScheduleList = new ArrayList<ScheduleBean>();
+monthScheduleList = (List<ScheduleBean>) request.getAttribute("monthScheduleList");
 
 int weekCount = monthBean.getWeekCount();
 int[] calendarDay = monthBean.getCalendarDay();
@@ -215,13 +215,14 @@ span {color: #333; font-size: 80%;}
       %>
       <td class="sche">
         <%
-        if (cssDisplay.equals("day") && dayScheduleList.size() != 0) {
+        if (cssDisplay.equals("day") && monthScheduleList.size() != 0) {
         %>
 
         <ul class=<%=cssDisplay%> >
           <%
+          //  ulタグの cssDisplayのCSSのクラス属性によって、当月分だけ表示できるようになってる
           int count = 0;
-          for (ScheduleBean scheBean : dayScheduleList) {
+          for (ScheduleBean scheBean : monthScheduleList) {
             if (scheBean.getScheduleDate().getDayOfMonth() == calendarDay[j + k]) {
               String schedule = scheBean.getSchedule();
               count++;
