@@ -180,7 +180,7 @@ public class ScheduleDao {
 
 
     // タイムスケジュール登録画面で使うそのユーザーのその日のスケジュールのリストが欲しい NewScheduleServletから呼び出す
-    public List<ScheduleBean> GetOneDaySchedule(int userId, int year, int month, int day) {
+    public List<ScheduleBean> GetOneDaySchedule(int userId, LocalDate localDate) {
         List<ScheduleBean> oneDayScheduleList = new ArrayList<ScheduleBean>();
 
         ScheduleBean scheBean = null;
@@ -200,8 +200,8 @@ public class ScheduleDao {
             // データベースのdate型のカラムは java.sql.Date型ですので java.sql.Date型インスタンスにしてセットする
 
           //   java.sql.Date sqlDate = new java.sql.Date(year, month, day);  // このコンストラクタは非推奨になったので使わない方がいい
-            LocalDate localdate = LocalDate.of(year, month, day);
-            java.sql.Date sqlDate = java.sql.Date.valueOf(localdate);
+
+            java.sql.Date sqlDate = java.sql.Date.valueOf(localDate);
             pstmt.setDate(2, sqlDate);
 
             rs = pstmt.executeQuery();
@@ -257,5 +257,82 @@ public class ScheduleDao {
         }
         return oneDayScheduleList;
     }
+
+    // 主キーから、インスタンス取得する
+    public ScheduleBean find(int id) {
+         ScheduleBean scheBean = null;
+
+         Connection conn = null;
+         PreparedStatement pstmt = null;
+         ResultSet rs = null;
+
+         try {
+             Class.forName(DRIVER_NAME);
+             conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+             // 主キーで検索するから、得られるのは１件
+             String sql = "select * from schedule where id = ?::integer "; // テーブル名カラム名小文字で
+             pstmt = conn.prepareStatement(sql);
+             pstmt.setInt(1, id);
+             rs = pstmt.executeQuery();
+             if(rs.next()) {  // １件なので whileじゃなくてもいい if でも whileでもいい
+                 int userId = rs.getInt("userid");  // PostgreSQLなので useid 全て小文字にすること
+
+                 // rs.getDate("scheduledate") だと、このResultSetオブジェクトの現在の行の指定された列の値を、Javaプログラミング言語のjava.sql.Dateオブジェクトとして取得します。
+                 java.sql.Date sqlScheduleDate = rs.getDate("scheduledate");
+                 // java.sql.Date型から LocalDate型へ変換します
+                 LocalDate scheduleDate = sqlScheduleDate.toLocalDate();
+
+                 // rs.getTime("starttime") だと このResultSetオブジェクトの現在の行の指定された列の値を、Javaプログラミング言語のjava.sql.Timeオブジェクトとして取得します。
+                 java.sql.Time sqlStartTime = rs.getTime("starttime");
+                 // java.sql.Time型から LocalTime型へ変換します
+                 LocalTime startTime = sqlStartTime.toLocalTime();
+
+                 // 同様にする
+                 java.sql.Time sqlEndTime = rs.getTime("starttime");
+                 LocalTime endTime = sqlEndTime.toLocalTime();
+                 String schedule = rs.getString("schedule");
+                 String scheduleMemo = rs.getString("scheduleMemo");
+                 // インスタンス生成する
+                 scheBean = new ScheduleBean(userId, scheduleDate, startTime, endTime, schedule, scheduleMemo);
+             }
+         } catch (SQLException | ClassNotFoundException e) {
+             // データベース接続やSQL実行失敗時の処理
+             // JDBCドライバが見つからなかったときの処理
+             e.printStackTrace();
+             return null; // 失敗した時に、nullを返す
+         } finally {
+             // ResultSetインスタンスのクローズ処理
+             if (rs != null) { // close()する順番は、逆からする
+                 try {
+                     rs.close();
+                 } catch (SQLException e) {
+                     // クローズ処理失敗時の処理
+                     e.printStackTrace();
+                     return null; // 失敗した時に、nullを返す
+                 }
+             }
+             // PrepareStatementインスタンスのクローズ処理
+             if (pstmt != null) {
+                 try {
+                     pstmt.close();
+                 } catch (SQLException e) {
+                     // クローズ処理失敗時の処理
+                     e.printStackTrace();
+                     return null; // 失敗した時に、nullを返す
+                 }
+             }
+             // データベース切断
+             if (conn != null) {
+                 try {
+                     conn.close();
+                 } catch (SQLException e) {
+                     // データベース切断失敗時の処理
+                     e.printStackTrace();
+                     return null; // 失敗した時に、nullを返す
+                 }
+             }
+         }
+         return scheBean;
+     }
 
 }

@@ -1,16 +1,27 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="model.ScheduleBean, model.DayBean , java.util.List, java.util.LinkedList" %>
+<%@ page import="model.ScheduleBean, model.DayBean ,
+java.util.List, java.util.LinkedList, viewComposer.TimeScheduleView,
+java.time.LocalDate, java.time.temporal.TemporalAdjusters" %>
 
 <%
 // 文字化け対策
 request.setCharacterEncoding("UTF-8");
-// リクエストスコープから取り出す 表示に必要
- DayBean dayBean = (DayBean)request.getAttribute("dayBean");  // 年月日の情報 と その月が何日あるかが格納されてます。
-int year = dayBean.getYear();
-int month = dayBean.getMonth();
-int day = dayBean.getDay();
-int thisMonthlastDay =  dayBean.getThisMonthlastDay();  // その月が何日あるのか
+// リクエストスコープから取り出す 表示に必要 DayBean後で必要なくなるかも
+// DayBean dayBean = (DayBean)request.getAttribute("dayBean");  // 年月日の情報 と その月が何日あるかが格納されてます。
+ //int year = dayBean.getYear();
+// int month = dayBean.getMonth();
+// int day = dayBean.getDay();
+// int thisMonthlastDay =  dayBean.getThisMonthlastDay();  // その月が何日あるのか
+
+// リクエストスコープから取り出す
+ScheduleBean formScheBean = (ScheduleBean)request.getAttribute("formScheBean");
+LocalDate scheduleDate = formScheBean.getScheduleDate();
+int year =  scheduleDate.getYear();
+int month =  scheduleDate.getMonthValue();
+int day =  scheduleDate.getDayOfMonth();
+// その月が何日あるのか
+int thisMonthlastDay = LocalDate.of(year, month, day).with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
 
 // リクエストスコープから取り出す もし、リストの要素が 0でなかったら、表示する
 List<ScheduleBean> oneDayScheduleList = (List<ScheduleBean>)request.getAttribute("oneDayScheduleList");
@@ -44,6 +55,7 @@ p{font-size:0.75em;}
 #contents:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
 #contents span {color: darkgreen; font-weight:bold;}
 .memo {color:#444;}
+.sche_img {border-radius: 50%}
 </style>
 
 </head>
@@ -57,12 +69,10 @@ p{font-size:0.75em;}
 <div id="contents">
 
 <div id="left">
-
+ <img src="./img/IMG_1044.JPG" class="sche_img" width="12px" height="12px">
 <table class="sche">
 
 <tr><td class="top" style="width:80px">時刻</td><td class="top" style="width:300px">予定</td></tr>
-<%= oneDayScheduleList.get(0).createStrStartTime() %>
-<%=timeStack.get(0) %>
 
 <%
   for(int i = 0; i < timeStack.size(); i++ ){
@@ -71,7 +81,8 @@ p{font-size:0.75em;}
   <td class="time"><%=timeStack.get(i) %></td>
   <td class="contents">
  <% for(int j = 0; j < oneDayScheduleList.size(); j++) {
- if(timeStack.get(i).equals(oneDayScheduleList.get(j).createStrStartTime() )){%>
+       if(timeStack.get(i).equals(oneDayScheduleList.get(j).createStrStartTime() )){
+   %>
   [<%= oneDayScheduleList.get(j).createStrStartTime()%>-<%= oneDayScheduleList.get(j).createStrEndTime()%>]
   <span><%= oneDayScheduleList.get(j).getSchedule() %></span><br />
   <small class="memo">メモ: <%= oneDayScheduleList.get(j).getScheduleMemo() %></small><br />
@@ -80,18 +91,16 @@ p{font-size:0.75em;}
  }
  %>
   </td>
+
 </tr>
 <%
     }
 %>
 </table>
-
 </div>
 
+<!-- フォーム表示 -->
 <div id="right">
-
-
-
 <form method="post" action="ScheduleInsertServlet">
 <table>
 <tr>
@@ -141,9 +150,12 @@ p{font-size:0.75em;}
 <select name="s_hour">
 <option value="" selected>--時
 <% for (int i = 0 ; i <= 23 ; i++){
+
 %>
 <option value="<%=i %>"><%=i %>時
-<% } %>
+<%
+
+   }%>
 </select>
 
 <select name="s_minute">
@@ -170,13 +182,13 @@ p{font-size:0.75em;}
 
 <tr>
 <td nowrap>予定</td>
-<td><input type="text" name="schedule" value="" size="30" maxlength="70">
+<td><input type="text" name="schedule" value="<%=formScheBean.getSchedule() %>" size="30" maxlength="70">
 </td>
 </tr>
 
 <tr>
 <td valign="top" nowrap>メモ</td>
-<td><textarea name="scheduleMemo" cols="30" rows="8" wrap="virtual"></textarea></td>
+<td><textarea name="scheduleMemo" cols="30" rows="8" wrap="virtual"><%=formScheBean.getScheduleMemo() %></textarea></td>
 </tr>
 </table>
 

@@ -9,19 +9,19 @@ request.setCharacterEncoding("UTF-8");
 MonthBean monthBean = (MonthBean) request.getAttribute("monthBean");
 String mon = (String) request.getAttribute("mon");
 String msg = (String) request.getAttribute("msg");
-// monthScheduleListもリクエストスコープから取り出す そのユーザのその表示したい月のスケジュールの全件が入ったリストを MonthDisplayServletでリクエストスコープに保存して送ってきてる
-List<ScheduleBean> monthScheduleList = new ArrayList<ScheduleBean>();
-monthScheduleList = (List<ScheduleBean>) request.getAttribute("monthScheduleList");
 
 int weekCount = monthBean.getWeekCount();
 int[] calendarDay = monthBean.getCalendarDay();
-
+int year = monthBean.getYear();
+int month = monthBean.getMonth();
 // セッションに保存しないとだめ、リクエストスコープでは、aリンク越しに渡せないので 先月 翌月 のために
 // 翌月の翌月も表示させるために 表示してるインスタンスを送る セッションスコープを使う session は、JSPで使える暗黙オブジェクト セッションは、後で明示的に消すことが大事残ってるから
 session.setAttribute("monthBean", monthBean);
 
-int year = monthBean.getYear();
-int month = monthBean.getMonth();
+
+// monthScheduleListもリクエストスコープから取り出す そのユーザのその表示したい月のスケジュールの全件が入ったリストを MonthDisplayServletでリクエストスコープに保存して送ってきてる
+List<ScheduleBean> monthScheduleList = new ArrayList<ScheduleBean>();
+monthScheduleList = (List<ScheduleBean>) request.getAttribute("monthScheduleList");
 
 // 今現在の日時
 LocalDateTime now = LocalDateTime.now();
@@ -91,8 +91,8 @@ td.sche {
  line-height: 1.1;
 }
 
-img {
-  border: 0px;
+.current_day {
+  border-radius: 50%;
 }
 
 p {
@@ -185,13 +185,16 @@ span {color: #333; font-size: 80%;}
       <td class=<%=cssDisplay%>><%=calendarDay[j + k]%> <%
  if (now_year == year && now_month == month && now_day == calendarDay[j + k]) {
  %>
-        <img src="./img/IMG_1044.JPG" width="14" height="14"
-        style="border-radius: 50%"><br /> <%
+        <img class="current_day" src="./img/IMG_1044.JPG" width="14" height="14"
+        ><br /> <%
  }
  %> <%
  if (cssDisplay.equals("day")) {
- %> <a
-        href="/LocalDateTimeSchedule/NewScheduleServlet?year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>"><i
+ %>
+   <!-- スケジュールを新規に作成するためのリンク ログインしてきたユーザID userId も必要とりあえず、1で送る userId=1
+         注意 主キーのidではない -->
+   <a
+        href="/LocalDateTimeSchedule/NewScheduleServlet?action=add&userId=1&year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>"><i
           class="fas fa-clipboard-list"></i></a> <%
  }
  %></td>
@@ -221,11 +224,12 @@ span {color: #333; font-size: 80%;}
         <ul class=<%=cssDisplay%> >
           <%
           //  ulタグの cssDisplayのCSSのクラス属性によって、当月分だけ表示できるようになってる
-          int count = 0;
+         int count = 0;
           for (ScheduleBean scheBean : monthScheduleList) {
             if (scheBean.getScheduleDate().getDayOfMonth() == calendarDay[j + k]) {
+              int id = scheBean.getId();  // 主キープライマリーキーが編集に必要
               String schedule = scheBean.getSchedule();
-              count++;
+             count++;
               if(schedule.length() >= 7 ) {
                 schedule = schedule.substring(0,8) + "...";
               }
@@ -234,7 +238,11 @@ span {color: #333; font-size: 80%;}
                 scheduleMemo = scheduleMemo.substring(0,8) + "...";
               }
           %>
-          <li ><small class="schedule"><%=schedule%>:&nbsp;<span><%=scheduleMemo%></span></small></li>
+          <!-- 編集画面表示のためのリンクになってる 主キーの id を送る  注意 userId ではない-->
+          <li >
+            <a href="/LocalDateTimeSchedule/NewScheduleServlet?action=edit&id=<%=id %>"><small class="schedule"><%=schedule%>:&nbsp;</small></a><small><span><%=scheduleMemo%></span></small>
+          </li>
+
           <%
           }
           }

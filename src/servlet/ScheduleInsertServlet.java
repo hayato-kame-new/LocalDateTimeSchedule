@@ -82,7 +82,7 @@ public class ScheduleInsertServlet extends HttpServlet {
          HttpSession session = request.getSession(true);
          session.setAttribute("msg", msg);
 
-         // 下のこれじゃなくて、一覧が表示できるといいかな
+         //これも必要だと思う
          session.setAttribute("scheBean", scheBean);
 
          session.setAttribute("mon", "scheduleResult");  // switch文で必要どの月を表示するのかcaseで切り替えるのに必要

@@ -3,6 +3,7 @@ package model;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 public class ScheduleBean implements Serializable {
 
@@ -19,6 +20,7 @@ public class ScheduleBean implements Serializable {
     private String schedule;
     private String scheduleMemo; // schedulememo
 
+
     public ScheduleBean() {
         super();
         // TODO 自動生成されたコンストラクター・スタブ
@@ -28,7 +30,7 @@ public class ScheduleBean implements Serializable {
     public ScheduleBean( int userId, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime,
             String schedule, String scheduleMemo) {
         super();
-
+        // 主キーの idはデータベースに登録されるときに自動生成されるので、ここではいらない
         this.userId = userId;
         this.scheduleDate = scheduleDate;
         this.startTime = startTime;
@@ -49,6 +51,14 @@ public class ScheduleBean implements Serializable {
         int hour = this.endTime.getHour();
         int minute =  this.endTime.getMinute();
         return String.valueOf(hour) + ":" + String.valueOf(minute);
+    }
+
+    // 時間の差分を求める引数なし 自分自身のインスタンスのフィールドの値を使う
+    public int rowCount() {
+        long minutes = ChronoUnit.MINUTES.between(this.startTime, this.endTime);
+        double hours = minutes / 60.0;
+        double row =  hours * 2 ;
+        return (int)row;
     }
 
     public int getId() {
