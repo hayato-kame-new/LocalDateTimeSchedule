@@ -42,8 +42,16 @@ public class ScheduleBean implements Serializable {
     // startTimeを文字列にする 引数なしです 自分自身のインスタンスのフィールドの値を使います
     public String createStrStartTime() {
         int hour = this.startTime.getHour(); // 0 とか  17 とかが取れる 自分自身のインスタンスのフィールドの値を使います
-        int minute = this.startTime.getMinute(); // 0  とか  30
-        return String.valueOf(hour) + ":" + String.valueOf(minute);  // 0:00 とか 17:30
+        int minute = this.startTime.getMinute(); // 0  とか  30  注意  0 だったら 00 にすべき
+        String strHour = String.valueOf(hour);
+        String strMinute = "";
+        // 分で 0 が取れた時には、00 としないといけない
+        if(minute == 0) {
+            strMinute = String.format("%02d", minute);
+        } else {
+            strMinute = String.valueOf(minute);
+        }
+        return strHour + ":" + strMinute;  // 0:00 とか 17:30
     }
 
  // endTimeを文字列にする 引数なしです 自分自身のインスタンスのフィールドの値を使います

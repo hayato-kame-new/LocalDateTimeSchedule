@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="model.ScheduleBean, model.DayBean ,
+<%@ page import="model.ScheduleBean,
 java.util.List, java.util.LinkedList, viewComposer.TimeScheduleView,
 java.time.LocalDate, java.time.temporal.TemporalAdjusters" %>
 
@@ -55,7 +55,7 @@ p{font-size:0.75em;}
 #contents:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
 #contents span {color: darkgreen; font-weight:bold;}
 .memo {color:#444;}
-.sche_img {border-radius: 50%}
+
 </style>
 
 </head>
@@ -69,7 +69,19 @@ p{font-size:0.75em;}
 <div id="contents">
 
 <div id="left">
- <img src="./img/IMG_1044.JPG" class="sche_img" width="12px" height="12px">
+
+<%-- <p ><%= oneDayScheduleList.size() %></p>
+<p ><%= oneDayScheduleList.get(0).getSchedule() %></p> --%>
+<p ><%= oneDayScheduleList.get(0).createStrStartTime() %></p>
+<p ><%= timeStack.get(1) %></p>
+<%-- <p ><%= oneDayScheduleList.get(1).createStrStartTime() %></p>
+<p ><%= timeStack.get(2) %></p>
+<p ><%= oneDayScheduleList.get(2).createStrStartTime() %></p>
+<p ><%= timeStack.get(3) %></p>
+<p ><%= oneDayScheduleList.get(3).createStrStartTime() %></p>
+<p ><%= timeStack.get(4) %></p> --%>
+
+
 <table class="sche">
 
 <tr><td class="top" style="width:80px">時刻</td><td class="top" style="width:300px">予定</td></tr>
