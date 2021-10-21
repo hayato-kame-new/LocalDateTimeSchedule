@@ -26,11 +26,11 @@ public class ScheduleBean implements Serializable {
         // TODO 自動生成されたコンストラクター・スタブ
     }
 
-    // 引数にidはいらない 自動採番なので、データベースに登録されるときに自動で生成されるので
+    // 新規登録に使うコンストラクタ 6つの引数を使う 新規に登録する際には、引数にidはいらない 自動採番なので、データベースに登録されるときに自動で生成されるので
     public ScheduleBean( int userId, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime,
             String schedule, String scheduleMemo) {
         super();
-        // 主キーの idはデータベースに登録されるときに自動生成されるので、ここではいらない
+        // 主キーの idはデータベースに新規に登録されるときに自動生成されるので、ここではいらない 新規登録に使うコンストラクタではいらない
         this.userId = userId;
         this.scheduleDate = scheduleDate;
         this.startTime = startTime;
@@ -39,7 +39,22 @@ public class ScheduleBean implements Serializable {
         this.scheduleMemo = scheduleMemo;
     }
 
-    // startTimeを文字列にする 引数なしです 自分自身のインスタンスのフィールドの値を使います
+
+    // 検索メソッドに必要な 引数が全てのフィールド(7つの引数)のコンストラクタ 検索するときに、データベースから取得するときに、主キーのidも引数に入れてインスタンスを生成して返すメソッドに使うため、引数に、主キーでユニークのidも必要となる
+    // 1日分のリストを作る時に使う
+    public ScheduleBean(int id, int userId, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime,
+            String schedule, String scheduleMemo) {
+        super();
+        this.id = id;
+        this.userId = userId;
+        this.scheduleDate = scheduleDate;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.schedule = schedule;
+        this.scheduleMemo = scheduleMemo;
+    }
+
+    // 表示のためにstartTimeを文字列にする 引数なしです 自分自身のインスタンスのフィールドの値を使います
     public String createStrStartTime() {
         int hour = this.startTime.getHour(); // 0 とか  17 とかが取れる 自分自身のインスタンスのフィールドの値を使います
         int minute = this.startTime.getMinute(); // 0  とか  30  注意  0 だったら 00 にすべき
@@ -53,6 +68,8 @@ public class ScheduleBean implements Serializable {
         }
         return strHour + ":" + strMinute;  // 0:00 とか 17:30
     }
+
+
 
  // endTimeを文字列にする 引数なしです 自分自身のインスタンスのフィールドの値を使います
     public String createStrEndTime() {

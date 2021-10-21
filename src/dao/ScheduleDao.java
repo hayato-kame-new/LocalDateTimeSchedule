@@ -133,6 +133,7 @@ public class ScheduleDao {
                 String scheduleMemo = null;
 
                 while (rs.next()) {
+                    int id = rs.getInt("id");
                     // java.sql.Dateから LocalDateに変換が必要です
                     localdateScheduleDate = rs.getDate("scheduledate").toLocalDate();
                     // java.sql.Timeから LocalTimeに変換が必要です
@@ -140,7 +141,7 @@ public class ScheduleDao {
                     localTimeEndTime = rs.getTime("endtime").toLocalTime();
                     schedule = rs.getString("schedule");
                     scheduleMemo = rs.getString("schedulememo");
-                    scheBean = new ScheduleBean(userId, localdateScheduleDate, localTimeStartTime, localTimeEndTime,
+                    scheBean = new ScheduleBean(id, userId, localdateScheduleDate, localTimeStartTime, localTimeEndTime,
                             schedule, scheduleMemo);
                     list.add(scheBean); //ここで
                 }
@@ -258,6 +259,7 @@ public class ScheduleDao {
         return oneDayScheduleList;
     }
 
+
     // 主キーから、インスタンス取得する
     public ScheduleBean find(int id) {
          ScheduleBean scheBean = null;
@@ -288,12 +290,12 @@ public class ScheduleDao {
                  LocalTime startTime = sqlStartTime.toLocalTime();
 
                  // 同様にする
-                 java.sql.Time sqlEndTime = rs.getTime("starttime");
+                 java.sql.Time sqlEndTime = rs.getTime("endtime");
                  LocalTime endTime = sqlEndTime.toLocalTime();
                  String schedule = rs.getString("schedule");
                  String scheduleMemo = rs.getString("scheduleMemo");
-                 // インスタンス生成する
-                 scheBean = new ScheduleBean(userId, scheduleDate, startTime, endTime, schedule, scheduleMemo);
+                 // インスタンス生成する 引数7つ のコンストラクタを呼ぶこと
+                 scheBean = new ScheduleBean(id, userId, scheduleDate, startTime, endTime, schedule, scheduleMemo);
              }
          } catch (SQLException | ClassNotFoundException e) {
              // データベース接続やSQL実行失敗時の処理

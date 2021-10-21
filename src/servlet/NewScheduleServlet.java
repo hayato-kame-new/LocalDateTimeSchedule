@@ -64,7 +64,8 @@ public class NewScheduleServlet extends HttpServlet {
             int id = Integer.parseInt(request.getParameter("id"));
             // 入力フォームに表示するために 渡ってきたidから、インスタンスを取得する
             // するとuserIdも取得できる
-            formScheBean = scheDao.find(id);
+
+            formScheBean = scheDao.find(id);  // 主キーで検索する
 
             localDate = formScheBean.getScheduleDate();
 
@@ -79,18 +80,17 @@ public class NewScheduleServlet extends HttpServlet {
         // 後でいらなくなるかも
        //  DayBean dayBean = new DayBean(year, month, day);
 
-        // さらに、そのユーザーのその一日のスケジュールをリクエストスコープに格納すればいい
-       // ScheduleDao scheDao = new ScheduleDao();
-
         // ビューを作るためのクラス TimeScheduleView からメソッドを呼び出し
         LinkedList<String> timeStack = TimeScheduleView.makeTimeStack();
 
      // リクエストスコープに保存する。リクエストスコープは、フォワードできる(リダイレクトはできない)
         // リクエストスコープに保存できるのは、参照型 クラス型のインスタンスだけ。自分で作ったクラスは、JavaBeansのクラスにすること
      //   request.setAttribute("dayBean", dayBean); // 後でいらなくなるかも
+        //  そのユーザーのその一日のスケジュールをリクエストスコープに格納
         request.setAttribute("oneDayScheduleList", oneDayScheduleList);
         request.setAttribute("timeStack", timeStack);
         request.setAttribute("formScheBean", formScheBean);
+        request.setAttribute("action", action);
 
    //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/time_schedule.jsp");

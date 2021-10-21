@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ page import="model.ScheduleBean,
 java.util.List, java.util.LinkedList, viewComposer.TimeScheduleView,
-java.time.LocalDate, java.time.temporal.TemporalAdjusters" %>
+java.time.LocalDate, java.time.temporal.TemporalAdjusters, java.time.LocalTime" %>
 
 <%
 // 文字化け対策
@@ -15,6 +15,9 @@ request.setCharacterEncoding("UTF-8");
 // int thisMonthlastDay =  dayBean.getThisMonthlastDay();  // その月が何日あるのか
 
 // リクエストスコープから取り出す
+String action = (String)request.getAttribute("action");
+String title = action.equals("add") ? "新規" : "編集";
+// リクエストスコープから フォーム用のインスタンスを取り出して
 ScheduleBean formScheBean = (ScheduleBean)request.getAttribute("formScheBean");
 LocalDate scheduleDate = formScheBean.getScheduleDate();
 int year =  scheduleDate.getYear();
@@ -22,6 +25,16 @@ int month =  scheduleDate.getMonthValue();
 int day =  scheduleDate.getDayOfMonth();
 // その月が何日あるのか
 int thisMonthlastDay = LocalDate.of(year, month, day).with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+LocalTime startTime = formScheBean.getStartTime();
+LocalTime endTime = formScheBean.getEndTime();
+//System.out.println(startTime);
+//System.out.println(endTime);
+// 時間と分に分けておく
+String s_hour = String.valueOf(startTime.getHour());  // 開始時間の時間
+String s_minute = String.format("%02d", startTime.getMinute());  // 開始時間の分
+String e_hour = String.valueOf(endTime.getHour());  // 終了時間の時間
+String e_minute = String.format("%02d", endTime.getMinute());  // 終了時間の分
+
 
 // リクエストスコープから取り出す もし、リストの要素が 0でなかったら、表示する
 List<ScheduleBean> oneDayScheduleList = (List<ScheduleBean>)request.getAttribute("oneDayScheduleList");
@@ -33,7 +46,7 @@ LinkedList<String> timeStack = (LinkedList<String>)request.getAttribute("timeSta
 <html>
 <head>
 <meta charset="UTF-8">
-<title>タイムスケジュール登録</title>
+<title>タイムスケジュール<%= title %></title>
 
 <style>
 table.sche{border:1px solid #a9a9a9;padding:0px;margin:0px;border-collapse:collapse;}
@@ -63,7 +76,7 @@ p{font-size:0.75em;}
 <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current">今月表示へ戻る</a>
 <hr />
 
-<h3>タイムスケジュール登録</h3>
+<h3>タイムスケジュール<%= title %></h3>
 
 
 <div id="contents">
@@ -110,6 +123,7 @@ p{font-size:0.75em;}
 %>
 </table>
 </div>
+
 
 <!-- フォーム表示 -->
 <div id="right">
@@ -160,37 +174,84 @@ p{font-size:0.75em;}
 
 <tr><td nowrap>時刻</td><td>
 <select name="s_hour">
-<option value="" selected>--時
+<% if (s_hour == null) {%>
+  <option value="" selected>--時
+<% } %>
 <% for (int i = 0 ; i <= 23 ; i++){
-
+   if( s_hour != null && Integer.parseInt(s_hour) == i ) {
 %>
-<option value="<%=i %>"><%=i %>時
+<option value="<%=i %>" selected><%=i %>時
 <%
-
+ } else {
+ %>
+ <option value="<%=i %>" ><%=i %>時
+  <% }
    }%>
 </select>
 
 <select name="s_minute">
-<option value="">--分
-<option value="0">00分
-<option value="30">30分
+<% if (s_minute == null) {%>
+  <option value="" selected>--分
+  <option value="0" selected>00分
+  <option value="30">30分
+<% } else if ( s_minute != null && s_minute.equals("00")){ %>
+  <option value="" >--分
+  <option value="0" selected>00分
+  <option value="30">30分
+<% } else if ( s_minute != null && s_minute.equals("30")){ %>
+  <option value="" >--分
+  <option value="0" >00分
+  <option value="30" selected>30分
+  <% } %>
 </select>
 
 <select name="e_hour">
-<option value="" selected>--時
+<% if (e_hour == null) {%>
+  <option value="" selected>--時
+<% } %>
+<% for (int i = 0 ; i <= 23 ; i++){
+   if( e_hour != null && Integer.parseInt(e_hour) == i ) {
+%>
+<option value="<%=i %>" selected><%=i %>時
+<%
+ } else {
+ %>
+ <option value="<%=i %>" ><%=i %>時
+  <% }
+   }%>
+</select>
+
+
+<%-- <select name="e_hour">
+<option value="<%=e_hour %>" selected>--時
 <% for (int i = 0 ; i <= 23 ; i++){
 %>
 <option value="<%=i %>"><%=i %>時
 <% } %>
-</select>
-
+</select> --%>
 
 <select name="e_minute">
-<option value="">--分
+<% if (e_minute == null) {%>
+  <option value="" selected>--分
+  <option value="0" >00分
+  <option value="30">30分
+<% } else if ( e_minute != null && e_minute.equals("00")){ %>
+  <option value="" >--分
+  <option value="0" selected>00分
+  <option value="30">30分
+<% } else if ( e_minute != null && e_minute.equals("30")){ %>
+  <option value="" >--分
+  <option value="0" >00分
+  <option value="30" selected>30分
+  <% } %>
+</select>
+
+<%-- <select name="e_minute">
+<option value="<%=e_minute %>">--分
 <option value="0">00分
 <option value="30">30分
 </select>
-</td></tr>
+</td></tr> --%>
 
 <tr>
 <td nowrap>予定</td>

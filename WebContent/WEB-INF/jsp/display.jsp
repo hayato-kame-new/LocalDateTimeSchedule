@@ -238,7 +238,7 @@ span {color: #333; font-size: 80%;}
                 scheduleMemo = scheduleMemo.substring(0,8) + "...";
               }
           %>
-          <!-- 編集画面表示のためのリンクになってる 主キーの id を送る  注意 userId ではない-->
+          <!-- 編集画面表示のためのリンクになってる 主キーの id を送る  注意 userId ではない 主キーは、ユニークだから主キーで検索すること  -->
           <li >
             <a href="/LocalDateTimeSchedule/NewScheduleServlet?action=edit&id=<%=id %>"><small class="schedule"><%=schedule%>:&nbsp;</small></a><small><span><%=scheduleMemo%></span></small>
           </li>
