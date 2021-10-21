@@ -55,7 +55,7 @@ public class NewScheduleServlet extends HttpServlet {
              localDate = LocalDate.of(year, month, day);
             // 新規の時には、ログインしたユーザのIDを送るようにしてる 注意 主キーのidではない とりあえず、 userId=1 としてクエリー文字列で送ってきてる 後で、ログイン機能作った時にaリンクのところを修正します
             int userId = Integer.parseInt(request.getParameter("userId"));
-             // とりあえず userId=1 で送られてきてる
+             // とりあえず userId=1 で送られてきてる  idは、この時点では規定値の 0 としてフィールドの値がなってる コンストラクタの引数は　６つ
             formScheBean = new ScheduleBean(1, localDate , null, null, null, null);
             // このインスタンスをフォームに送って表示させる
             break;  // switch文から抜ける

@@ -18,23 +18,34 @@ request.setCharacterEncoding("UTF-8");
 String action = (String)request.getAttribute("action");
 String title = action.equals("add") ? "新規" : "編集";
 // リクエストスコープから フォーム用のインスタンスを取り出して
+//  action が "add"の時の、formScheBeanインスタンスは、ユーザIDだけ入ってるあとは、データ型の規定値になってます int型なら 0 参照型なら null が入ってます
 ScheduleBean formScheBean = (ScheduleBean)request.getAttribute("formScheBean");
-LocalDate scheduleDate = formScheBean.getScheduleDate();
-int year =  scheduleDate.getYear();
+
+LocalDate scheduleDate = formScheBean.getScheduleDate(); // 新規の時も 年月日はある
+
+int year =  scheduleDate.getYear(); // 新規のは   scheduleDate は入ってる
 int month =  scheduleDate.getMonthValue();
 int day =  scheduleDate.getDayOfMonth();
 // その月が何日あるのか
 int thisMonthlastDay = LocalDate.of(year, month, day).with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
-LocalTime startTime = formScheBean.getStartTime();
-LocalTime endTime = formScheBean.getEndTime();
-//System.out.println(startTime);
-//System.out.println(endTime);
-// 時間と分に分けておく
-String s_hour = String.valueOf(startTime.getHour());  // 開始時間の時間
-String s_minute = String.format("%02d", startTime.getMinute());  // 開始時間の分
-String e_hour = String.valueOf(endTime.getHour());  // 終了時間の時間
-String e_minute = String.format("%02d", endTime.getMinute());  // 終了時間の分
 
+
+LocalTime startTime = formScheBean.getStartTime();  // 新規の時は null
+LocalTime endTime = formScheBean.getEndTime(); // 新規の時は null
+
+
+// 時間と分に分けておく
+String s_hour = "";
+String s_minute =  "";
+String e_hour = "";
+String e_minute =  "";
+// ここ新規の時は null なので、実行しようとすると NullPointerException発生する 新規では null回避する
+if(!action.equals("add")) { // null対策
+ s_hour = String.valueOf(startTime.getHour());  // 開始時間の時間
+ s_minute = String.format("%02d", startTime.getMinute());  // 開始時間の分
+ e_hour = String.valueOf(endTime.getHour());  // 終了時間の時間
+ e_minute = String.format("%02d", endTime.getMinute());  // 終了時間の分
+}
 
 // リクエストスコープから取り出す もし、リストの要素が 0でなかったら、表示する
 List<ScheduleBean> oneDayScheduleList = (List<ScheduleBean>)request.getAttribute("oneDayScheduleList");
@@ -83,18 +94,6 @@ p{font-size:0.75em;}
 
 <div id="left">
 
-<%-- <p ><%= oneDayScheduleList.size() %></p>
-<p ><%= oneDayScheduleList.get(0).getSchedule() %></p> --%>
-<p ><%= oneDayScheduleList.get(0).createStrStartTime() %></p>
-<p ><%= timeStack.get(1) %></p>
-<%-- <p ><%= oneDayScheduleList.get(1).createStrStartTime() %></p>
-<p ><%= timeStack.get(2) %></p>
-<p ><%= oneDayScheduleList.get(2).createStrStartTime() %></p>
-<p ><%= timeStack.get(3) %></p>
-<p ><%= oneDayScheduleList.get(3).createStrStartTime() %></p>
-<p ><%= timeStack.get(4) %></p> --%>
-
-
 <table class="sche">
 
 <tr><td class="top" style="width:80px">時刻</td><td class="top" style="width:300px">予定</td></tr>
@@ -109,7 +108,7 @@ p{font-size:0.75em;}
        if(timeStack.get(i).equals(oneDayScheduleList.get(j).createStrStartTime() )){
    %>
   [<%= oneDayScheduleList.get(j).createStrStartTime()%>-<%= oneDayScheduleList.get(j).createStrEndTime()%>]
-  <span><%= oneDayScheduleList.get(j).getSchedule() %></span><br />
+  <a href="/LocalDateTimeSchedule/NewScheduleServlet?action=edit&id=<%=oneDayScheduleList.get(j).getId() %>"><small class="schedule"><span><%= oneDayScheduleList.get(j).getSchedule() %></span></small></a><br />
   <small class="memo">メモ: <%= oneDayScheduleList.get(j).getScheduleMemo() %></small><br />
   <%
   }
@@ -174,11 +173,11 @@ p{font-size:0.75em;}
 
 <tr><td nowrap>時刻</td><td>
 <select name="s_hour">
-<% if (s_hour == null) {%>
+<% if (s_hour.equals("")) {%>
   <option value="" selected>--時
 <% } %>
 <% for (int i = 0 ; i <= 23 ; i++){
-   if( s_hour != null && Integer.parseInt(s_hour) == i ) {
+   if( s_hour != null && !s_hour.equals("") &&  Integer.parseInt(s_hour) == i ) {
 %>
 <option value="<%=i %>" selected><%=i %>時
 <%
@@ -190,15 +189,15 @@ p{font-size:0.75em;}
 </select>
 
 <select name="s_minute">
-<% if (s_minute == null) {%>
+<% if (s_minute.equals("")) {%>
   <option value="" selected>--分
   <option value="0" selected>00分
   <option value="30">30分
-<% } else if ( s_minute != null && s_minute.equals("00")){ %>
+<% } else if ( s_minute != null && !s_minute.equals("") && s_minute.equals("00")){ %>
   <option value="" >--分
   <option value="0" selected>00分
   <option value="30">30分
-<% } else if ( s_minute != null && s_minute.equals("30")){ %>
+<% } else if ( s_minute != null &&  !s_minute.equals("") && s_minute.equals("30")){ %>
   <option value="" >--分
   <option value="0" >00分
   <option value="30" selected>30分
@@ -206,11 +205,11 @@ p{font-size:0.75em;}
 </select>
 
 <select name="e_hour">
-<% if (e_hour == null) {%>
+<% if (e_hour.equals("")) {%>
   <option value="" selected>--時
 <% } %>
 <% for (int i = 0 ; i <= 23 ; i++){
-   if( e_hour != null && Integer.parseInt(e_hour) == i ) {
+   if( e_hour != null && !e_hour.equals("") && Integer.parseInt(e_hour) == i ) {
 %>
 <option value="<%=i %>" selected><%=i %>時
 <%
@@ -222,36 +221,21 @@ p{font-size:0.75em;}
 </select>
 
 
-<%-- <select name="e_hour">
-<option value="<%=e_hour %>" selected>--時
-<% for (int i = 0 ; i <= 23 ; i++){
-%>
-<option value="<%=i %>"><%=i %>時
-<% } %>
-</select> --%>
-
 <select name="e_minute">
-<% if (e_minute == null) {%>
+<% if (e_minute.equals("")) {%>
   <option value="" selected>--分
   <option value="0" >00分
   <option value="30">30分
-<% } else if ( e_minute != null && e_minute.equals("00")){ %>
+<% } else if ( e_minute != null && !e_minute.equals("") && e_minute.equals("00")){ %>
   <option value="" >--分
   <option value="0" selected>00分
   <option value="30">30分
-<% } else if ( e_minute != null && e_minute.equals("30")){ %>
+<% } else if ( e_minute != null &&  !e_minute.equals("") && e_minute.equals("30")){ %>
   <option value="" >--分
   <option value="0" >00分
   <option value="30" selected>30分
   <% } %>
 </select>
-
-<%-- <select name="e_minute">
-<option value="<%=e_minute %>">--分
-<option value="0">00分
-<option value="30">30分
-</select>
-</td></tr> --%>
 
 <tr>
 <td nowrap>予定</td>

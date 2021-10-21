@@ -26,7 +26,7 @@ public class ScheduleBean implements Serializable {
         // TODO 自動生成されたコンストラクター・スタブ
     }
 
-    // 新規登録に使うコンストラクタ 6つの引数を使う 新規に登録する際には、引数にidはいらない 自動採番なので、データベースに登録されるときに自動で生成されるので
+    // 新規登録の時だけ使うコンストラクタ 6つの引数を使う 新規に登録する際には、引数にidはいらない 自動採番なので、データベースに登録されるときに自動で生成されるので
     public ScheduleBean( int userId, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime,
             String schedule, String scheduleMemo) {
         super();

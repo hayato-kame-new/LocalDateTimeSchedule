@@ -214,6 +214,8 @@ public class ScheduleDao {
             String scheduleMemo = null;
 
             while (rs.next()) {
+                // idも必要
+                int id = rs.getInt("id");
                 // java.sql.Dateから LocalDateに変換が必要です
                 localdateScheduleDate = rs.getDate("scheduledate").toLocalDate();
                 // java.sql.Timeから LocalTimeに変換が必要です
@@ -221,7 +223,8 @@ public class ScheduleDao {
                 localTimeEndTime = rs.getTime("endtime").toLocalTime();
                 schedule = rs.getString("schedule");
                 scheduleMemo = rs.getString("schedulememo");
-                scheBean = new ScheduleBean(userId, localdateScheduleDate, localTimeStartTime, localTimeEndTime,
+                // 7つの引数のコンストラクタを使う
+                scheBean = new ScheduleBean(id, userId, localdateScheduleDate, localTimeStartTime, localTimeEndTime,
                         schedule, scheduleMemo);
                 oneDayScheduleList.add(scheBean);  // ここでリストに追加する whileの中で
             }
