@@ -50,7 +50,7 @@ public class MonthDisplayServlet extends HttpServlet {
         MonthBean monthBean = (MonthBean) session.getAttribute("monthBean");
         session.removeAttribute("monthBean");  // 取り出したら、消しておくセッションから
 
-        // スケジュール登録したあとにリダイレクトしてきた セッションスコープから取得する
+        // スケジュール新規登録したあとや、更新した後にリダイレクトしてきた セッションスコープから取得する
            ScheduleBean scheBean = (ScheduleBean) session.getAttribute("scheBean") ;
            if(scheBean != null ) {
                mon = (String) session.getAttribute("mon");  // "scheduleResult"が入ってる
@@ -116,7 +116,7 @@ public class MonthDisplayServlet extends HttpServlet {
             monthScheduleList = scheDao.getMonthScheduleList(1 , year,  month , thisMonthlastDay);
             break; // switch文抜ける
         case "scheduleResult":
-
+            // スケジュールの新規登録や更新をした後に、再度表示する 表示する月は、新規登録や更新した月を表示するようにしてる
             LocalDate scheduleResultLocalDate = LocalDate.of(scheBean.getScheduleDate().getYear(), scheBean.getScheduleDate().getMonthValue(), scheBean.getScheduleDate().getDayOfMonth());
             // 新しいインスタンスを生成する
             monthBean = new MonthBean(scheduleResultLocalDate);

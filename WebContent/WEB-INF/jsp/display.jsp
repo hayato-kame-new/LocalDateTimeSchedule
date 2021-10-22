@@ -86,7 +86,6 @@ td.sche {
   text-align: left;
   height: 80px;
   border-top: none;
-  color: darkgreen;
   /* 追加 */
  line-height: 1.1;
 }
@@ -108,6 +107,9 @@ li {
 span {color: #333; font-size: 80%;}
 .schedule {
   font-weight:bold;
+}
+.schedule span {
+  color: darkgreen;
 }
 .count {
   font-size: 70%;
@@ -240,7 +242,10 @@ span {color: #333; font-size: 80%;}
           %>
           <!-- 編集画面表示のためのリンクになってる 主キーの id を送る  注意 userId ではない 主キーは、ユニークだから主キーで検索すること  -->
           <li >
-            <a href="/LocalDateTimeSchedule/NewScheduleServlet?action=edit&id=<%=id %>"><small class="schedule"><%=schedule%>:&nbsp;</small></a><small><span><%=scheduleMemo%></span></small>
+            <a href="/LocalDateTimeSchedule/NewScheduleServlet?action=edit&id=<%=id %>">
+              <small class="schedule">[<%=scheBean.createStrStartTime() %>-<%=scheBean.createStrEndTime() %>]&nbsp;<span><%=schedule%></span>:&nbsp;</small>
+            </a>
+            <small><span><%=scheduleMemo%></span></small>
           </li>
 
           <%

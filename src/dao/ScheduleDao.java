@@ -27,7 +27,12 @@ public class ScheduleDao {
     final String DB_USER = "postgres";
     final String DB_PASS = "postgres";
 
-    public boolean addSchedule(ScheduleBean scheBean) {
+    /**
+     * ScheduleBeanインスタンスを新規登録
+     * @param scheBean
+     * @return @return true 成功<br> false 失敗
+     */
+    public boolean add(ScheduleBean scheBean) {
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -37,7 +42,7 @@ public class ScheduleDao {
             Class.forName(DRIVER_NAME);
             // データベースへ接続
             conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
-            // PostgreSQLだと、全部小文字でカラム名やテーブル名を書くこと
+            // PostgreSQLだと、全部小文字でカラム名やテーブル名を書くこと id は、自動採番なので、書かない
             String sql = "insert into schedule (userid, scheduledate, starttime, endtime, schedule, schedulememo) values (?::integer, ?::date, ?::time, ?::time, ?, ?)";
 
             // pstmt = conn.prepareStatement(sql);
@@ -100,10 +105,17 @@ public class ScheduleDao {
     }
 
 
-    // 一人のユーザーのひと月分が取れた
+    /**
+     * 一人のユーザーのひと月分のScheduleBeanインスタンスをリストにして取得する
+     * @param userId
+     * @param year
+     * @param month
+     * @param thisMonthlastDay
+     * @return monthScheduleList
+     */
     public List<ScheduleBean> getMonthScheduleList(int userId, int year, int month, int thisMonthlastDay) {
 
-        List<ScheduleBean> list = new ArrayList<ScheduleBean>();
+        List<ScheduleBean> monthScheduleList = new ArrayList<ScheduleBean>();
         ScheduleBean scheBean = null;
 
         Connection conn = null;
@@ -143,7 +155,7 @@ public class ScheduleDao {
                     scheduleMemo = rs.getString("schedulememo");
                     scheBean = new ScheduleBean(id, userId, localdateScheduleDate, localTimeStartTime, localTimeEndTime,
                             schedule, scheduleMemo);
-                    list.add(scheBean); //ここで
+                    monthScheduleList.add(scheBean); //ここで
                 }
             }
         } catch (SQLException | ClassNotFoundException e) {
@@ -176,11 +188,16 @@ public class ScheduleDao {
                 }
             }
         }
-        return list;
+        return monthScheduleList;
     }
 
-
-    // タイムスケジュール登録画面で使うそのユーザーのその日のスケジュールのリストが欲しい NewScheduleServletから呼び出す
+   /**
+    * そのユーザーのその日1日分のScheduleBeanインスタンスをリストにして取得する
+    * NewScheduleServletから呼び出す
+    * @param userId
+    * @param localDate
+    * @return oneDayScheduleList
+    */
     public List<ScheduleBean> GetOneDaySchedule(int userId, LocalDate localDate) {
         List<ScheduleBean> oneDayScheduleList = new ArrayList<ScheduleBean>();
 
@@ -263,7 +280,11 @@ public class ScheduleDao {
     }
 
 
-    // 主キーから、インスタンス取得する
+    /**
+     * 主キーを引数に、ScheduleBeanインスタンス取得する
+     * @param id
+     * @return scheBean
+     */
     public ScheduleBean find(int id) {
          ScheduleBean scheBean = null;
 
@@ -339,5 +360,70 @@ public class ScheduleDao {
          }
          return scheBean;
      }
+
+
+    /**
+     * ScheduleBeanインスタンスを更新する
+     * @param scheBean
+     * @return @return true 成功<br> false 失敗
+     */
+    public boolean update(ScheduleBean scheBean) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            Class.forName(DRIVER_NAME);
+            conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+
+         // 注意 PostgreSQLではテーブル名カラム名全て小文字で  whereをつけ忘れないように
+           String sql = "update schedule set (scheduledate, starttime, endtime, schedule, schedulememo) values (?::date, ?::time, ?::time, ?, ?) where id = ?::integer";
+            pstmt = conn.prepareStatement(sql);
+            // LocalDate型を java.sql.Dateへ変換する
+            java.sql.Date sqlScheduleDate = java.sql.Date.valueOf(scheBean.getScheduleDate());
+            pstmt.setDate(1, sqlScheduleDate);
+            // LocaTime型を java.sql.Timeに変換する
+            java.sql.Time sqlStartTime = java.sql.Time.valueOf(scheBean.getStartTime());
+            pstmt.setTime(2, sqlStartTime);
+         // LocaTime型を java.sql.Timeに変換する
+            java.sql.Time sqlEndTime = java.sql.Time.valueOf(scheBean.getEndTime());
+            pstmt.setTime(3, sqlEndTime);
+
+            pstmt.setString(4, scheBean.getSchedule());
+            pstmt.setString(5, scheBean.getScheduleMemo());
+            pstmt.setInt(6, scheBean.getId());
+
+           int result = pstmt.executeUpdate();  // 更新に成功した件数が返る
+           if(result != 1) {  // where句で 主キーで検索してるので、返る件数は成功したら、１件
+               return false;  // 失敗したらfalseを返す
+           }
+
+        }catch (SQLException | ClassNotFoundException e) {
+            // データベース接続やSQL実行失敗時の処理
+            // JDBCドライバが見つからなかったときの処理
+            e.printStackTrace();
+            return false; // 失敗した時に、falseを返す
+        } finally {
+            // PrepareStatementインスタンスのクローズ処理 順番は逆からクローズする
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    // クローズ処理失敗時の処理
+                    e.printStackTrace();
+                    return false; // 失敗した時に、falseを返す
+                }
+            }
+            // データベース切断
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    // データベース切断失敗時の処理
+                    e.printStackTrace();
+                    return false; // 失敗した時に、falseを返す
+                }
+            }
+        }
+        return true;
+    }
 
 }

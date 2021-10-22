@@ -44,8 +44,12 @@ public class ScheduleInsertServlet extends HttpServlet {
 
         // 文字化け対策
         request.setCharacterEncoding("UTF-8");
+        // actionの値が hiddenフィールドで送られてくる "add" か "edit" 入ってる
+        String action = request.getParameter("action");
+        // 新規では、主キーidの値は int型の規定値(デフォルト値)の 0  編集では、主キーの値が入ってる hiddenフィールドで送られてくる
+        int id = Integer.parseInt(request.getParameter("id"));
 
-        // フォームからの送信で送られてきたのを取得する
+        // time_schedule.jspのフォーム からの送信で送られてきたのを取得する
         int year = Integer.parseInt(request.getParameter("year"));
         int month = Integer.parseInt(request.getParameter("month"));
         int day = Integer.parseInt(request.getParameter("day"));
@@ -60,29 +64,54 @@ public class ScheduleInsertServlet extends HttpServlet {
         LocalTime startTime = LocalTime.of(s_hour, s_minute);
         LocalTime endTime = LocalTime.of(e_hour, e_minute);
 
-
-        // idは、自動採番です  userId を用意してないから仮に 1 で練習に登録する
+        ScheduleDao scheDao = new ScheduleDao();
+        //   userId を用意してないから仮に 1 で練習に登録する
         int userId = 1;  // 仮に練習のために
-        // 引数ありのコンストラクタをよぶ
-         ScheduleBean scheBean = new ScheduleBean( userId, scheduleDate, startTime, endTime, schedule, scheduleMemo);
+        String msg = "";
+        boolean success = true; // trueならデータベース処理が成功
+        ScheduleBean scheBean = null;
+        switch(action) {
+        case "add":
+            // 新規登録の時だけ使うコンストラクタ(6つの引数のコンストラクタ)を使う  新規登録の時には、主キーの idの値は、データベースに登録される時に、自動採番で生成して登録されますので、idが引数には要りません
+            scheBean = new ScheduleBean( userId, scheduleDate, startTime, endTime, schedule, scheduleMemo);
 
-         ScheduleDao scheDao = new ScheduleDao();
-         String msg = year + "年" + month + "月" + day + "日" + "のスケジュールを登録しました。";
-         boolean success = true; // trueならデータベース処理が成功
-         // データベースに新規登録
-         success = scheDao.addSchedule(scheBean);
-         if(!success) {  // falseだったら失敗
-             msg = "スケジュールを登録できませんでした。";
-         }
-         // MonthDisplayServletへリダイレクトします。リダイレクトの際に、year month dayの情報が必要なので、ScheduleBeanインスタンスをセッションスコープに保存します。
-         // リダイレクトの時には、リクエストスコープ使えないので、セッションスコープを使う
-         // セッションは、requestから呼び出します。 サーブレットでは、セッションは明示的に破棄することが大切　(SpringBootだと自動でフレームワークが行ってくれてるが、明示的に破棄することが大切)
-         // スコープに置けるのはインスタンスのみです。Stringなどの参照型のインスタンスは置ける。プリミティブ型は置けない。
-         // クラス型のインスタンスは置けるが、自分で作ったクラスのインスタンスをスコープへ置けるようにするには、Beanとして作らないといけない。Beanを作るルール
+            // データベースに新規登録
+            success = scheDao.add(scheBean); // addメソッドの戻り値は boolean型です
+            if(success == false) {  // falseだったら失敗
+                msg = year + "年" + month + "月" + day + "日" + "のスケジュールを新規登録できませんでした。";
+            }
+            msg = year + "年" + month + "月" + day + "日" +  "のスケジュールを新規登録しました。";
+            break; // switch文を抜ける
+        case "edit":
+            // 編集の時には、id 主キーの値が必要 hiddenフィールドから取得したので idを元に検索する
+            scheBean = scheDao.find(id);
+            // scheBeanの idとuserId以外の 5つのフィールド をフォームの値で更新してから、そのインスタンスをデータベースを更新する
+            scheBean.setScheduleDate(scheduleDate);
+            scheBean.setStartTime(startTime);
+            scheBean.setEndTime(endTime);
+            scheBean.setSchedule(schedule);
+            scheBean.setScheduleMemo(scheduleMemo);
+            // データベース更新
+            success = scheDao.update(scheBean); // updateメソッドの戻り値は boolean型です
+            if (success == false) {
+                msg = year + "年" + month + "月" + day + "日" + "のスケジュールを更新できませんでした。";
+            }
+            msg = year + "年" + month + "月" + day + "日" + "のスケジュールを更新しました。";
+            break; // switch文を抜ける
+        }
+
+        /*
+         * MonthDisplayServletへリダイレクトします。リダイレクトの際に、year month dayの情報が必要なので、ScheduleBeanインスタンスをセッションスコープに保存します。
+         * リダイレクトの時には、リクエストスコープ使えないので、セッションスコープを使う
+         * セッションは、requestから呼び出します。 サーブレットでは、セッションは明示的に破棄することが大切 (情報:SpringBootだと自動でフレームワークが行ってくれてるが、明示的に破棄することが大切)
+         * スコープに置けるのはインスタンスのみです。String List Map などの参照型のインスタンスは置ける。プリミティブ型は置けない。
+         * クラス型のインスタンスは置けるが、自分で作ったクラスのインスタンスをスコープへ置けるようにするには、Beanとして作らないといけない。Beanを作るルール
+         */
+
          HttpSession session = request.getSession(true);
          session.setAttribute("msg", msg);
-
-         //これも必要だと思う
+         // この ScheduleBeanのインスタンスは、再度月を表示する際に、表示する年月日を情報として、送りたいので、これをセッションに保存してる
+         // リダイレクト後は、変更したことを確認するために、変更したスケジュールの月を表示するようにしてる
          session.setAttribute("scheBean", scheBean);
 
          session.setAttribute("mon", "scheduleResult");  // switch文で必要どの月を表示するのかcaseで切り替えるのに必要

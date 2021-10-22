@@ -7,21 +7,15 @@ java.time.LocalDate, java.time.temporal.TemporalAdjusters, java.time.LocalTime" 
 <%
 // 文字化け対策
 request.setCharacterEncoding("UTF-8");
-// リクエストスコープから取り出す 表示に必要 DayBean後で必要なくなるかも
-// DayBean dayBean = (DayBean)request.getAttribute("dayBean");  // 年月日の情報 と その月が何日あるかが格納されてます。
- //int year = dayBean.getYear();
-// int month = dayBean.getMonth();
-// int day = dayBean.getDay();
-// int thisMonthlastDay =  dayBean.getThisMonthlastDay();  // その月が何日あるのか
-
-// リクエストスコープから取り出す
+// NewScheduleServletサーブレットでリクエストスコープに保存してるので  リクエストスコープから取り出す 表示に必要
 String action = (String)request.getAttribute("action");
-String title = action.equals("add") ? "新規" : "編集";
+String title = action.equals("add") ? "新規登録" : "編集";
 // リクエストスコープから フォーム用のインスタンスを取り出して
 //  action が "add"の時の、formScheBeanインスタンスは、ユーザIDだけ入ってるあとは、データ型の規定値になってます int型なら 0 参照型なら null が入ってます
 ScheduleBean formScheBean = (ScheduleBean)request.getAttribute("formScheBean");
+int id = formScheBean.getId();  // 新規では、 int型の規定値の 0 が入ってる  編集では、主キーの値がきちんと入ってる
 
-LocalDate scheduleDate = formScheBean.getScheduleDate(); // 新規の時も 年月日はある
+LocalDate scheduleDate = formScheBean.getScheduleDate(); // 新規の時も 年月日はある NewScheduleServletサーブレットでLocalDateの値は、きちんと入ってる
 
 int year =  scheduleDate.getYear(); // 新規のは   scheduleDate は入ってる
 int month =  scheduleDate.getMonthValue();
@@ -87,7 +81,7 @@ p{font-size:0.75em;}
 <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current">今月表示へ戻る</a>
 <hr />
 
-<h3>タイムスケジュール<%= title %></h3>
+<h2>タイムスケジュール<%= title %></h2>
 
 
 <div id="contents">
@@ -126,133 +120,137 @@ p{font-size:0.75em;}
 
 <!-- フォーム表示 -->
 <div id="right">
+<h3>スケジュールを<%=title %>します</h3>
 <form method="post" action="ScheduleInsertServlet">
-<table>
-<tr>
-<td nowrap>日付</td><td>
-<select name="year">
-<% for (int i = year-1 ; i <= year+1 ; i++){
-  if(i == year) {
-%>
-<option value=<%=i %> selected><%=i %>
-<% } else { %>
-<option value=<%=i %> ><%=i %>
-<%
-}
-}
-%>
-</select>
-
-<select name="month" >
-<% for (int i = 1 ; i <= 12 ; i++){
-  if(i == month) {
-%>
-<option value=<%=i %> selected><%=i %>
-<%} else {%>
-<option value=<%=i %> ><%=i %>
-<%
-}
-}
-%>
-</select>
-
-<select name="day" id="day">
-<% for (int i = 1 ; i <= thisMonthlastDay ; i++){
-  if(i == day) {
-%>
-<option value=<%=i %> selected><%=i %>
-<% } else { %>
-<option value=<%=i %>><%=i %>
-<%
-}
-}
+  <input type="hidden" name="action" value="<%=action %>" />
+  <!-- 編集では、主キーの値が必要 -->
+  <input type="hidden" name="id" value="<%=id %>" />
+  <table>
+  <tr>
+  <td nowrap>日付</td><td>
+  <select name="year">
+  <% for (int i = year-1 ; i <= year+1 ; i++){
+    if(i == year) {
   %>
-</select>
+  <option value=<%=i %> selected><%=i %>
+  <% } else { %>
+  <option value=<%=i %> ><%=i %>
+  <%
+  }
+  }
+  %>
+  </select>
 
-</td></tr>
+  <select name="month" >
+  <% for (int i = 1 ; i <= 12 ; i++){
+    if(i == month) {
+  %>
+  <option value=<%=i %> selected><%=i %>
+  <%} else {%>
+  <option value=<%=i %> ><%=i %>
+  <%
+  }
+  }
+  %>
+  </select>
 
-<tr><td nowrap>時刻</td><td>
-<select name="s_hour">
-<% if (s_hour.equals("")) {%>
-  <option value="" selected>--時
-<% } %>
-<% for (int i = 0 ; i <= 23 ; i++){
-   if( s_hour != null && !s_hour.equals("") &&  Integer.parseInt(s_hour) == i ) {
-%>
-<option value="<%=i %>" selected><%=i %>時
-<%
- } else {
- %>
- <option value="<%=i %>" ><%=i %>時
-  <% }
-   }%>
-</select>
+  <select name="day" id="day">
+  <% for (int i = 1 ; i <= thisMonthlastDay ; i++){
+    if(i == day) {
+  %>
+  <option value=<%=i %> selected><%=i %>
+  <% } else { %>
+  <option value=<%=i %>><%=i %>
+  <%
+  }
+  }
+    %>
+  </select>
 
-<select name="s_minute">
-<% if (s_minute.equals("")) {%>
-  <option value="" selected>--分
-  <option value="0" selected>00分
-  <option value="30">30分
-<% } else if ( s_minute != null && !s_minute.equals("") && s_minute.equals("00")){ %>
-  <option value="" >--分
-  <option value="0" selected>00分
-  <option value="30">30分
-<% } else if ( s_minute != null &&  !s_minute.equals("") && s_minute.equals("30")){ %>
-  <option value="" >--分
-  <option value="0" >00分
-  <option value="30" selected>30分
+  </td></tr>
+
+  <tr><td nowrap>時刻</td><td>
+  <select name="s_hour">
+  <% if (s_hour.equals("")) {%>
+    <option value="" selected>--時
   <% } %>
-</select>
+  <% for (int i = 0 ; i <= 23 ; i++){
+     if( s_hour != null && !s_hour.equals("") &&  Integer.parseInt(s_hour) == i ) {
+  %>
+  <option value="<%=i %>" selected><%=i %>時
+  <%
+   } else {
+   %>
+   <option value="<%=i %>" ><%=i %>時
+    <% }
+     }%>
+  </select>
 
-<select name="e_hour">
-<% if (e_hour.equals("")) {%>
-  <option value="" selected>--時
-<% } %>
-<% for (int i = 0 ; i <= 23 ; i++){
-   if( e_hour != null && !e_hour.equals("") && Integer.parseInt(e_hour) == i ) {
-%>
-<option value="<%=i %>" selected><%=i %>時
-<%
- } else {
- %>
- <option value="<%=i %>" ><%=i %>時
-  <% }
-   }%>
-</select>
+  <select name="s_minute">
+  <% if (s_minute.equals("")) {%>
+    <option value="" selected>--分
+    <option value="0" selected>00分
+    <option value="30">30分
+  <% } else if ( s_minute != null && !s_minute.equals("") && s_minute.equals("00")){ %>
+    <option value="" >--分
+    <option value="0" selected>00分
+    <option value="30">30分
+  <% } else if ( s_minute != null &&  !s_minute.equals("") && s_minute.equals("30")){ %>
+    <option value="" >--分
+    <option value="0" >00分
+    <option value="30" selected>30分
+    <% } %>
+  </select>
 
-
-<select name="e_minute">
-<% if (e_minute.equals("")) {%>
-  <option value="" selected>--分
-  <option value="0" >00分
-  <option value="30">30分
-<% } else if ( e_minute != null && !e_minute.equals("") && e_minute.equals("00")){ %>
-  <option value="" >--分
-  <option value="0" selected>00分
-  <option value="30">30分
-<% } else if ( e_minute != null &&  !e_minute.equals("") && e_minute.equals("30")){ %>
-  <option value="" >--分
-  <option value="0" >00分
-  <option value="30" selected>30分
+  <select name="e_hour">
+  <% if (e_hour.equals("")) {%>
+    <option value="" selected>--時
   <% } %>
-</select>
+  <% for (int i = 0 ; i <= 23 ; i++){
+     if( e_hour != null && !e_hour.equals("") && Integer.parseInt(e_hour) == i ) {
+  %>
+  <option value="<%=i %>" selected><%=i %>時
+  <%
+   } else {
+   %>
+   <option value="<%=i %>" ><%=i %>時
+    <% }
+     }%>
+  </select>
 
-<tr>
-<td nowrap>予定</td>
-<td><input type="text" name="schedule" value="<%=formScheBean.getSchedule() %>" size="30" maxlength="70">
-</td>
-</tr>
 
-<tr>
-<td valign="top" nowrap>メモ</td>
-<td><textarea name="scheduleMemo" cols="30" rows="8" wrap="virtual"><%=formScheBean.getScheduleMemo() %></textarea></td>
-</tr>
-</table>
+  <select name="e_minute">
+  <% if (e_minute.equals("")) {%>
+    <option value="" selected>--分
+    <option value="0" >00分
+    <option value="30">30分
+  <% } else if ( e_minute != null && !e_minute.equals("") && e_minute.equals("00")){ %>
+    <option value="" >--分
+    <option value="0" selected>00分
+    <option value="30">30分
+  <% } else if ( e_minute != null &&  !e_minute.equals("") && e_minute.equals("30")){ %>
+    <option value="" >--分
+    <option value="0" >00分
+    <option value="30" selected>30分
+    <% } %>
+  </select>
 
-<p>
-<input type="submit" name="Register" value="送信">
-<input type="reset" value="キャンセル">
-<p>
+  <tr>
+  <td nowrap>予定</td>
+  <td><input type="text" name="schedule" value="<%=formScheBean.getSchedule() %>" size="30" maxlength="70">
+  </td>
+  </tr>
+
+  <tr>
+  <td valign="top" nowrap>メモ</td>
+  <td><textarea name="scheduleMemo" cols="30" rows="8" wrap="virtual"><%=formScheBean.getScheduleMemo() %></textarea></td>
+  </tr>
+  </table>
+
+  <p>
+  <input type="submit" name="Register" value="送信">
+  <input type="reset" value="キャンセル">
+  <p>
 </form>
 
 </div>
