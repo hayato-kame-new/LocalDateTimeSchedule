@@ -375,7 +375,9 @@ public class ScheduleDao {
             conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
 
          // 注意 PostgreSQLではテーブル名カラム名全て小文字で  whereをつけ忘れないように
-           String sql = "update schedule set (scheduledate, starttime, endtime, schedule, schedulememo) values (?::date, ?::time, ?::time, ?, ?) where id = ?::integer";
+           //  String sql = "update employees set (name, age, gender, photoId, zipNumber, pref, address, departmentId, hireDate, retirementDate) = (?, ?::integer, ?::integer, ?::integer, ?, ?, ?, ?, ?::date, ?::date) where employeeId = ?";
+
+           String sql = "update schedule set (scheduledate, starttime, endtime, schedule, schedulememo) = (?::date, ?::time, ?::time, ?, ?) where id = ?::integer";
             pstmt = conn.prepareStatement(sql);
             // LocalDate型を java.sql.Dateへ変換する
             java.sql.Date sqlScheduleDate = java.sql.Date.valueOf(scheBean.getScheduleDate());

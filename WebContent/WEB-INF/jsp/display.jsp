@@ -233,11 +233,11 @@ span {color: #333; font-size: 80%;}
               String schedule = scheBean.getSchedule();
              count++;
               if(schedule.length() >= 7 ) {
-                schedule = schedule.substring(0,8) + "...";
+                schedule = schedule.substring(0,7) + "...";
               }
               String scheduleMemo = scheBean.getScheduleMemo();
               if(scheduleMemo.length() >= 7 ) {
-                scheduleMemo = scheduleMemo.substring(0,8) + "...";
+                scheduleMemo = scheduleMemo.substring(0,7) + "...";
               }
           %>
           <!-- 編集画面表示のためのリンクになってる 主キーの id を送る  注意 userId ではない 主キーは、ユニークだから主キーで検索すること  -->

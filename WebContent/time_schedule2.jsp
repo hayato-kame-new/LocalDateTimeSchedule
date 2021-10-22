@@ -264,7 +264,10 @@ function createSelectBox() {
   //const strM = document.month.options[monthNum].value;
 
   // その年のその月が何日あるのかを取得する
-  var days_count = new Date(parseInt(Number(strY), 10), parseInt(Number(strM), 10), 0).getDate();
+ // var days_count = new Date(parseInt(Number(strY), 10), parseInt(Number(strM), 10), 0).getDate();
+
+  var = dt = new date(year, month, 0);
+  var lastday = dt.getDate();
 
   for (var i = 1; i <= days_count; i++) {
     let op = document.createElement("option");
