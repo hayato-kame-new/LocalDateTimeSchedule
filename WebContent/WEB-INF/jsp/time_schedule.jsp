@@ -261,11 +261,25 @@ p{font-size:0.75em;}
   </table>
 
   <p>
-  <input type="submit" name="Register" value="送信">
-  <input type="reset" value="キャンセル">
+    <input type="submit" name="Register" value="送信">
+    <input type="reset" value="キャンセル">
   <p>
 </form>
 
+<%
+if(!action.equals("add")) {
+%>
+<!-- 削除のボタン表示 action の値を "delete" で送る 削除にはid主キーの値が必要なのでhiddenで送る 削除後に削除した月を表示する -->
+<small>※このスケジュールを削除したい時は、削除ボタンを押してください</small>
+<!-- onsubmit属性を使って 確認ダイアログを出す -->
+<form method="post" action="ScheduleInsertServlet" onsubmit="return beforeSubmit()">
+    <input type="hidden" name="action" value="delete" />
+    <!-- 削除では、主キーの値が必要 -->
+    <input type="hidden" name="id" value="<%=id %>" />
+
+    <input type="submit" value="削除"  />
+</form>
+<% } %>
 </div>
 
 </div>
@@ -299,7 +313,21 @@ p{font-size:0.75em;}
     });
   })(jQuery);
 
+
+
 </script>
+
+<script>
+
+function beforeSubmit() {
+    if(window.confirm('本当に削除しますか？')) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+</script>
+
 
 </body>
 </html>

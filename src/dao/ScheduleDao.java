@@ -428,4 +428,49 @@ public class ScheduleDao {
         return true;
     }
 
+    // 削除
+    public boolean delete(int id) {
+
+          Connection conn = null;
+          PreparedStatement pstmt = null;
+          try {
+              Class.forName(DRIVER_NAME);
+              conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+
+           // 注意 PostgreSQLではテーブル名カラム名全て小文字で  whereをつけ忘れないように
+
+             String sql = "delete from schedule where id = ?::integer";
+              pstmt = conn.prepareStatement(sql);
+              pstmt.setInt(1, id);
+              // 成功したら、executeUpdateメソッドの戻り値は、更新された行数を表します。
+              int result = pstmt.executeUpdate();
+              if(result != 1) {
+                  return false;
+              }
+              // 1 だったら成功
+          } catch (SQLException | ClassNotFoundException e) {
+              e.printStackTrace();
+              return false;
+          } finally {
+              // PrepareStatementインスタンスのクローズ処理
+              if (pstmt != null) {
+                  try {
+                      pstmt.close();
+                  } catch (SQLException e) {
+                      e.printStackTrace();
+                      return false;
+                  }
+              }
+           // データーベース切断
+              if (conn != null) {
+                  try {
+                      conn.close();
+                  } catch (SQLException e) {
+                      e.printStackTrace();
+                      return false;
+                  }
+              }
+          }
+          return true;
+      }
 }
