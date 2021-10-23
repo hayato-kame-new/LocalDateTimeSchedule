@@ -18,7 +18,7 @@ public class ScheduleUserBean implements Serializable {
 
     private int id;  // 主キーでオートインクリメント(自動採番)なので 新規に作成する時には、INSERTで値を入れなくとも、自動で採番されるカラムです
     // idカラムには さらにインデックスもついてる
-    private String scheduleuser;  // ユーザー名
+    private String scheduleUser;  // ユーザー名  カラム名は全て小文字 scheduleuser  です
     private String pass;  // パスワード
     private int roll;  // 管理者権限を持ったユーザーは「roll」カラムに「1」を設定します  管理者なら1、それ以外は0
 
@@ -29,13 +29,22 @@ public class ScheduleUserBean implements Serializable {
     }
 
 
+    public ScheduleUserBean(String scheduleUser, String pass) {
+        super();
+        this.scheduleUser = scheduleUser;
+        this.pass = pass;
+    }
+
+
+
+
     public int getId() {
         return id;
     }
 
 
-    public String getScheduleuser() {
-        return scheduleuser;
+    public String getScheduleUser() {
+        return scheduleUser;
     }
 
 
@@ -54,8 +63,8 @@ public class ScheduleUserBean implements Serializable {
     }
 
 
-    public void setScheduleuser(String scheduleuser) {
-        this.scheduleuser = scheduleuser;
+    public void setScheduleUser(String scheduleUser) {
+        this.scheduleUser = scheduleUser;
     }
 
 
@@ -67,8 +76,6 @@ public class ScheduleUserBean implements Serializable {
     public void setRoll(int roll) {
         this.roll = roll;
     }
-
-
 
 
 }
