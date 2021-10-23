@@ -7,7 +7,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class LoginCheckServlet
@@ -38,16 +37,18 @@ public class LoginCheckServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 
-         HttpSession session = request.getSession(true);
 
-            /* 認証失敗から呼び出されたのかどうか */
-            Object status = session.getAttribute("status");
-
-            String msg = "";
-            if (status != null){
-                msg = "認証に失敗しました 再度ユーザー名とパスワードを入力して下さい";
-                session.setAttribute("status", null);
-            }
+         // ここでは書かないかも
+//         HttpSession session = request.getSession(true);
+//
+//            /* 認証失敗から呼び出されたのかどうか */
+//            Object status = session.getAttribute("status");
+//
+//            String msg = "";
+//            if (status != null){
+//                msg = "認証に失敗しました 再度ユーザー名とパスワードを入力して下さい";
+//                session.setAttribute("status", null);
+//            }
 
 
     }

@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-
+//   自分で作成したクラスのインスタンスをスコープにおくには、Beanのクラスにして作らないとだめ
+//Beanのクラスのルールにしたがってクラスを作ること スコープには、Beanクラスにしないと保存できないので 普通のString List Map など参照系のクラスのオブジェクトはスコープに置けますが、プリミティブ型は置けない
+// 自分で作成したクラスをインスタンスにしてスコープに置くには、Beanにしないといけない
 public class ScheduleBean implements Serializable {
 
     /**
@@ -13,6 +15,8 @@ public class ScheduleBean implements Serializable {
     private static final long serialVersionUID = -2992636428327453702L;
 
     private int id;    // データベースでは主キー 自動採番  さらにインデックスもついてる
+    // 主キーでオートインクリメント(自動採番)なので 新規に作成する時には、INSERTで値を入れなくとも、自動で採番されるカラムです
+
     private int userId;  // PostgreSQLでは、 カラム名が全て小文字になっています userid です
     private LocalDate scheduleDate; // scheduledate
     private LocalTime startTime;  // starttime

@@ -6,8 +6,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class MonthBean implements Serializable {  //  自分で作成したクラスのインスタンスをスコープにおくには、Beanのクラスにして作らないとだめ
-// Beanのクラスのルールにしたがってクラスを作ること スコープには、Beanクラスにしないと保存できないので 普通のStringなど参照系のクラスのオブジェクトはスコープに置けますが、
+public class MonthBean implements Serializable {  //   自分で作成したクラスのインスタンスをスコープにおくには、Beanのクラスにして作らないとだめ
+    //Beanのクラスのルールにしたがってクラスを作ること スコープには、Beanクラスにしないと保存できないので 普通のString List Map など参照系のクラスのオブジェクトはスコープに置けますが、プリミティブ型は置けない
     // 自分で作成したクラスをインスタンスにしてスコープに置くには、Beanにしないといけない
 
     /**
