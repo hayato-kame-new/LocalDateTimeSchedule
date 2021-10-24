@@ -7,12 +7,8 @@
 <%
 
 /* LoginCheckServlet で ユーザの名前とパスワードが会ってれば、このwelcome.jsp ページにくる */
-  // セッションスコープからログインユーザ情報を取得
+  // セッションスコープからログインユーザ情報を取得  フィルターで判断するために必要 セッションスコープから取り出す
   ScheduleUserBean userBean = (ScheduleUserBean) session.getAttribute("userBean");
-
-// フィルターで判断するために必要 セッションスコープから取り出す
-/* Map<String,String> userMap = (HashMap<String,String>) session.getAttribute("userMap");
-String userName = userMap.get("scheduleUser"); */
 %>
 <html>
 <head>

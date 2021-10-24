@@ -29,21 +29,10 @@ import model.ScheduleUserBean;
  * 今回は、init()メソッドとdestroy()メソッドでは何も処理を行わないので、空で実装しています。
  * フィルタはサーブレットクラスだけでなく、JSPファイルやHTMLファイルにも適用することができます。
  *  「@WebFilter("/*")」は、すべてのサーブレットクラス以外にJSPファイル、HTMLファイルも含まれています
- *
+ * @WebFilter("/*") にしないとうまく機能しない
  *
  */
-@WebFilter(
-        urlPatterns = {
-                "/LoginCheckFilter", // 自分自身のフィルタークラスは、設定しないと、フィルターが働かなくなるのでつける
-        },
-        servletNames = {
-                "FilterServlet",
-                "LogoutServlet",
-                "NewScheduleServlet",
-                "ScheduleInsertServlet",
-                "MonthDisplayServlet",
-                "LoginCheckServlet"
-        })
+@WebFilter("/*")
 public class LoginCheckFilter implements Filter {
 
     /**
@@ -85,21 +74,15 @@ public class LoginCheckFilter implements Filter {
           // index.jsp へ フォワード
           ((HttpServletRequest) request).getRequestDispatcher("./").forward(request, response);
         } else {  // 既存のセッションが存在したので継続する 引数に falseを設定したので、既存のセッションを継続します
-          // ログインユーザの取得  これは、マップじゃなくて、UserBeanインスタンスにすべき
-
+          // ログインユーザの取得  セッションからUserBeanインスタンスを取得する
             ScheduleUserBean userBean = (ScheduleUserBean) session.getAttribute("userBean");
 
-
-        //   Map<String, String> userMap = (HashMap<String, String>) session.getAttribute("userMap");
           if (userBean == null) {  // ログインしてなかった(直接リクエストされたなどで)   index.jspへフォワードさせる
             ((HttpServletRequest) request).getRequestDispatcher("./").forward(request, response);
           }
+          chain.doFilter(request, response);  // 次のフィルタやサーブレットクラスに処理を渡しています
 
-        //「chain.doFilter(request, response);」で、 次のフィルタやサーブレットクラスに処理を渡しています
-
-          chain.doFilter(request, response);
-
-          // 「chain.doFilter(request, response);」より後に記述する内容は後処理にあたりフィルタやサーブレットクラスが処理された後に実行されます。今回は必要なし
+          // ここに記述する内容は後処理にあたりフィルタやサーブレットクラスが処理された後に実行されます。今回は必要なし
 
         }
     }

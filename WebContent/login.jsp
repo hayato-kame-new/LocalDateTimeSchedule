@@ -21,7 +21,7 @@
   <% if (message != null) { %>
     <p><%=message %></p>
   <%} %>
-  <div align="center">
+  <div >
     <form action="/LocalDateTimeSchedule/LoginCheckServlet" method="post">
      <!-- <input type="hidden" name="action" value="action.LoginLogic" /> -->
       <table>
@@ -41,6 +41,9 @@
         </tr>
       </table>
     </form>
+  </div>
+  <div>
+  <a href="./user_registration.jsp">新規ユーザ登録画面へ</a>
   </div>
 
 </body>
