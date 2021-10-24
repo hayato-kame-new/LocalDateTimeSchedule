@@ -42,12 +42,14 @@ public class LoginCheckServlet extends HttpServlet {
           // リクエストパラメータの取得 login.jspからくる
         // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫だが
         request.setCharacterEncoding("UTF-8");
-      //   String action = request.getParameter("action");  // "login"  もしくは null  なのかしら
+
         String scheduleUser = request.getParameter("scheduleUser");  // ユーザー名
         String pass = request.getParameter("pass");  // パスワード
 
-     // セッションスコープを取得
-        HttpSession session = request.getSession();
+     // セッションスコープを取得 フィルターで、すでにあるかもfalseにして継続にすべきだと思う
+     //    HttpSession session = request.getSession(false );
+        // こっち下ジャないと思うんだよね。。。ちょっとこっちをコメントにしてみるね
+       HttpSession session = request.getSession();
         // 遷移先のパスを設定
         String next = "";
      // セッションスコープのチェック
@@ -55,23 +57,18 @@ public class LoginCheckServlet extends HttpServlet {
           // フォワード
           request.getRequestDispatcher("./").forward(request, response);
         } else {
-          // セッションスコープにユーザ名・パスワードを登録
-        ScheduleUserBean userBean = new ScheduleUserBean(scheduleUser, pass);
+            if( pass.equals("password") ) { // とりあえず
+          // セッションスコープにユーザ名・パスワードを登録 これがセッションスコープにあるかぎり、あればログインしてることになるよ
+                ScheduleUserBean userBean = new ScheduleUserBean(scheduleUser, pass);
                 session.setAttribute("userBean", userBean);
-//          Map<String, String> map = new HashMap<String, String>();
-//          map.put("userName", userName);
-//          map.put("password", password);
-    //       session.setAttribute("userBean", userBean);
-
-
-     // 遷移先のパスを設定
-     //   String next = "";
-
-        // 直接リクエストされた時の対処
-//        if (scheduleUser == null) {  //  ログインしていない場合（直接リクエスト）フィルターをつけたので、大丈夫だと思うが
-//            request.setAttribute("loginFailure", "ログイン画面を経由していません。ログイン処理から行ってください。");
-//            next =  "/login.jsp";
-      //   } else { // 直接リクエストではないなら パスワードを調べる
+                //welcome.jspへフォワードする
+                next = next + "/WEB-INF/jsp/welcome.jsp";
+              }else{
+                  // ログイン失敗時のメッセージをリクエストスコープに保存
+                  request.setAttribute("loginFailure", "ログインに失敗しました。もう一度入力してください。");
+                   // ログイン画面 login.jsp にフォワードする
+                 next =  "/login.jsp";
+                }
 
         // パスワードが、データベースのものと同じだったら、welcomeにフォワードする
 
@@ -81,7 +78,12 @@ public class LoginCheckServlet extends HttpServlet {
         // それを取得する
         // pass が、データベースから取り出したものと同じなら、もしくは passをハッシュしたのと、データベースから取り出したのをハッシュしたの？
      // ログイン処理
-        if( pass.equals("password") ) {
+
+
+
+     //   if( pass.equals("password") ) { // とりあえず
+
+
           // ユーザ情報をセッションスコープに保存
        //   HttpSession session = request.getSession();
           // ユーザー名とパスから ユーザBeanインスタンスを取得する   このインスタンスがセッションにあるかどうかで、ログインしてるかチェックする
@@ -89,14 +91,15 @@ public class LoginCheckServlet extends HttpServlet {
         //  session.setAttribute("userBean", new ScheduleUserBean(scheduleUser, pass));
 
           //welcome.jspへフォワードする
-         next = next + "/WEB-INF/jsp/welcome.jsp";
 
-        }else{
-          // ログイン失敗時のメッセージをリクエストスコープに保存
-          request.setAttribute("loginFailure", "ログインに失敗しました。もう一度入力してください。");
-           // ログイン画面 login.jsp にフォワードする
-         next =  "/login.jsp";
-        }
+
+//         next = next + "/WEB-INF/jsp/welcome.jsp";
+//        }else{
+//          // ログイン失敗時のメッセージをリクエストスコープに保存
+//          request.setAttribute("loginFailure", "ログインに失敗しました。もう一度入力してください。");
+//           // ログイン画面 login.jsp にフォワードする
+//         next =  "/login.jsp";
+//        }
 
     }
         // フォワード処理
