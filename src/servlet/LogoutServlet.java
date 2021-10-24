@@ -29,7 +29,7 @@ public class LogoutServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // ログアウトするには
-         // 既存のセッションスコープを取得
+         // 既存のセッションスコープを取得getSession() は　getSession(true) と同じ
         HttpSession session = request.getSession();
         // セッションスコープを破棄
         session.invalidate();

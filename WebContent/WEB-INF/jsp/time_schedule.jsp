@@ -202,7 +202,7 @@ p{font-size:0.75em;}
     <select name="s_minute">
     <% if (s_minute.equals("")) {%>
       <option value="" selected>--分
-      <option value="0" selected>00分
+      <option value="0">00分
       <option value="30">30分
     <% } else if ( s_minute != null && !s_minute.equals("") && s_minute.equals("00")){ %>
       <option value="" >--分

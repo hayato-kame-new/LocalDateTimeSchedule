@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import model.ScheduleUserBean;
+import model.UserBean;
 
 /**
  * Servlet implementation class LoginCheckServlet
@@ -47,7 +47,13 @@ public class LoginCheckServlet extends HttpServlet {
 
         String scheduleUser = request.getParameter("scheduleUser"); // ユーザー名
         String pass = request.getParameter("pass"); // パスワード
-        HttpSession session = request.getSession();
+//        HttpSession session = request.getSession(false);
+//        if(session != null) {
+//            // セッションスコープを破棄
+//            session.invalidate();
+//        }
+
+        HttpSession  session = request.getSession();
 
         // セッションスコープのチェック
         if (session == null) {
@@ -57,7 +63,7 @@ public class LoginCheckServlet extends HttpServlet {
         } else {
             if (pass.equals("password")) {
                 // セッションスコープにユーザ名・パスワードを登録 これがセッションスコープにあるかぎり、あればログインしてることになるよ
-                ScheduleUserBean userBean = new ScheduleUserBean(scheduleUser, pass);
+                UserBean userBean = new UserBean(scheduleUser, pass);
                 session.setAttribute("userBean", userBean);
 
                 //  ログイン成功したら welcome.jspにフォワード
@@ -66,6 +72,8 @@ public class LoginCheckServlet extends HttpServlet {
             } else {
                 // ログイン失敗時のメッセージをリクエストスコープに保存
                 request.setAttribute("loginFailure", "ログインに失敗しました。もう一度入力してください。");
+                UserBean userBean = new UserBean(); // 空
+                session.setAttribute("userBean", userBean);
                 // index.jsp にフォワードする
                 request.getRequestDispatcher("./").forward(request, response);
                 return;

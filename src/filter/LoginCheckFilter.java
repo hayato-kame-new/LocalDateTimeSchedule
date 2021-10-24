@@ -12,7 +12,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import model.ScheduleUserBean;
+import model.UserBean;
 
 /**
  * Servlet Filter implementation class CharacterEndodingFilter
@@ -75,7 +75,7 @@ public class LoginCheckFilter implements Filter {
           ((HttpServletRequest) request).getRequestDispatcher("./").forward(request, response);
         } else {  // 既存のセッションが存在したので継続する 引数に falseを設定したので、既存のセッションを継続します
           // ログインユーザの取得  セッションからUserBeanインスタンスを取得する
-            ScheduleUserBean userBean = (ScheduleUserBean) session.getAttribute("userBean");
+            UserBean userBean = (UserBean) session.getAttribute("userBean");
 
           if (userBean == null) {  // ログインしてなかった(直接リクエストされたなどで)   index.jspへフォワードさせる
             ((HttpServletRequest) request).getRequestDispatcher("./").forward(request, response);

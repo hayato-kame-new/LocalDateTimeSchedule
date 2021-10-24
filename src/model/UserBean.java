@@ -9,7 +9,7 @@ import java.io.Serializable;
 // PostgreSQLは user が予約語なので、 userは "" で囲んでエスケープすれば使えますが、使わないほうがいいです いちいち select文などでも "user" と書かないとダメです。
 // このモデル Beanクラスに関連するテーブルは usertable テーブルです  userが予約語なので、usertable としてます
 //  ユーザーのカラムは schduleuser カラムとしてデータベースで作っています ちなみに、PostgreSQLは テーブル名カラム名全て小文字です
-public class ScheduleUserBean implements Serializable {
+public class UserBean implements Serializable {
 
     /**
      * シリアル番号UID
@@ -23,13 +23,13 @@ public class ScheduleUserBean implements Serializable {
     private int roll;  // 管理者権限を持ったユーザーは「roll」カラムに「1」を設定します  管理者なら1、それ以外は0
 
 
-    public ScheduleUserBean() {
+    public UserBean() {
         super();
         // TODO 自動生成されたコンストラクター・スタブ
     }
 
 
-    public ScheduleUserBean(String scheduleUser, String pass) {
+    public UserBean(String scheduleUser, String pass) {
         super();
         this.scheduleUser = scheduleUser;
         this.pass = pass;

@@ -22,6 +22,7 @@
     <p><%=message %></p>
   <%} %>
   <div >
+  <h4>ログインフォーム</h4>
     <form action="/LocalDateTimeSchedule/LoginCheckServlet" method="post">
       <table>
         <tr>
@@ -41,5 +42,40 @@
       </table>
     </form>
   </div>
+
+  <div>
+  <!-- フォームの  method属性のデフォルト値は GET です  method="get" は書かなくても良い
+  formタグで送る理由は、サーブレットに行ってから、jspファイルにアクセスしたいから。
+  aリンクでは送れないので、(GETメソッドでuser_registration.jspにリンクでできないため aリンクは HTTPメソッドのGET)
+  フィルターで全てのサーブレットとjspに、ログイン前にアクセスすると、index.jspへ転送するようにしてるのでaリンクでアクセスできないだめ -->
+    <p>まだ、ユーザー登録されていない方は登録してください</p>
+    <form action="/LocalDateTimeSchedule/UserFormServlet" >
+       <input type="submit" value="新規登録画面へ">
+    </form>
+  </div>
+
+ <!--  <div >
+  <h4>ユーザ登録まだの方はこちらのフォームに入力して登録してください</h4>
+    <form action="/LocalDateTimeSchedule/LoginCheckServlet" method="post">
+      管理者権限のないユーザの登録をするので、 0 の値を送る
+      <input type="hidden" name="roll" value="0" />
+      <table>
+        <tr>
+          <th >ユーザ名</th>
+          <td ><input type="text" name="scheduleUser" value="" size="32"  ></td>
+        </tr>
+        <tr>
+          <th >パスワード</th>
+          <td><input type="password" name="pass" value="" size="32"></td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <input type="submit" value="login">
+            <input type="reset" value="reset">
+          </td>
+        </tr>
+      </table>
+    </form>
+  </div> -->
 </body>
 </html>
