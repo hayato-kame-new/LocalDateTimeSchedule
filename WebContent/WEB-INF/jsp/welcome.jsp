@@ -2,10 +2,15 @@
     pageEncoding="UTF-8"%>
 
 <%@ page import="model.ScheduleUserBean" %>
-
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
 <%
   // セッションスコープからログインユーザ情報を取得
   ScheduleUserBean userBean = (ScheduleUserBean) session.getAttribute("userBean");
+
+// フィルターで判断するために必要
+Map<String,String> user = (HashMap<String,String>) session.getAttribute("user");
+String userName = user.get("userName");
 %>
 <html>
 <head>

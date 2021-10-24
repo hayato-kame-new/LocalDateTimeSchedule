@@ -80,7 +80,6 @@ public class LoginCheckServlet extends HttpServlet {
         // フォワード処理
         request.getRequestDispatcher(next).forward(request, response);
 
-
     }
 
 }

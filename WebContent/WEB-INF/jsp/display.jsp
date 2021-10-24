@@ -102,7 +102,7 @@ li {
   list-style:none;
 }
 .msg {
-  color: #FF6E00; font-weight:bold;
+  color: orange; font-weight:bold;
 }
 span {color: #333; font-size: 80%;}
 .schedule {
@@ -136,8 +136,6 @@ span {color: #333; font-size: 80%;}
   <%
   }
   %>
- <!--  パラメータいるかな？ "logout" -->
-  <a href="/LocalDateTimeSchedule/LogoutServlet">ログアウト</a>
   <hr />
 
   <h3><%=year%>年<%=month%>月のカレンダー

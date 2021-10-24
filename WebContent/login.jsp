@@ -21,7 +21,7 @@
   <% if (message != null) { %>
     <p><%=message %></p>
   <%} %>
- あああああ
+
  <!--  <p>スケジュール帳をご利用頂くにはまずログインして頂く必要があります。ユーザー名とパスワードを入力してログインして下さい。</p>
  -->
   <%
@@ -44,7 +44,7 @@
 
   <div align="center">
     <form action="/LocalDateTimeSchedule/LoginCheckServlet" method="post">
-     <input type="hidden" name="action" value="action.LoginLogic" />
+     <!-- <input type="hidden" name="action" value="action.LoginLogic" /> -->
       <table>
         <tr>
           <th >ユーザ名</th>
