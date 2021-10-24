@@ -47,10 +47,6 @@ public class LoginCheckServlet extends HttpServlet {
 
         String scheduleUser = request.getParameter("scheduleUser"); // ユーザー名
         String pass = request.getParameter("pass"); // パスワード
-
-        // セッションスコープを取得 フィルターで、すでにあるかもfalseにして継続にすべきだと思う
-        //    HttpSession session = request.getSession(false );
-        // こっち下ジャないと思うんだよね。。。ちょっとこっちをコメントにしてみるね
         HttpSession session = request.getSession();
 
         // セッションスコープのチェック
@@ -70,15 +66,12 @@ public class LoginCheckServlet extends HttpServlet {
             } else {
                 // ログイン失敗時のメッセージをリクエストスコープに保存
                 request.setAttribute("loginFailure", "ログインに失敗しました。もう一度入力してください。");
-                // ログイン画面 login.jsp にフォワードする
-                // index.jspへ フォワード WebContentからのルート相対パス / から書くこと
-                request.getRequestDispatcher("/login.jsp").forward(request, response);
+                // index.jsp にフォワードする
+                request.getRequestDispatcher("./").forward(request, response);
                 return;
             }
 
         }
-        // フォワード処理
-        //  request.getRequestDispatcher(next).forward(request, response);
 
     }
 
