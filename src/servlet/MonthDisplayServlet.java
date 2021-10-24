@@ -145,7 +145,8 @@ public class MonthDisplayServlet extends HttpServlet {
         request.setAttribute("msg", msg);
 
         //   フォワードする
-   //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く
+   //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする
+        // WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く このパスはルート相対ぱす /  から始めてる WebContentからの ルート相対パスです (相対パス ではない)
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/display.jsp");
         dispatcher.forward(request, response);
 

@@ -45,10 +45,18 @@ public class LoginCheckServlet extends HttpServlet {
         String scheduleUser = request.getParameter("scheduleUser");  // ユーザー名
         String pass = request.getParameter("pass");  // パスワード
 
-        // パスワードが、データベースのものと同じだったら、welcomeにフォワードする
-        // そうでないなら、ログイン画面にフォワードする
      // 遷移先のパスを設定
         String next = "";
+
+        // 直接リクエストされた時の対処
+        if (scheduleUser == null) {  //  ログインしていない場合（直接リクエスト）
+            request.setAttribute("loginFailure", "ログイン画面を経由していません。ログイン処理から行ってください。");
+            next =  "/login.jsp";
+        } else { // 直接リクエストではないなら パスワードを調べる
+
+        // パスワードが、データベースのものと同じだったら、welcomeにフォワードする
+        // そうでないなら、ログイン画面にフォワードする
+
       // データベースに問い合わせる pass を
         // それを取得する
         // pass が、データベースから取り出したものと同じなら、もしくは passをハッシュしたのと、データベースから取り出したのをハッシュしたの？
@@ -68,6 +76,7 @@ public class LoginCheckServlet extends HttpServlet {
          next =  "/login.jsp";
         }
 
+    }
         // フォワード処理
         request.getRequestDispatcher(next).forward(request, response);
 
