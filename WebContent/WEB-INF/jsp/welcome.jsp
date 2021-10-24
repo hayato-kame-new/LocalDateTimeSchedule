@@ -5,12 +5,14 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
 <%
+
+/* LoginCheckServlet で ユーザの名前とパスワードが会ってれば、このwelcome.jsp ページにくる */
   // セッションスコープからログインユーザ情報を取得
   ScheduleUserBean userBean = (ScheduleUserBean) session.getAttribute("userBean");
 
-// フィルターで判断するために必要
-Map<String,String> user = (HashMap<String,String>) session.getAttribute("user");
-String userName = user.get("userName");
+// フィルターで判断するために必要 セッションスコープから取り出す
+/* Map<String,String> userMap = (HashMap<String,String>) session.getAttribute("userMap");
+String userName = userMap.get("scheduleUser"); */
 %>
 <html>
 <head>

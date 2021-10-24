@@ -36,7 +36,7 @@ public class MonthDisplayServlet extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 文字化け対策
+        // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫だが
         request.setCharacterEncoding("UTF-8");
 
         // aリンクのについてた?以降のクエリーパラメータからの取り出し リクエストスコープから取り出す "current" "next" "before" どれかが入ってる

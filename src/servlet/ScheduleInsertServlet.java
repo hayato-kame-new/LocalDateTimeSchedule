@@ -42,8 +42,9 @@ public class ScheduleInsertServlet extends HttpServlet {
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // 文字化け対策
+        // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫だが
         request.setCharacterEncoding("UTF-8");
+
         // actionの値が hiddenフィールドで送られてくる "add" か "edit" か "delete" 入ってる
         // 削除 "delete"　の時には、フォームからは action と id だけしか 送ってこない
         String action = request.getParameter("action");

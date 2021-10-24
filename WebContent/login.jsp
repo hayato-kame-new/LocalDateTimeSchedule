@@ -21,27 +21,6 @@
   <% if (message != null) { %>
     <p><%=message %></p>
   <%} %>
-
- <!--  <p>スケジュール帳をご利用頂くにはまずログインして頂く必要があります。ユーザー名とパスワードを入力してログインして下さい。</p>
- -->
-  <%
-  /* sessionはjspの暗黙オブジェクトの１つなので、いきなり使える */
- //  session = request.getSession(true);
-
-  /* 認証失敗から呼び出されたのかどうか */
- //  Object status = session.getAttribute("status");
-
- /*  String str = "";
-  if (status != null){
-    str = "認証に失敗しました 再度ユーザー名とパスワードを入力して下さい";
-      session.setAttribute("status", null);
-  } */
-  %>
-
- <%--  <p><%=str %></p> --%>
-
-
-
   <div align="center">
     <form action="/LocalDateTimeSchedule/LoginCheckServlet" method="post">
      <!-- <input type="hidden" name="action" value="action.LoginLogic" /> -->

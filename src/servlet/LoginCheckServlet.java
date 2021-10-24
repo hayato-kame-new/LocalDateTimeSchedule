@@ -40,21 +40,41 @@ public class LoginCheckServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
           // リクエストパラメータの取得 login.jspからくる
-        request.setCharacterEncoding("UTF-8");  // 文字化け防止
+        // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫だが
+        request.setCharacterEncoding("UTF-8");
       //   String action = request.getParameter("action");  // "login"  もしくは null  なのかしら
         String scheduleUser = request.getParameter("scheduleUser");  // ユーザー名
         String pass = request.getParameter("pass");  // パスワード
 
-     // 遷移先のパスを設定
+     // セッションスコープを取得
+        HttpSession session = request.getSession();
+        // 遷移先のパスを設定
         String next = "";
+     // セッションスコープのチェック
+        if (session == null) {
+          // フォワード
+          request.getRequestDispatcher("./").forward(request, response);
+        } else {
+          // セッションスコープにユーザ名・パスワードを登録
+        ScheduleUserBean userBean = new ScheduleUserBean(scheduleUser, pass);
+                session.setAttribute("userBean", userBean);
+//          Map<String, String> map = new HashMap<String, String>();
+//          map.put("userName", userName);
+//          map.put("password", password);
+    //       session.setAttribute("userBean", userBean);
+
+
+     // 遷移先のパスを設定
+     //   String next = "";
 
         // 直接リクエストされた時の対処
-        if (scheduleUser == null) {  //  ログインしていない場合（直接リクエスト）
-            request.setAttribute("loginFailure", "ログイン画面を経由していません。ログイン処理から行ってください。");
-            next =  "/login.jsp";
-        } else { // 直接リクエストではないなら パスワードを調べる
+//        if (scheduleUser == null) {  //  ログインしていない場合（直接リクエスト）フィルターをつけたので、大丈夫だと思うが
+//            request.setAttribute("loginFailure", "ログイン画面を経由していません。ログイン処理から行ってください。");
+//            next =  "/login.jsp";
+      //   } else { // 直接リクエストではないなら パスワードを調べる
 
         // パスワードが、データベースのものと同じだったら、welcomeにフォワードする
+
         // そうでないなら、ログイン画面にフォワードする
 
       // データベースに問い合わせる pass を
@@ -63,9 +83,11 @@ public class LoginCheckServlet extends HttpServlet {
      // ログイン処理
         if( pass.equals("password") ) {
           // ユーザ情報をセッションスコープに保存
-          HttpSession session = request.getSession();
-          // ユーザー名とパスから ユーザBeanインスタンスを取得する
-          session.setAttribute("userBean", new ScheduleUserBean(scheduleUser, pass));
+       //   HttpSession session = request.getSession();
+          // ユーザー名とパスから ユーザBeanインスタンスを取得する   このインスタンスがセッションにあるかどうかで、ログインしてるかチェックする
+          // フィルターでは、Mapにしないで、このインスタンスを使います。
+        //  session.setAttribute("userBean", new ScheduleUserBean(scheduleUser, pass));
+
           //welcome.jspへフォワードする
          next = next + "/WEB-INF/jsp/welcome.jsp";
 

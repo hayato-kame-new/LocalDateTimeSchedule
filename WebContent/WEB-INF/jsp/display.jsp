@@ -123,19 +123,20 @@ span {color: #333; font-size: 80%;}
 <body>
   <!--  aリンクだと、インスタンスを送りたい時には、セッションスコープへ入れないとダメ session は、JSPで使える暗黙オブジェクト
 上のスクリプトレットでセッションに保存している session.setAttribute("monthBean", monthBean); -->
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before">&lang;&lang;
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before">&lang;
     前月表示</a>
   <small>&emsp;</small>
   <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next">翌月表示
-    &rang;&rang;</a>
+    &rang;</a>
   <br />
   <%
   if (!mon.equals("current")) {
   %>
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current">今月の表示に戻る</a>
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current">今月の表示に戻る&lang;</a>
   <%
   }
   %>
+  <a href="/LocalDateTimeSchedule/LogoutServlet">ログアウト</a>
   <hr />
 
   <h3><%=year%>年<%=month%>月のカレンダー
@@ -197,7 +198,8 @@ span {color: #333; font-size: 80%;}
          注意 主キーのidではない -->
    <a
         href="/LocalDateTimeSchedule/NewScheduleServlet?action=add&userId=1&year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>"><i
-          class="fas fa-clipboard-list"></i></a> <%
+          class="fas fa-clipboard-list"></i></a>
+ <%
  }
  %></td>
       <%

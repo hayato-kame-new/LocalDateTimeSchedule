@@ -36,7 +36,7 @@ public class NewScheduleServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // 文字化け対策
+        // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫だが
         request.setCharacterEncoding("UTF-8");
         // display.jspの画面のaリンク(HTTPメソッドはGET)でアクセスしてくるので ?以降のクエリーパラメーターから取得する  新規では年月日が取れる
         String action = request.getParameter("action");  // 新規の時は add  編集の時は edit が入ってくる
