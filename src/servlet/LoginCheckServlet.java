@@ -62,7 +62,7 @@ public class LoginCheckServlet extends HttpServlet {
             return;
         } else {
             if (pass.equals("password")) {
-                // セッションスコープにユーザ名・パスワードを登録 これがセッションスコープにあるかぎり、あればログインしてることになるよ
+                // セッションスコープにユーザ名・パスワードを登録 これがセッションスコープにないと、フィルターが聞いて index.jspへ転送されてしまう
                 UserBean userBean = new UserBean(scheduleUser, pass);
                 session.setAttribute("userBean", userBean);
 
@@ -72,6 +72,7 @@ public class LoginCheckServlet extends HttpServlet {
             } else {
                 // ログイン失敗時のメッセージをリクエストスコープに保存
                 request.setAttribute("loginFailure", "ログインに失敗しました。もう一度入力してください。");
+                // 空の(フィールドが規定値のままの)userBeanをセッションに置く これがセッションスコープにないと、フィルターが聞いて index.jspへ転送されてしまう
                 UserBean userBean = new UserBean(); // 空
                 session.setAttribute("userBean", userBean);
                 // index.jsp にフォワードする

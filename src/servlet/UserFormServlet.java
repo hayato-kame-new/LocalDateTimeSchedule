@@ -41,7 +41,7 @@ public class UserFormServlet extends HttpServlet {
             request.getRequestDispatcher("./").forward(request, response);
             return;
         } else {
-
+            // 空の(フィールドが規定値のままの)userBeanをセッションに置く これがセッションスコープにないと、フィルターが聞いて index.jspへ転送されてしまう
         UserBean userBean = new UserBean(); // 空
         session.setAttribute("userBean", userBean);
 
