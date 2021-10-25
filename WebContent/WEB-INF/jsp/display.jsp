@@ -76,13 +76,13 @@ td.otherday {
 }
 
 td.stamp {
-  background-color: #fffffff;
+  background-color: #fff;
   text-align: left;
   height: 17px;
 }
 
 td.sche {
-  background-color: #fffffff;
+  background-color: #fff;
   text-align: left;
   height: 80px;
   border-top: none;
@@ -113,7 +113,6 @@ span {color: #333; font-size: 80%;}
 }
 .count {
   font-size: 70%;
-  color: font-style:bold;
 }
 .fontAwesome a {
   font-size: 120%;
@@ -208,6 +207,9 @@ span {color: #333; font-size: 80%;}
     </tr>
 
 
+
+
+
     <tr>
       <%
       for (int k = 0; k < 7; k++) {
@@ -231,16 +233,16 @@ span {color: #333; font-size: 80%;}
          int count = 0;
           for (ScheduleBean scheBean : monthScheduleList) {
             if (scheBean.getScheduleDate().getDayOfMonth() == calendarDay[j + k]) {
-              int id = scheBean.getId();  // 主キープライマリーキーが編集に必要
-              String schedule = scheBean.getSchedule();
-             count++;
-              if(schedule.length() >= 7 ) {
-                schedule = schedule.substring(0,7) + "...";
-              }
-              String scheduleMemo = scheBean.getScheduleMemo();
-              if(scheduleMemo.length() >= 7 ) {
-                scheduleMemo = scheduleMemo.substring(0,7) + "...";
-              }
+                int id = scheBean.getId();  // 主キープライマリーキーが編集に必要
+                String schedule = scheBean.getSchedule();
+               count++;
+                if(schedule.length() >= 7 ) {
+                  schedule = schedule.substring(0,7) + "...";
+                }
+                String scheduleMemo = scheBean.getScheduleMemo();
+                if(scheduleMemo.length() >= 7 ) {
+                  scheduleMemo = scheduleMemo.substring(0,7) + "...";
+                }
           %>
           <!-- 編集画面表示のためのリンクになってる 主キーの id を送る  注意 userId ではない 主キーは、ユニークだから主キーで検索すること  -->
           <li >
@@ -251,23 +253,29 @@ span {color: #333; font-size: 80%;}
           </li>
 
           <%
-          }
+          }  // ulとliの間は２個でいいんじゃないかな このまま変更なし
           }
           %>
         </ul>
+
         <%if(count != 0) { %>
          <span class="count">&lang;<%= count%>件です&rang;</span>
         <%
-        }
-     }
+        } // 最初ここは２つあった これは ifのとじかっこだからこのまま
+      } // ulとtdの間は 1こ  変更なし
      %>
       </td>
       <%
-      }
-      }
-      }
+
+     } // 最初ここ3つあった閉じ括弧  でも trとtdの間は一個じゃないかな
+    //  }
+    //  }
       %>
     </tr>
+    <%
+    }  // もともとなかったが 2こ付け足した trとtableの間には 2こじゃないかな
+    }
+      %>
 
   </table>
 

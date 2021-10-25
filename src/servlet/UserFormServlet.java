@@ -41,8 +41,8 @@ public class UserFormServlet extends HttpServlet {
             request.getRequestDispatcher("./").forward(request, response);
             return;
         } else {
-            // 空の(フィールドが規定値のままの)userBeanをセッションに置く これがセッションスコープにないと、フィルターが聞いて index.jspへ転送されてしまう
-        UserBean userBean = new UserBean(); // 空
+            // 空の(フィールドが規定値のままの)userBeanをセッションに置く これがセッションスコープにない nullだと、フィルターが効くので index.jspへ転送されてしまう
+        UserBean userBean = new UserBean(); // 空にしておけばいい nullじゃなければいいので nullだと、フィルターの作用でindex.jspへ転送されてしまう
         session.setAttribute("userBean", userBean);
 
         // このサーブレットでは、登録画面にフォワードするだけです

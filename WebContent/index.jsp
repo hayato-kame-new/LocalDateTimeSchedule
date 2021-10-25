@@ -33,6 +33,10 @@
           <th >パスワード</th>
           <td><input type="password" name="pass" value="" size="32"></td>
         </tr>
+         <tr>
+          <th >メールアドレス</th>
+          <td><input type="email" name="mail" value="" size="32"></td>
+        </tr>
         <tr>
           <td colspan="2">
             <input type="submit" value="ログイン">

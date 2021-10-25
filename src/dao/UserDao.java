@@ -38,7 +38,7 @@ public class UserDao {
             // user は PostgreSQLの予約語のため、なるべく使わない ""で囲んでエスケープすれば使えるけど、使わないほうがいい
             // 主キーの id が serial です シーケンス（データ型のserial）とは 自動採番するカラムです。
             // シーケンスとはINSERTで値を入れなくとも、自動で採番される列で、CREATE SEQUENCE文で作成することができます。またテーブル作成時、データ型に「serial」を指定した場合も同じくシーケンスとなります。シーケンスは自動で1から採番され、＋1ずつされます。
-            String sql = "insert into usertable (scheduleuser, pass, roll) values (?, ?, ?::integer)";
+            String sql = "insert into usertable (scheduleuser, pass, roll, mail) values (?, ?, ?::integer, ?)";
 
             // pstmt = conn.prepareStatement(sql);
             pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -82,5 +82,36 @@ public class UserDao {
         }
         return true;
     }
+
+    // ログイン時は パスワードで照合する　UserBeanが返る
+//    public UserBean findByMail(String mail) {
+//         Connection conn = null;
+//         PreparedStatement pstmt = null;
+//         ResultSet rs = null;
+//
+//         try {
+//             // JDBCドライバを読み込み
+//             Class.forName(DRIVER_NAME);
+//             // データベースへ接続
+//             conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+//
+//             String sql = "select * from usertable where mail = ?";
+//
+//             pstmt = conn.prepareStatement(sql);
+//
+//             pstmt.setString(1, mail);
+//             rs = pstmt.executeQuery();
+//             if(rs.next()) {  // 一意制約のカラムを元にして検索したので、1件だけ返るので whileじゃなくて ifでもいい
+//                int id = rs.getInt("id");
+//                String scheduleUser = rs.getString("scheduleUser");
+//                // パスワードどうしようか
+//
+//
+//             }
+//
+//             }
+//
+//    }
+
 
 }

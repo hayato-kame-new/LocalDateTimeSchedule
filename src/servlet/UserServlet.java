@@ -47,16 +47,7 @@ public class UserServlet extends HttpServlet {
         String pass = request.getParameter("pass");
         int roll = Integer.parseInt(request.getParameter("roll"));
 
-        // セッションを取得するgetSession() は　getSession(true) と同じことらしい このリクエストに関連付けられている現在のセッションを返すか、リクエストにセッションがない場合は作成します。
-        HttpSession session = request.getSession();
-
-        // セッションスコープのチェック
-        if (session == null) {
-            // セッションがなかったら index.jspへ フォワード
-            request.getRequestDispatcher("./").forward(request, response);
-            return;
-        } else {
-            // セッションがあったら、新規に登録して登録が成功したら、セッションスコープに UserBeanインスタンスを保存しておきます。
+            //新規に登録して登録が成功したら、セッションスコープに UserBeanインスタンスを保存して上書きおきます。空のインスタンスがあるので上書きする
             UserDao userDao = new UserDao();
             UserBean userBean = new UserBean(scheduleUser, pass);
 
