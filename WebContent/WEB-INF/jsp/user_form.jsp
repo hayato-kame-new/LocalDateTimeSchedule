@@ -17,7 +17,7 @@ UserBean userBean = (UserBean)session.getAttribute("userBean");
 <body>
 
    <div >
-  <h4>一般ユーザ登録画面</h4>
+  <h4>ユーザ登録画面</h4>
     <form action="/LocalDateTimeSchedule/UserServlet" method="post">
       <table>
         <tr>
@@ -26,7 +26,7 @@ UserBean userBean = (UserBean)session.getAttribute("userBean");
         </tr>
         <tr>
           <th >パスワード</th>
-          <td><input type="password" name="pass" value="<%=userBean.getPass() %>" size="32"></td>
+          <td><input type="password" name="flat_password" value="" size="32"></td>
         </tr>
         <tr>
           <th >メールアドレス</th>

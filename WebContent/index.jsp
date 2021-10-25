@@ -25,17 +25,17 @@
   <h4>ログインフォーム</h4>
     <form action="/LocalDateTimeSchedule/LoginCheckServlet" method="post">
       <table>
-        <tr>
+  <!--       <tr>
           <th >ユーザ名</th>
           <td ><input type="text" name="scheduleUser" value="" size="32"  ></td>
-        </tr>
-        <tr>
-          <th >パスワード</th>
-          <td><input type="password" name="pass" value="" size="32"></td>
-        </tr>
+        </tr> -->
          <tr>
           <th >メールアドレス</th>
           <td><input type="email" name="mail" value="" size="32"></td>
+        </tr>
+        <tr>
+          <th >パスワード</th>
+          <td><input type="password" name="flat_password" value="" size="32"></td>
         </tr>
         <tr>
           <td colspan="2">
@@ -57,29 +57,5 @@
        <input type="submit" value="新規登録画面へ">
     </form>
   </div>
-
- <!--  <div >
-  <h4>ユーザ登録まだの方はこちらのフォームに入力して登録してください</h4>
-    <form action="/LocalDateTimeSchedule/LoginCheckServlet" method="post">
-      管理者権限のないユーザの登録をするので、 0 の値を送る
-      <input type="hidden" name="roll" value="0" />
-      <table>
-        <tr>
-          <th >ユーザ名</th>
-          <td ><input type="text" name="scheduleUser" value="" size="32"  ></td>
-        </tr>
-        <tr>
-          <th >パスワード</th>
-          <td><input type="password" name="pass" value="" size="32"></td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <input type="submit" value="login">
-            <input type="reset" value="reset">
-          </td>
-        </tr>
-      </table>
-    </form>
-  </div> -->
 </body>
 </html>
