@@ -15,6 +15,7 @@ import util.PasswordUtil;
 
 /**
  * Servlet implementation class UserServlet
+ * ユーザ新規登録する
  */
 @WebServlet("/UserServlet")
 public class UserServlet extends HttpServlet {
@@ -76,10 +77,19 @@ public class UserServlet extends HttpServlet {
                 } else { // 成功したらセッションスコープにUserBeanインスタンスを保存しておく フィルターのために
                     // このUserBeanインスタンス  が セッションスコープにあるかぎり、あればログインしてることになるから
                     HttpSession  session = request.getSession();
-                    session.setAttribute("userBean", userBean);
+                    // セッションスコープのチェック 必要だこれ
+                    if (session == null) {
+                        // セッションがなかったら index.jspへ フォワード
+                        request.setAttribute("userRegistFailure", "セッションなかったために！！！ユーザ新規登録に失敗しました。もう一度入力してください。");
+                        request.getRequestDispatcher("./").forward(request, response);
+                        return;
+                    } else {
+                        session.setAttribute("userBean", userBean);
 
-                    // 新規登録成功 welcome.jspにフォワード
-                    request.getRequestDispatcher("/WEB-INF/jsp/welcome.jsp").forward(request, response);
+                        // 新規登録成功 welcome.jspにフォワード
+                        request.getRequestDispatcher("/WEB-INF/jsp/welcome.jsp").forward(request, response);
+
+                    }
                 }
             }
         }

@@ -5,6 +5,7 @@
 <%@ page import="java.util.HashMap" %>
 <%
   String message = (String) request.getAttribute("loginFailure");
+  String userRegistMessage =  (String) request.getAttribute("userRegistFailure");
 %>
 <!DOCTYPE html>
 <html>
@@ -16,10 +17,13 @@
 
   <h2>スケジュール帳へようこそ</h2>
   <hr>
-<!-- このログイン画面は、ログイン処理で失敗した場合の遷移先にもなっているため、
+<!-- このログイン画面は、ログイン処理で失敗した場合の遷移先にもなっているため、また、新規登録処理失敗でも遷移先となっている
 メッセージが取得できた、つまりログイン処理に失敗した場合は、そのメッセージを表示しています -->
   <% if (message != null) { %>
     <p><%=message %></p>
+  <%} %>
+   <% if (userRegistMessage != null) { %>
+    <p><%=userRegistMessage %></p>
   <%} %>
   <div >
   <h4>ログインフォーム</h4>

@@ -90,10 +90,6 @@ td.sche {
  line-height: 1.1;
 }
 
-.current_day {
-  border-radius: 50%;
-}
-
 p {
   font-size: 0.75em;
 }
@@ -117,6 +113,7 @@ span {color: #333; font-size: 80%;}
 .fontAwesome a {
   font-size: 120%;
 }
+
 </style>
 </head>
 <body>
@@ -167,6 +164,8 @@ span {color: #333; font-size: 80%;}
     <%
     // 今月のものだけを表示したい
     String cssDisplay = "day";
+    // 今月の本日だけを表示したい
+    String todayDisplay = "today";
 
     for (int i = 0; i < weekCount; i++) {
       for (int j = i * 7; j < i * 7 + 7; j += 7) { // ２重ループ
@@ -176,19 +175,29 @@ span {color: #333; font-size: 80%;}
       <%
       for (int k = 0; k < 7; k++) {
         // 今月分だけ表示するものと、区別してる タイムスケジュールのリンクや画像リンクは、今月のだけに表示する 日付は今月だけ黒にする
+
         if (i == 0 && calendarDay[j + k] > 7) {
           cssDisplay = "otherday";
+          todayDisplay = "not_today";
         } else if (i == weekCount - 1 && calendarDay[j + k] < 22) {
           cssDisplay = "otherday";
+          todayDisplay = "not_today";
         } else {
           cssDisplay = "day";
+          todayDisplay = "today";
         }
       %>
-      <td class=<%=cssDisplay%>><%=calendarDay[j + k]%> <%
- if (now_year == year && now_month == month && now_day == calendarDay[j + k]) {
+      <td class=<%=cssDisplay%>><%=calendarDay[j + k]%>
+
+ <%
+ if (now_year == year && now_month == month && now_day == calendarDay[j + k] && todayDisplay.equals("today")) {
  %>
-        <img class="current_day" src="./img/IMG_1044.JPG" width="14" height="14"
-        ><br /> <%
+
+        <img src="./img/IMG_1044.JPG" width="14" height="14" style="border-radius: 50%;"
+        >
+       <br />
+ <%
+
  }
  %> <%
  if (cssDisplay.equals("day")) {
