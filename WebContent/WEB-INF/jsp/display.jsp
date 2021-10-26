@@ -5,22 +5,27 @@
 <%
 // 文字化け対策
 request.setCharacterEncoding("UTF-8");
-// リクエストスコープから取り出す
+// MonthDisplayServeletから送られた リクエストスコープから取り出す
 MonthBean monthBean = (MonthBean) request.getAttribute("monthBean");
 String mon = (String) request.getAttribute("mon");
 String msg = (String) request.getAttribute("msg");
+int getUserId = (Integer)request.getAttribute("getUserId"); // ユーザの id  Integer型からint型へアンボクシング(自動)された
 
 int weekCount = monthBean.getWeekCount();
 int[] calendarDay = monthBean.getCalendarDay();
 int year = monthBean.getYear();
 int month = monthBean.getMonth();
-// セッションに保存しないとだめ、リクエストスコープでは、aリンク越しに渡せないので 先月 翌月 のために
+// セッションに保存しないとだめ、リクエストスコープでは、aリンク越しに渡せないので 先月 翌月 のために　年と月の情報が必要
+// あと、ユーザの idも必要だけど、文字列として、aリンクの?以降のクエリー文字列で送れるから、セッションには入れない
 // 翌月の翌月も表示させるために 表示してるインスタンスを送る セッションスコープを使う session は、JSPで使える暗黙オブジェクト セッションは、後で明示的に消すことが大事残ってるから
 session.setAttribute("monthBean", monthBean);
 
 
-// monthScheduleListもリクエストスコープから取り出す そのユーザのその表示したい月のスケジュールの全件が入ったリストを MonthDisplayServletでリクエストスコープに保存して送ってきてる
+// monthScheduleListもリクエストスコープから取り出す
+// そのユーザのその表示したい月のスケジュールの全件が入ったリストを MonthDisplayServletでリクエストスコープに保存して送ってきてる
 List<ScheduleBean> monthScheduleList = new ArrayList<ScheduleBean>();
+
+//  そのユーザのもの 一月の
 monthScheduleList = (List<ScheduleBean>) request.getAttribute("monthScheduleList");
 
 // 今現在の日時
@@ -118,17 +123,19 @@ span {color: #333; font-size: 80%;}
 </head>
 <body>
   <!--  aリンクだと、インスタンスを送りたい時には、セッションスコープへ入れないとダメ session は、JSPで使える暗黙オブジェクト
-上のスクリプトレットでセッションに保存している session.setAttribute("monthBean", monthBean); -->
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before">&lang;
+  リダイレクトした先で、年と月とユーザのidの情報が必要だから、セッションスコープに入れておくこと
+上のスクリプトレットでセッションに保存している session.setAttribute("monthBean", monthBean);
+int型の getUserId は文字列になるけど送れる-->
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before&getUserId=<%= getUserId%>">&lang;
     前月表示</a>
   <small>&emsp;</small>
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next">翌月表示
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next&getUserId=<%= getUserId%>">翌月表示
     &rang;</a>
   <br />
   <%
   if (!mon.equals("current")) {
   %>
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current">今月の表示に戻る&lang;</a>
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current&getUserId=<%= getUserId%>">今月の表示に戻る&lang;</a>
   <%
   }
   %>
