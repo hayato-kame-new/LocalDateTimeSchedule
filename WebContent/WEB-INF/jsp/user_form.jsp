@@ -3,9 +3,14 @@
 <%@ page import="model.UserBean" %>
 
 <%
+// request も session も、JSPで使える暗黙オブジェクトです
 // UserFormサーブレットでは、セッションスコープに、空のインスタンス(各フィールドは、各データ型の規定値になってる) が保存されてますので
 // セッションスコープから、取り出して、フォームに使う
-UserBean userBean = (UserBean)session.getAttribute("userBean");
+
+// UserBean userBean = (UserBean)session.getAttribute("userBean");
+
+// いや、リクエストスコープからでいい??? 変更してみたが		
+UserBean userBean = (UserBean)request.getAttribute("userBean");
 
 %>
 <!DOCTYPE html>

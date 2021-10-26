@@ -43,7 +43,10 @@ public class UserFormServlet extends HttpServlet {
         } else {
             // 空の(フィールドが規定値のままの)userBeanをセッションに置く これがセッションスコープにない nullだと、フィルターが効くので index.jspへ転送されてしまう
         UserBean userBean = new UserBean(); // 空にしておけばいい nullじゃなければいいので nullだと、フィルターの作用でindex.jspへ転送されてしまう
-        session.setAttribute("userBean", userBean);
+        // これ必要かなあ？？？要らないかも いや、ないと、フォワードできない？？
+        // いや、セッションじゃなくて、リクエストスコープにおけばいいのでは？？？
+        request.setAttribute("userBean", userBean);
+       //  session.setAttribute("userBean", userBean);
 
         // このサーブレットでは、登録画面にフォワードするだけです
         //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く

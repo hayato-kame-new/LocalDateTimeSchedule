@@ -9,7 +9,8 @@ request.setCharacterEncoding("UTF-8");
 MonthBean monthBean = (MonthBean) request.getAttribute("monthBean");
 String mon = (String) request.getAttribute("mon");
 String msg = (String) request.getAttribute("msg");
-int getUserId = (Integer)request.getAttribute("getUserId"); // ユーザの id  Integer型からint型へアンボクシング(自動)された
+// 必要！！
+ int userId = (Integer)request.getAttribute("userId"); // ユーザの id
 
 int weekCount = monthBean.getWeekCount();
 int[] calendarDay = monthBean.getCalendarDay();
@@ -126,16 +127,16 @@ span {color: #333; font-size: 80%;}
   リダイレクトした先で、年と月とユーザのidの情報が必要だから、セッションスコープに入れておくこと
 上のスクリプトレットでセッションに保存している session.setAttribute("monthBean", monthBean);
 int型の getUserId は文字列になるけど送れる-->
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before&getUserId=<%= getUserId%>">&lang;
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before&userId=<%=userId %>">&lang;
     前月表示</a>
   <small>&emsp;</small>
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next&getUserId=<%= getUserId%>">翌月表示
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next&userId=<%=userId %>">翌月表示
     &rang;</a>
   <br />
   <%
   if (!mon.equals("current")) {
   %>
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current&getUserId=<%= getUserId%>">今月の表示に戻る&lang;</a>
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current&userId=<%=userId %>">今月の表示に戻る&lang;</a>
   <%
   }
   %>

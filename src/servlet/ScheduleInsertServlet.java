@@ -141,6 +141,7 @@ public class ScheduleInsertServlet extends HttpServlet {
          // この ScheduleBeanのインスタンスは、再度月を表示する際に、表示する年月日を情報として、送りたいので、これをセッションに保存してる
          // リダイレクト後は、変更したことを確認するために、変更したスケジュールの月を表示するようにしてる
          session.setAttribute("scheBean", scheBean);
+         // session.setAttribute("user_id", session);
 
          session.setAttribute("mon", "scheduleResult");  // switch文で必要どの月を表示するのかcaseで切り替えるのに必要
 
