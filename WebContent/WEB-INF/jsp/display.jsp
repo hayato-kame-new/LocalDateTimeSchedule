@@ -60,7 +60,7 @@ td {
   vertical-align: top;
   margin: 0px;
   padding: 2px;
-  overflow: scroll;
+ /* overflow: scroll; */
 }
 
 td.week {
@@ -195,7 +195,8 @@ int型の getUserId は文字列になるけど送れる-->
           todayDisplay = "today";
         }
       %>
-      <td class=<%=cssDisplay%>><%=calendarDay[j + k]%>
+      <td class=<%=cssDisplay%>>
+      <%=calendarDay[j + k]%>
 
  <%
  if (now_year == year && now_month == month && now_day == calendarDay[j + k] && todayDisplay.equals("today")) {
@@ -207,14 +208,15 @@ int型の getUserId は文字列になるけど送れる-->
  <%
 
  }
- %> <%
+ %>
+ <%
  if (cssDisplay.equals("day")) {
  %>
    <!-- スケジュールを新規に作成するためのリンク ログインしてきたユーザID userId も必要
          注意 主キーのidではない -->
-   <a
-        href="/LocalDateTimeSchedule/ScheduleFormServlet?action=add&userId=<%=userId %>&year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>"><i
-          class="fas fa-clipboard-list"></i></a>
+   <a href="/LocalDateTimeSchedule/ScheduleFormServlet?action=add&userId=<%=userId %>&year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>">
+        <i class="fas fa-clipboard-list"></i>
+   </a>
  <%
  }
  %></td>
@@ -222,9 +224,6 @@ int型の getUserId は文字列になるけど送れる-->
       }
       %>
     </tr>
-
-
-
 
 
     <tr>
