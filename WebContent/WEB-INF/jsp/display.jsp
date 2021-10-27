@@ -128,15 +128,15 @@ span {color: #333; font-size: 80%;}
 上のスクリプトレットでセッションに保存している session.setAttribute("monthBean", monthBean);
 int型の getUserId は文字列になるけど送れる-->
   <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=before&userId=<%=userId %>">&lang;
-    前月表示</a>
+    前の月を表示する</a>
   <small>&emsp;</small>
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next&userId=<%=userId %>">翌月表示
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=next&userId=<%=userId %>">次の月を表示する
     &rang;</a>
   <br />
   <%
   if (!mon.equals("current")) {
   %>
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current&userId=<%=userId %>">今月の表示に戻る&lang;</a>
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=return_current&userId=<%=userId %>">今月の表示に戻る&lang;</a>
   <%
   }
   %>
@@ -210,10 +210,10 @@ int型の getUserId は文字列になるけど送れる-->
  %> <%
  if (cssDisplay.equals("day")) {
  %>
-   <!-- スケジュールを新規に作成するためのリンク ログインしてきたユーザID userId も必要とりあえず、1で送る userId=1
+   <!-- スケジュールを新規に作成するためのリンク ログインしてきたユーザID userId も必要
          注意 主キーのidではない -->
    <a
-        href="/LocalDateTimeSchedule/NewScheduleServlet?action=add&userId=1&year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>"><i
+        href="/LocalDateTimeSchedule/ScheduleFormServlet?action=add&userId=<%=userId %>&year=<%=year%>&month=<%=month%>&day=<%=calendarDay[j + k]%>"><i
           class="fas fa-clipboard-list"></i></a>
  <%
  }
@@ -263,7 +263,7 @@ int型の getUserId は文字列になるけど送れる-->
           %>
           <!-- 編集画面表示のためのリンクになってる 主キーの id を送る  注意 userId ではない 主キーは、ユニークだから主キーで検索すること  -->
           <li >
-            <a href="/LocalDateTimeSchedule/NewScheduleServlet?action=edit&id=<%=id %>">
+            <a href="/LocalDateTimeSchedule/ScheduleFormServlet?action=edit&id=<%=id %>">
               <small class="schedule">[<%=scheBean.createStrStartTime() %>-<%=scheBean.createStrEndTime() %>]&nbsp;<span><%=schedule%></span>:&nbsp;</small>
             </a>
             <small><span><%=scheduleMemo%></span></small>

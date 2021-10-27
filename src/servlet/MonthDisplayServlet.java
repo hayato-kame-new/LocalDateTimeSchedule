@@ -54,12 +54,17 @@ public class MonthDisplayServlet extends HttpServlet {
            MonthBean monthBean = null;
             ScheduleBean scheBean = null;
            HttpSession session = request.getSession(true);  // 引数のセッション生成フラグにtrueを指定すると、現在セッションが存在しない場合は、生成して返します 注意nullを代入しちゃだめ　なくなってしまうから
+           if(session.getAttribute("mon") != null) {
+            mon = (String)session.getAttribute("mon");
+           }
            int userId = 0;
            String msg = "";
         switch(mon) {
-        case "current":  //　今月は、aリンクでアクセスしてきたり、リダイレクトできたりする
-            // 新規の時は、aリンクのクエリー文字列からそのユーザのid を取得してきて　ScheduleBeanインスタンスにセットする
-             userId = Integer.parseInt(id);  // ここでjava.lang.NumberFormatException: null
+        case "current":
+            // welcome画面から今月を表示する 今月は、aリンクでアクセスしてくる
+            // welcome画面からのaリンクのクエリー文字列からそのUserBeanインスタンスのidフィールドの値 を取得してきてScheduleBeanインスタンスのuserIdの値にセットする
+
+                userId = Integer.parseInt(id);  // ここでjava.lang.NumberFormatException: null
 
             // 今月を表示するために新しくインスタンスを生成する 今月は、引数なしのコンストラクタを呼ぶ
             // 引数なしのコンストラクタは、現在の日時を基準にしてフィールドを初期化するようにしてある
@@ -72,16 +77,18 @@ public class MonthDisplayServlet extends HttpServlet {
             monthScheduleList = scheDao.getMonthScheduleList(userId , year,  month , thisMonthlastDay);
             break; // switch文抜ける
 
-            // リダイレクト後の時は MonthBeanのBeanは、セッションスコープから取り出す、次の次の次の月など使うため  スケジュール登録してリダイレクトしてきたあともセッションスコープから取得する
-        case "before":   // リダイレクトでくる インスタンスは、セッションに保存しておいてるのでセッションスコープから取得する
-             monthBean = (MonthBean) session.getAttribute("monthBean");  // リダイレクトしてきた時に必要だから取得する
-          // 取り出したら、消しておくセッションから
+        case "before":
+            // 前の月を表示する
+            // aリンクの 前の月を表示 からくるが、インスタンスは、aリンクのクエリー文字列では送れないため、
+            // display.jspでは session.setAttribute("monthBean", monthBean); というふうにセッションスコープにに保存しておいてるのでセッションスコープから取得する
+             monthBean = (MonthBean) session.getAttribute("monthBean");
+          // 取り出したら、消しておくセッションから 消すこと SpringBootでも
             session.removeAttribute("monthBean");
           userId = Integer.parseInt(request.getParameter("userId")); // 先月へのaリンクのクエリー文字列から取得
- 
+
             // 1つ前の月の初日を生成してる   セッションから取得したmonthBeanインスタンスを利用してます
             LocalDate beforeLocalDate = LocalDate.of(monthBean.getYear(), monthBean.getMonth(), 1).minusMonths(1);
-            // 上書きする 新しくインスタンスを生成して上書きする 引数ありのコンストラクタをよぶ １ヶ月前に変更したlocaldateインスタンスを実引数にする
+            // monthBeanを上書きする 新しくインスタンスを生成して上書きする 引数ありのコンストラクタをよぶ １ヶ月前に変更したlocaldateインスタンスを実引数にする
             monthBean = new MonthBean(beforeLocalDate);  // 1つ前の月の初日からmonthBeanを生成して上書きしてます
             year = monthBean.getYear();
             month = monthBean.getMonth();
@@ -89,67 +96,70 @@ public class MonthDisplayServlet extends HttpServlet {
               monthScheduleList = scheDao.getMonthScheduleList(userId , year,  month , thisMonthlastDay); // そのユーザのその月のスケジュール全部
             break; // switch文抜ける
         case "next":
-              //  MonthBeanのBeanは、セッションスコープから取り出す、次の次の次の月など使うため  スケジュール登録してリダイレクトしてきたあともセッションスコープから取得する
-         //   session = request.getSession(true);  // 引数のセッション生成フラグにtrueを指定すると、現在セッションが存在しない場合は、生成して返します
-            monthBean = (MonthBean) session.getAttribute("monthBean");  // リダイレクトしてきた時に必要だから取得する
-            session.removeAttribute("monthBean");  // 取り出したら、消しておくセッションから
-            // スケジュール新規登録したあとリダイレクトしてくる時や、更新した後にリダイレクトしてきた セッションスコープから取得する
-             scheBean = (ScheduleBean) session.getAttribute("scheBean") ;
-            if(scheBean != null ) {  // 一番最初にアクセスしてきた時は このScheduleBeanインスタンスは nullだから  リダイレクトしてきた時は セッションスコープに保存してあるので
-                mon = (String) session.getAttribute("mon");  // "scheduleResult"が入ってる
-                msg = (String) session.getAttribute("msg");
-                // リダイレクトしてきた時は、セッションから そのユーザのidを取得する
-
-                //　ここでセッションからscheBeanというキーの値を削除してます!!!
-                session.removeAttribute("scheBean");  // 取り出したら、消しておくセッションから
-            }
-
-            // useId = Integer.parseInt(request.getParameter("getUserId")); // 次の月へのリンクのクエリー文字列を取得
-            // インスタンスは、セッションに保存しておいてるのでセッションスコープから取得する
-             // セッションから取得したBeanインスタンスを利用する １ヶ月後にする
+            // 次の月を表示する
+            // aリンクの 前の月を表示 からくるが、インスタンスは、aリンクのクエリー文字列では送れないため、
+            // display.jspでは session.setAttribute("monthBean", monthBean); というふうにセッションスコープにに保存しておいてるのでセッションスコープから取得する
+            monthBean = (MonthBean) session.getAttribute("monthBean");
+         // 取り出したら、消しておくセッションから
+            session.removeAttribute("monthBean");
+            userId = Integer.parseInt(request.getParameter("userId")); // 次の月へのaリンクのクエリー文字列から取得
+         // 1つ後ろの月の初日を生成してる   セッションから取得したmonthBeanインスタンスを利用してます
             LocalDate nextLocalDate = LocalDate.of(monthBean.getYear(), monthBean.getMonth(), 1).plusMonths(1);
-            // 新しくインスタンスを生成する引数ありのコンストラクタをよぶ １ヶ月後に変更したlocaldateインスタンスを実引数にする
-            monthBean = new MonthBean(nextLocalDate);
-
+            // monthBeanを上書きする 新しくインスタンスを生成して上書きする 引数ありのコンストラクタをよぶ １ヶ月後に変更したlocaldateインスタンスを実引数にする
+            monthBean = new MonthBean(nextLocalDate); // 1つ後ろの月の初日からmonthBeanを生成して上書きしてます
             year = monthBean.getYear();
             month = monthBean.getMonth();
             // その月が何日あるのか
-             thisMonthlastDay = monthBean.getThisMonthlastDay();
+             thisMonthlastDay = monthBean.getThisMonthlastDay(); // その月が何日あるのか
 
          // そのユーザのその月にあるスケジュール全てをリストにして取得
-            monthScheduleList = scheDao.getMonthScheduleList(scheBean.getUserId() , year,  month , thisMonthlastDay);
+            monthScheduleList = scheDao.getMonthScheduleList(userId , year,  month , thisMonthlastDay);
             break; // switch文抜ける
-        case "scheduleResult":
-              //  MonthBeanのBeanは、セッションスコープから取り出す、次の次の次の月など使うため  スケジュール登録してリダイレクトしてきたあともセッションスコープから取得する
-        //     session = request.getSession(true);  // 引数のセッション生成フラグにtrueを指定すると、現在セッションが存在しない場合は、生成して返します
-             monthBean = (MonthBean) session.getAttribute("monthBean");  // リダイレクトしてきた時に必要だから取得する
-            session.removeAttribute("monthBean");  // 取り出したら、消しておくセッションから
-            // スケジュール新規登録したあとリダイレクトしてくる時や、更新した後にリダイレクトしてきた セッションスコープから取得する
+        case "return_current":  // scheBean mon msg
+            // 今月の表示に戻る  display.jspのaリンクの 今月の表示に戻る から、きた時 クエリー文字列から userIdが取得できる
+            // インスタンスは、aリンクのクエリー文字列では送れないため、 display.jspでは session.setAttribute("monthBean", monthBean); というふうにセッションスコープにに保存しておいてるのでセッションスコープから取得する
+            monthBean = (MonthBean) session.getAttribute("monthBean");
+         // 取り出したら、消しておくセッションから
+            session.removeAttribute("monthBean");
+            userId = Integer.parseInt(request.getParameter("userId")); // aリンクのクエリー文字列から取得
+         // 今月を表示するために新しくインスタンスを生成する 今月は、引数なしのコンストラクタを呼ぶ
+            // monthBeanを現在の日時にして上書きする 引数なしのコンストラクタは、現在の日時を基準にしてフィールドを初期化するようにしてある
+            monthBean = new MonthBean();  // newして現在日付の月のインスタンス生成 下でリクエストスコープに保存する
+             year = monthBean.getYear();
+            month = monthBean.getMonth();
+             thisMonthlastDay = monthBean.getThisMonthlastDay(); // // その月が何日あるのか
+
+            // そのユーザのその月にあるスケジュール全てをリストにして取得 新規では第1引数は、ユーザのidを取得したので、それを入れる
+            monthScheduleList = scheDao.getMonthScheduleList(userId , year,  month , thisMonthlastDay);
+            break; // switch文抜ける
+
+
+        case "scheduleResult": // リダイレクト後
+            // スケージュール登録や編集 削除後にリダイレクトしてきたら、ScheduleInsertServletから リダイレクトしてくるので、登録や編集をした月を表示する
+            // ScheduleInsertServletで、セッションスコープに保存したので セッションスコープから取得する
              scheBean = (ScheduleBean) session.getAttribute("scheBean") ;
-            if(scheBean != null ) {  // 一番最初にアクセスしてきた時は このScheduleBeanインスタンスは nullだから  リダイレクトしてきた時は セッションスコープに保存してあるので
-                mon = (String) session.getAttribute("mon");  // "scheduleResult"が入ってる
+            userId = scheBean.getUserId();  // これが必要
+              //  mon = (String) session.getAttribute("mon");  // "scheduleResult"が入ってる
                 msg = (String) session.getAttribute("msg");
                 // リダイレクトしてきた時は、セッションから そのユーザのidを取得する
 
-                //　ここでセッションからscheBeanというキーの値を削除してます!!!
-                session.removeAttribute("scheBean");  // 取り出したら、消しておくセッションから
-            }
+             // 取り出したら、消しておくセッションから
+                session.removeAttribute("scheBean");
+                session.removeAttribute("mon");
+                session.removeAttribute("msg");
 
-            // getUserId = Integer.parseInt(request.getParameter("getUserId")); // 先月へのリンクのクエリー文字列を取得
-            // スケジュールの新規登録や更新をした後に、再度表示する 表示する月は、新規登録や更新した月を表示するようにしてる
-            LocalDate scheduleResultLocalDate = LocalDate.of(scheBean.getScheduleDate().getYear(), scheBean.getScheduleDate().getMonthValue(), scheBean.getScheduleDate().getDayOfMonth());
-            // 新しいインスタンスを生成する
-            monthBean = new MonthBean(scheduleResultLocalDate);
+            // 削除した年月日を取得してる ScheduleBeanの 削除をした後に、再度表示する月は削除した月なので
+            LocalDate resultLocalDate = LocalDate.of(scheBean.getScheduleDate().getYear(), scheBean.getScheduleDate().getMonthValue(), scheBean.getScheduleDate().getDayOfMonth());
+            // 新しいインスタンスを生成する 下でリクエストスコープに保存してる
+            monthBean = new MonthBean(resultLocalDate);
 
             year = monthBean.getYear();
             month = monthBean.getMonth();
-            // その月が何日あるのか
-             thisMonthlastDay = monthBean.getThisMonthlastDay();
+             thisMonthlastDay = monthBean.getThisMonthlastDay();  // その月が何日あるのか
 
          // そのユーザのその月にあるスケジュール全てをリストにして取得
             monthScheduleList = scheDao.getMonthScheduleList(scheBean.getUserId() , year,  month , thisMonthlastDay);
-
-            break;
+            break; // switch文を抜ける
         }
 
      // リクエストスコープに保存する。リクエストスコープは、フォワードできる(リダイレクトはできない)
@@ -159,7 +169,6 @@ public class MonthDisplayServlet extends HttpServlet {
         // 必要です！！！
      request.setAttribute("userId", userId);  // ユーザの id 必要
 
-        // dayScheduleListも保存
         request.setAttribute("monthScheduleList", monthScheduleList);
 
 

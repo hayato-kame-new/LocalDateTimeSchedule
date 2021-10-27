@@ -19,14 +19,14 @@ import viewComposer.TimeScheduleView;
 /**
  * Servlet implementation class NewScheduleServlet
  */
-@WebServlet("/NewScheduleServlet")
-public class NewScheduleServlet extends HttpServlet {
+@WebServlet("/ScheduleFormServlet")
+public class ScheduleFormServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public NewScheduleServlet() {
+    public ScheduleFormServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -36,7 +36,7 @@ public class NewScheduleServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫だが
+        // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫
         request.setCharacterEncoding("UTF-8");
         // display.jspの画面のaリンク(HTTPメソッドはGET)でアクセスしてくるので ?以降のクエリーパラメーターから取得する  新規では年月日が取れる
         String action = request.getParameter("action");  // 新規の時は add  編集の時は edit が入ってくる
@@ -47,17 +47,16 @@ public class NewScheduleServlet extends HttpServlet {
         LocalDate localDate = null;
         switch(action) {
         case "add":
+            // 新規の時だけuserIdを取得する スケジュール新規の時には、display.jspの画面のaリンク(HTTPメソッドはGET)でアクセスしてくる
+            int userId = Integer.parseInt(request.getParameter("userId"));
             // 新規の場合 aリンクのクエリー文字列から取得する必要
              int year = Integer.parseInt(request.getParameter("year"));
              int month = Integer.parseInt(request.getParameter("month"));
              int day = Integer.parseInt(request.getParameter("day"));
             // LocalDate型にする
              localDate = LocalDate.of(year, month, day);
-            // 新規の時には、ログインしたユーザのIDを送るようにしてる 注意 主キーのidではない とりあえず、 userId=1 としてクエリー文字列で送ってきてる 後で、ログイン機能作った時にaリンクのところを修正します
-            int userId = Integer.parseInt(request.getParameter("userId"));
-             // とりあえず userId=1 で送られてきてる  idは、この時点では規定値の 0 としてフィールドの値がなってる
             // コンストラクタは引数6つのを呼び出す
-            formScheBean = new ScheduleBean(1, localDate , null, null, null, null);
+            formScheBean = new ScheduleBean(userId, localDate , null, null, null, null);
             // このインスタンスをフォームに送って表示させる
             break;  // switch文から抜ける
         case "edit":
@@ -72,21 +71,14 @@ public class NewScheduleServlet extends HttpServlet {
 
             break;  // switch文から抜ける
         }
-        // ユーザIDはとりあえず 1として呼び出しています。。後で、修正します。そのユーザの指定した日の一日分のスケジュールのリスト取得
-        // 表示させるために
-        List<ScheduleBean> oneDayScheduleList = scheDao.GetOneDaySchedule(1, localDate);
-
-
-        // 年月日をBeanインスタンスに格納 スケジュールのまだ一件もない日でも、表示のために必要
-        // 後でいらなくなるかも
-       //  DayBean dayBean = new DayBean(year, month, day);
+     // そのユーザの指定した日の一日分のスケジュールのリスト取得
+        List<ScheduleBean> oneDayScheduleList = scheDao.GetOneDaySchedule(formScheBean.getUserId(), localDate);
 
         // ビューを作るためのクラス TimeScheduleView からメソッドを呼び出し
         LinkedList<String> timeStack = TimeScheduleView.makeTimeStack();
 
      // リクエストスコープに保存する。リクエストスコープは、フォワードできる(リダイレクトはできない)
         // リクエストスコープに保存できるのは、参照型 クラス型のインスタンスだけ。自分で作ったクラスは、JavaBeansのクラスにすること
-     //   request.setAttribute("dayBean", dayBean); // 後でいらなくなるかも
         //  そのユーザーのその一日のスケジュールをリクエストスコープに格納
         request.setAttribute("oneDayScheduleList", oneDayScheduleList);
         request.setAttribute("timeStack", timeStack);

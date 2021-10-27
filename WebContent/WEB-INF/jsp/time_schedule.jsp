@@ -81,7 +81,7 @@ p{font-size:0.75em;}
 
 
 <body>
-<a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current">今月表示へ戻る</a>
+
 <hr />
 
 <h2>タイムスケジュール<%= title %></h2>
@@ -126,6 +126,8 @@ p{font-size:0.75em;}
 <h3>スケジュールを<%=title %>します</h3>
 <form method="post" action="ScheduleInsertServlet">
   <input type="hidden" name="action" value="<%=action %>" />
+ <!--  新規登録の時に必要なuserId -->
+  <input type="hidden" name="userId" value="<%=formScheBean.getUserId() %>" />
   <!-- 編集では、主キーの値が必要 -->
   <input type="hidden" name="id" value="<%=id %>" />
   <table>

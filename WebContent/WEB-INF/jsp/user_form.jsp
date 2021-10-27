@@ -9,7 +9,8 @@
 
 // UserBean userBean = (UserBean)session.getAttribute("userBean");
 
-// いや、リクエストスコープからでいい??? 変更してみたが		
+// セッションにUserBeanをおくのは、新規登録に成功した後です！！！
+// いや、リクエストスコープからでいい??? 変更してみたが
 UserBean userBean = (UserBean)request.getAttribute("userBean");
 
 %>

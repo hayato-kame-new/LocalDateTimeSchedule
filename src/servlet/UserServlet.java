@@ -76,7 +76,7 @@ public class UserServlet extends HttpServlet {
 
                 } else { // 成功したらセッションスコープにUserBeanインスタンスを保存しておく フィルターのために
                     // このUserBeanインスタンス  が セッションスコープにあるかぎり、あればログインしてることになるから
-                    HttpSession  session = request.getSession();
+                    HttpSession  session = request.getSession(); // 引数なしは 引数 trueと同じ
                     // セッションスコープのチェック 必要だこれ
                     if (session == null) {
                         // セッションがなかったら index.jspへ フォワード
@@ -84,7 +84,7 @@ public class UserServlet extends HttpServlet {
                         request.getRequestDispatcher("./").forward(request, response);
                         return;
                     } else {
-                        session.setAttribute("userBean", userBean);
+                        session.setAttribute("userBean", userBean); // 新規に登録してから、これでログインをしてることと同じになる
 
                         // 新規登録成功 welcome.jspにフォワード
                         request.getRequestDispatcher("/WEB-INF/jsp/welcome.jsp").forward(request, response);

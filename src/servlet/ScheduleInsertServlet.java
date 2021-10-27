@@ -48,9 +48,10 @@ public class ScheduleInsertServlet extends HttpServlet {
         // actionの値が hiddenフィールドで送られてくる "add" か "edit" か "delete" 入ってる
         // 削除 "delete"　の時には、フォームからは action と id だけしか 送ってこない
         String action = request.getParameter("action");
-        // 新規では、主キーidの値は int型の規定値(デフォルト値)の 0  編集  削除 では、主キーの値が入ってる hiddenフィールドで送られてくる
+        // 編集と削除の時に使う新規では、主キーidの値は int型の規定値(デフォルト値)の 0  編集  削除 では、主キーの値が入ってる hiddenフィールドで送られてくる
         int id = Integer.parseInt(request.getParameter("id"));
 
+        int userId = 0;
         int year = 0;
         int month = 0;
         int day = 0;
@@ -63,6 +64,7 @@ public class ScheduleInsertServlet extends HttpServlet {
         // 削除の時には、渡って来ないので、例外発生を防ぐためにifが必要
         // time_schedule.jspの新規と編集のフォーム からの送信で送られてきたのを取得する
         if(action.equals("add") || action.equals("edit")) {
+             userId =  Integer.parseInt(request.getParameter("userId"));
              year = Integer.parseInt(request.getParameter("year"));
              month = Integer.parseInt(request.getParameter("month"));
              day = Integer.parseInt(request.getParameter("day"));
@@ -79,8 +81,8 @@ public class ScheduleInsertServlet extends HttpServlet {
         }
 
         ScheduleDao scheDao = new ScheduleDao();
-        //   userId を用意してないから仮に 1 で練習に登録する
-        int userId = 1;  // 仮に練習のために
+
+
         String msg = "";
         boolean success = true; // trueならデータベース処理が成功
         ScheduleBean scheBean = null;
@@ -117,7 +119,7 @@ public class ScheduleInsertServlet extends HttpServlet {
             // 削除の時には、id の値が必要 削除が成功したらリダイレクト後は、削除した月を表示する
             // 削除した後や削除に失敗したあと、削除をした月(削除しようとした月)の表示をするため
             // 削除の前に idからインスタンスを取得しておくそれからセッションに保存しておく
-            scheBean = scheDao.find(id);
+            scheBean = scheDao.find(id);  // 削除しようとした月を表示するためにセッションにおく
 
             // このインスタンスをデータベースから削除する
             success = scheDao.delete(id); // updateメソッドの戻り値は boolean型です
@@ -141,7 +143,6 @@ public class ScheduleInsertServlet extends HttpServlet {
          // この ScheduleBeanのインスタンスは、再度月を表示する際に、表示する年月日を情報として、送りたいので、これをセッションに保存してる
          // リダイレクト後は、変更したことを確認するために、変更したスケジュールの月を表示するようにしてる
          session.setAttribute("scheBean", scheBean);
-         // session.setAttribute("user_id", session);
 
          session.setAttribute("mon", "scheduleResult");  // switch文で必要どの月を表示するのかcaseで切り替えるのに必要
 
