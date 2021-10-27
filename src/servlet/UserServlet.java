@@ -121,8 +121,5 @@ public class UserServlet extends HttpServlet {
                 }
             }
         }
-        // セッションスコープにユーザ名・パスワードを登録 ScheduleUserBeanインスタンス が セッションスコープにあるかぎり、あればログインしてることになるよ
-//        ScheduleUserBean userBean = new ScheduleUserBean(scheduleUser, pass);
-//        session.setAttribute("userBean", userBean);
     }
 

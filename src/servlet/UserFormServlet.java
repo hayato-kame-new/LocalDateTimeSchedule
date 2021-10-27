@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import dao.UserDao;
 import model.UserBean;
 
 /**
@@ -30,21 +31,23 @@ public class UserFormServlet extends HttpServlet {
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-          // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫だが
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫だが
         request.setCharacterEncoding("UTF-8");
-        String action = request.getParameter("action");  // "add" または "edit"
+        String action = request.getParameter("action"); // "add" または "edit"
+        UserDao userDao = new UserDao();
         // セッションを作って、その中にUserBeanインスタンスを置かないと、フィルターに引っかかって、index.jspへ戻されてしまうので セッションを作る
-        HttpSession  session = request.getSession();  // 引数なしは 引数がtrueと同じこと
+        HttpSession session = request.getSession(); // 引数なしは 引数がtrueと同じこと
 
         // セッションスコープのチェック
-        if (session == null) {  // 必要
+        if (session == null) { // 必要
             // セッションがなかったら index.jspへ フォワード
             request.getRequestDispatcher("./").forward(request, response);
             return;
         } else {
 
-            switch(action) {
+            switch (action) {
             case "add":
                 // 空の(フィールドが規定値のままの)userBeanをセッションに置く これがセッションスコープにない nullだと、フィルターが効くので index.jspへ転送されてしまう
                 UserBean userBean = new UserBean(); // 空のインスタンス生成(各フィールドの値は、各データ型の既定値になっています)にしておけばいい nullじゃなければいいので nullだと、フィルターの作用でindex.jspへ転送されてしまう
@@ -53,29 +56,40 @@ public class UserFormServlet extends HttpServlet {
 
                 break;
             case "edit":
+                // 自分のUserBeanインスタンスの内容を更新するので、セッションから取り出せます
                 // 主キーから、UserBeanインスタンスを取得する welcome.jspのaリンクのクエリー文字列から取得できる
-               int id = Integer.parseInt(request.getParameter("id"));
-
+//  こんなことしなくてもセッションスコープから取り出せばいいのでは？？？  idパラメータ要らなかった
+                //                int id = Integer.parseInt(request.getParameter("id"));
+//                userBean = userDao.findById(id);
+//                if(userBean == null) { // 失敗
+//                	// 失敗のメッセージを
+//                	// リターン
+//                }
+                // UserBeanインスタンスを取得できたら
+               //  userBean = (UserBean)session.getAttribute("userBean");
+                 // 何もしなくていいので、もうログインしてるし、ここは経由せずに、welcomeからフォワードで
+                // user_formに行ってもいいのじゃないか？？
 
                 break;
             }
 
-        // リクエストスコープに保存する フォワード先で取得できる (リダイレクトでは渡せない)
-        request.setAttribute("action", action);  // "add" または "edit"を送ってる
+            // リクエストスコープに保存する フォワード先で取得できる (リダイレクトでは渡せない)
+            request.setAttribute("action", action); // "add" または "edit"を送ってる
 
-        // このサーブレットでは、登録画面にフォワードするだけです
-        //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く
-        // 現在は、フィルターをかけてるので、直接リクエストはされませんが
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp");
-        dispatcher.forward(request, response);
-    }
+            // このサーブレットでは、登録画面にフォワードするだけです
+            //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く
+            // 現在は、フィルターをかけてるので、直接リクエストはされませんが
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp");
+            dispatcher.forward(request, response);
+        }
     }
 
     /**
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-     // TODO Auto-generated method stub
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // TODO Auto-generated method stub
         doGet(request, response);
     }
 
