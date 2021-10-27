@@ -57,6 +57,7 @@
   -->
     <p>まだ、ユーザー登録されていない方は登録してください</p>
     <form action="/LocalDateTimeSchedule/UserFormServlet" >
+      <input type="hidden" name="action" value="add" />
     <!-- UserFormServletでセッションを作って、セッションスコープに新規のUserBeanを保存することによって、ログインの状態と同じことを意味しています -->
        <input type="submit" value="新規登録画面へ">
     </form>

@@ -15,7 +15,8 @@ import util.PasswordUtil;
 
 /**
  * Servlet implementation class UserServlet
- * ユーザ新規登録する
+ * ユーザ新規登録 編集 削除する
+ * 管理者だったら、一覧が見れ、他のユーザを新規も編集も削除もできるようにする
  */
 @WebServlet("/UserServlet")
 public class UserServlet extends HttpServlet {
@@ -42,44 +43,71 @@ public class UserServlet extends HttpServlet {
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
            // フォームに行ったら、別のサーブレットに行って、そこでデータベースに登録します。
-        // ユーザーをBeanのインスタンスにしたら、それを、セッションスコープにおくこと、Loginした時と同じようにしておくこと
+        // ユーザーをBeanのインスタンスにしたら、それを、セッションスコープに保存しておくこと、Loginした時と同じようにしておくこと
          // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫だが
+        //新規に登録して登録が成功したら、セッションスコープに UserBeanインスタンスを保存して上書きおきます。セッションスコープには空のUserBeanインスタンスがあるので上書きする
         request.setCharacterEncoding("UTF-8");
-
+        // フォームからの取得
         String scheduleUser = request.getParameter("scheduleUser");
         String flat_password = request.getParameter("flat_password"); // 平のパスワード
         int roll = Integer.parseInt(request.getParameter("roll"));  // 0 か 1     1 は管理者
         String mail = request.getParameter("mail");
-            //新規に登録して登録が成功したら、セッションスコープに UserBeanインスタンスを保存して上書きおきます。空のインスタンスがあるので上書きする
 
         UserDao userDao = new UserDao();
             // UserBeanをコンストラクタを呼んで生成しますが、パスワードには、平のパスワードを渡さないで、ハッシュ化されたものを渡す
             // 第2引数は、idカラムを利用する int型の数値ををString型にしたものを引数にする
-            // 主キーの idカラムは、自動採番(オートインクリメント)にしてるので、データベースから、保存してある、一番最後のidの値に +1 したものを文字列にしたものを引数に渡す
-            int getNewId = userDao.getNewId();
+            // 主キーの idカラムは、自動採番(オートインクリメント)にしてるので、データベースから、保存してある一番最後のidの値に +1 したものを文字列にしたものを引数に渡す
+            int getNewId = userDao.getNewId(); // 最後に +1 した 主キーのid
+            String form_msg = "";  // user_form.jspに表示する
             if(getNewId == 0) {  // 失敗
-                // 失敗のメッセージかな そしてユーザ登録画面へ戻るかな
-                // フォワードして
-                // リターンを書く return で、即終了させる　この行以降は実行されない
-            } else {  // 成功
+                // ここ大丈夫かな
+                // 失敗のメッセージかな そしてユーザ登録画面へ戻る フォームに入力した値をフォワード先に送って表示させる
+                form_msg = "ユーザー新規登録に失敗しました。";
+                request.setAttribute("form_msg", form_msg);
+                // リクエストスコープへ、保存します UserBeanにはしないで、バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
+                request.setAttribute("scheduleUser", scheduleUser);
+                request.setAttribute("flat_password",flat_password);
+                request.setAttribute("roll", roll);  // intだけど大丈夫？ 自動でIntegerのラッパークラスにボクシングするか？？
+                request.setAttribute("mail", mail);
+             // action がいる 再入力して
+                request.setAttribute("action", "re_enter");
+
+
+                // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと
+                request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(request, response);
+                return; // リターンを書く return で、即終了させる　この行以降は実行されない
+            } else {  // 成功  一度全てのユーザーを削除してみて、新規登録にエラーがないか確認してください
+                // ソルトに 主キーを使います 第2引数です ハッシュ化したパスワードを取得する
                 String pass = PasswordUtil.getSafetyPassword(flat_password, Integer.toString(getNewId));
-                // id 以外の引数をもつコンストラクタをよぶ idは、INSERTで値を入れなくとも、自動で採番される列なので要らない
+                // id 以外の引数をもつコンストラクタをよぶ idは、INSERTで値を入れなくとも、自動で採番される列なので要らない ハッシュ化したパスワードをデータベースに保存する
                 UserBean userBean = new UserBean(scheduleUser, pass, roll, mail);
-                //データベースに登録する 成功したら、セッションスコープにUserBeanインスタンスを保存しておく
+                //データベースに登録する 成功したら、セッションスコープにUserBeanインスタンスを保存しておく セッションスコープにUserBeanインスタンスがあるかぎり、ログイン中となる
                 boolean result = true;
-                String msg = "";
+
                 result = userDao.add(userBean);
                 if(result == false) { // 失敗
-                    // メッセージを書いてユーザ登録画面へ戻るかな
-                    // フォワードして
-                    // リターンを書く return で、即終了させる　この行以降は実行されない
+                     // ここ大丈夫かな
+                    // 失敗のメッセージかな そしてユーザ登録画面へ戻る フォームに入力した値をフォワード先に送って表示させる
+                    form_msg = "ユーザー新規登録に失敗しました。";
+                    request.setAttribute("form_msg", form_msg);
+                    // リクエストスコープへ、保存します UserBeanにはしないで、バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
+                    request.setAttribute("scheduleUser", scheduleUser);
+                    request.setAttribute("flat_password",flat_password);
+                    request.setAttribute("roll", roll);  // intだけど大丈夫？ 自動でIntegerのラッパークラスにボクシングするか？？
+                    request.setAttribute("mail", mail);
+                    // action がいる 再入力
+                    request.setAttribute("action", "re_enter");
 
+
+                    // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと
+                    request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(request, response);
+                    return; // リターンを書く return で、即終了させる　この行以降は実行されない
                 } else { // 成功したらセッションスコープにUserBeanインスタンスを保存しておく フィルターのために
                     // このUserBeanインスタンス  が セッションスコープにあるかぎり、あればログインしてることになるから
                     HttpSession  session = request.getSession(); // 引数なしは 引数 trueと同じ
                     // セッションスコープのチェック 必要だこれ
                     if (session == null) {
-                        // セッションがなかったら index.jspへ フォワード
+                        // セッションがなかったら index.jspへ フォワードするので、リクエストスコープに保存する
                         request.setAttribute("userRegistFailure", "セッションなかったために！！！ユーザ新規登録に失敗しました。もう一度入力してください。");
                         request.getRequestDispatcher("./").forward(request, response);
                         return;

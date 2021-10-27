@@ -23,7 +23,11 @@
 
  <!--  自分が登録したスケジュールだけ見れるようにする ?以降はクエリー文字列です aリンクはGETアクセスなのでクエリー文字列で遅れます
     クエリー文字列でユーザーの 主キーidを送ります-->
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current&id=<%=userBean.getId() %>" >今月表示</a>
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current&id=<%=userBean.getId() %>" >今月表示へ</a>
+
+
+<!-- ユーザ編集画面へ -->
+  <a href="/LocalDateTimeSchedule/UserFormServlet?action=edit&id=<%=userBean.getId() %>" >ユーザー情報編集画面へ</a>
 
   <!-- 本人であれば、ユーザアカウントを表示して、indexでみたり、
   パスワード以外を  編集したり、パスワードを変更したり  パスワードだけは、別のフォームでそれだけを変更する使用にする

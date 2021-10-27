@@ -76,7 +76,7 @@ public class LoginCheckServlet extends HttpServlet {
                 String hashed_pass = PasswordUtil.getSafetyPassword(flat_password, salt);
                 if(userBean.getPass().equals(hashed_pass)) {  // パスワードが照合できたら、ログインできたとする
                     session.setAttribute("userBean", userBean);  // 無事にログインできたとして、セッションスコープに保存します
-                //  ログイン成功 welcome.jspにフォワード
+                //  ログイン成功 welcome.jspにフォワード WebContentからの ルート相対パス  初め/ を書いて
                     request.getRequestDispatcher("/WEB-INF/jsp/welcome.jsp").forward(request, response); // ここでリターン終了
                     return;
                 } else { // パスワード照合できなかったら、ログインはできないので

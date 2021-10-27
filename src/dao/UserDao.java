@@ -83,6 +83,7 @@ public class UserDao {
             }
         }
         return true;
+
     }
 
 
@@ -210,6 +211,12 @@ public class UserDao {
          }
          return userBean;
      }
+
+    // 主キーから検索する
+    public UserBean findById(int id) {
+
+
+    }
 
 
 }
