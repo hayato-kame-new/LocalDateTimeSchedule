@@ -56,25 +56,19 @@ public class UserDao {
             // generateKeyを取得したい 解決策：追加 Statement.RETURN_GENERATED_KEYS でもつけるとエラー文法的に
             pstmt.executeUpdate();  // ここに引数を入れてはいけません
 
-            // executeUpdateメソッドの戻り値は、更新された行数を表します
-//            int result = pstmt.executeUpdate();
-//            if (result != 1) {
-//                return null; // 失敗したら null返す
-//            }
-            // 取れるかな自動生成した主キーの値
+            // 取れる自動生成した主キーの値
             rs = pstmt.getGeneratedKeys();  // この Statement オブジェクトを実行した結果として作成された自動生成キーを取得します。この Statement オブジェクトがキーを生成しなかった場合は、空の ResultSet オブジェクトが返されます。
 
             if(rs.next()) {
                  pstmt.getMetaData().getColumnCount();
 
                 int id = rs.getInt(1);  // 引数は 先頭なので 1を指定する  注: 自動生成キーを表す列が指定されなかった場合、JDBC ドライバ実装では、自動生成キーを表すのに最適な列を判断します。
-   // JDBC ドライバがこのメソッドgetGeneratedKeys() をサポートしない場合例外発生します PostgreSQLはサポートしてます
+   //  PostgreSQLはサポートしてます  JDBC ドライバがこのメソッドgetGeneratedKeys() をサポートしない場合例外発生します PostgreSQLはサポートしてます
              //   String name = rs.getString("name");
              //   String pass = rs.getString("pass");
               //  int roll = rs.getInt("roll");
               //  String mail = rs.getString("mail");
 
-                // これできないかな
                 userBean = new UserBean(id, name, pass, roll, mail );  // idが取得できれば、これできそうだな
             }
 
@@ -192,12 +186,12 @@ public class UserDao {
             rs = pstmt.executeQuery();
             if (rs.next()) { // 一意制約のカラムを元にして検索したので、1件だけ返るので whileじゃなくて ifでもいい
                 int id = rs.getInt("id");
-                String scheduleUser = rs.getString("scheduleUser");
+                String name = rs.getString("name");
                 // パスワードは、ハッシュ化されたものが、passカラム名でデータベースに格納されてる
                 String pass = rs.getString("pass");
                 int roll = rs.getInt("roll");
                 // String mail = rs.getString("mail");
-                userBean = new UserBean(id, scheduleUser, pass, roll, mail);
+                userBean = new UserBean(id, name, pass, roll, mail);
             }
 
         } catch (SQLException | ClassNotFoundException e) {
@@ -254,11 +248,11 @@ public class UserDao {
 
             rs = pstmt.executeQuery();
             if (rs.next()) { // 主キーで検索してるので、得られる件数は１件のみなので、whileじゃなくて ifでいい
-                String scheduleUser = rs.getString("scheduleUser");
+                String name = rs.getString("name");
                 String pass = rs.getString("pass");
                 int roll = rs.getInt("roll");
                 String mail = rs.getString("mail");
-                userBean = new UserBean(id, scheduleUser, pass, roll, mail);
+                userBean = new UserBean(id, name, pass, roll, mail);
             }
         } catch (SQLException | ClassNotFoundException e) {
             // データベース接続やSQL実行失敗時の処理
