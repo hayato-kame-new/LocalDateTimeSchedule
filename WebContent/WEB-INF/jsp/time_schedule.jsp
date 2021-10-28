@@ -86,7 +86,7 @@ p{font-size:0.75em;}
 
 <h2>タイムスケジュール<%= title %></h2>
 
-
+<%-- <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=specified&userId=<%=userId %>" ><%=year %>年<%=month %>月の表示に戻る</a> --%>
 <div id="contents">
 
 <div id="left">
