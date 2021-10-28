@@ -165,8 +165,6 @@ p{font-size:0.75em;}
 
       <select name="day" class="js-changeDay">
       <%
-      // ちょっとここ修正の必要がある
-      // for (int i = 1 ; i <= thisMonthlastDay ; i++){
         for (int i = 1 ; i <= 31 ; i++){
         if(i == day) {
       %>

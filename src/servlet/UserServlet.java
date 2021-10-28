@@ -92,10 +92,10 @@ public class UserServlet extends HttpServlet {
             // リクエストスコープへ保存する
             request.setAttribute("errMsgList", errMsgList);  // エラーリストを送ります
             request.setAttribute("form_msg", form_msg);
-               // リクエストスコープへ、保存します UserBeanにはしないで、バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
+               // リクエストスコープへ、保存します バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
             request.setAttribute("name", name);
-            request.setAttribute("flat_password",flat_password);
-            request.setAttribute("roll", roll);  // intだけど大丈夫？ 自動でIntegerのラッパークラスにボクシングするか？？
+         //   request.setAttribute("flat_password",flat_password); // パスワードはセキュリティのため表示させない
+            request.setAttribute("roll", roll);  // intだけど大丈夫だった 自動でIntegerのラッパークラスにボクシングすると思う
             request.setAttribute("mail", mail);
          // action がいる 再入力して
             request.setAttribute("action", "re_enter");
@@ -121,12 +121,11 @@ public class UserServlet extends HttpServlet {
                 request.setAttribute("form_msg", form_msg);
                 // リクエストスコープへ、保存します UserBeanにはしないで、バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
                 request.setAttribute("name", name);
-                request.setAttribute("flat_password",flat_password);
+              //   request.setAttribute("flat_password",flat_password); // パスワードはセキュリティのため表示させない
                 request.setAttribute("roll", roll);  // intだけど大丈夫？ 自動でIntegerのラッパークラスにボクシングするか？？
                 request.setAttribute("mail", mail);
              // action がいる 再入力して
                 request.setAttribute("action", "re_enter");
-
 
                 // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと
                 request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(request, response);
@@ -144,7 +143,7 @@ public class UserServlet extends HttpServlet {
                     request.setAttribute("form_msg", form_msg);
                     // リクエストスコープへ、保存します UserBeanにはしないで、バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
                     request.setAttribute("name", name);
-                    request.setAttribute("flat_password",flat_password);
+               //      request.setAttribute("flat_password",flat_password);  // パスワードはセキュリティのため表示させない
                     request.setAttribute("roll", roll);  // intだけど大丈夫？ 自動でIntegerのラッパークラスにボクシングするか？？
                     request.setAttribute("mail", mail);
                     // action がいる 再入力
@@ -158,7 +157,7 @@ public class UserServlet extends HttpServlet {
                     // セッションスコープのチェック 必要だこれ
                     if (session == null) {
                         // セッションがなかったら index.jspへ フォワードするので、リクエストスコープに保存する
-                        request.setAttribute("userRegistFailure", "ユーザ新規登録に失敗しました。もう一度入力してください。");
+                        request.setAttribute("userRegistFailureMsg", "ユーザ新規登録に失敗しました。もう一度入力してください。");
                         request.getRequestDispatcher("./").forward(request, response);
                         return;
                     } else {
