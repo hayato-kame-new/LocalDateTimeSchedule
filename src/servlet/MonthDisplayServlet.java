@@ -41,7 +41,7 @@ public class MonthDisplayServlet extends HttpServlet {
 
         // aリンクのについてた?以降のクエリー文字列からの取り出し リクエストスコープから取り出す
         String mon = request.getParameter("mon");
-        // idは新規の時に使う必要 新規では このidを、後でScheduleBeanインスタンスの、userIdフィールドへ代入する   リダイレクトできた時は、idは null になってる
+        // idはwelcome画面から  ログインしたときや ユーザ新規登録した時に渡ってくる UserBeanインスタンスの id です スケジュール新規では このidを、後でScheduleBeanインスタンスの、userIdフィールドへ代入する   リダイレクトできた時は、idは null になってる
         String id = request.getParameter("id"); // UserBeanの主キー id  int型だけど、クエリー文字列としてString型で送られてくる
 
            ScheduleDao scheDao = new ScheduleDao();
@@ -57,13 +57,13 @@ public class MonthDisplayServlet extends HttpServlet {
            if(session.getAttribute("mon") != null) {
             mon = (String)session.getAttribute("mon");
            }
-           int userId = 0;
+           int userId = 0;  // 新規との時は使わない
            String msg = "";
         switch(mon) {
         case "current":
             // welcome画面から今月を表示する 今月は、aリンクでアクセスしてくる
             // welcome画面からのaリンクのクエリー文字列からそのUserBeanインスタンスのidフィールドの値 を取得してきてScheduleBeanインスタンスのuserIdの値にセットする
-
+ // welcomeからきた時 ログインしてきた時 ユーザ新規の時には idがある
                 userId = Integer.parseInt(id);  // ここでjava.lang.NumberFormatException: null
 
             // 今月を表示するために新しくインスタンスを生成する 今月は、引数なしのコンストラクタを呼ぶ

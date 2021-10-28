@@ -23,10 +23,12 @@ public class UserDao {
     final String DB_USER = "postgres";
     final String DB_PASS = "postgres";
 
-    public boolean add(UserBean userBean) {
-
+    public UserBean add(String name, String pass, int roll, String mail) {
+ // 戻り値の　UserBeanインスタンスには、主キーがちゃんと入ってるのをリターンする。そして、それを、セッションスコープに保存をしてログインした状態とする
+       UserBean userBean = null;  // 主キーもきちんと入ってる完全形のUserBean これを後でセッションスコープに置きます
         Connection conn = null;
         PreparedStatement pstmt = null;
+        ResultSet rs = null;
 
         try {
             // JDBCドライバを読み込み
@@ -38,27 +40,49 @@ public class UserDao {
             // user は PostgreSQLの予約語のため、なるべく使わない ""で囲んでエスケープすれば使えるけど、使わないほうがいい
             // 主キーの id が serial です シーケンス（データ型のserial）とは 自動採番するカラムです。
             // シーケンスとはINSERTで値を入れなくとも、自動で採番される列で、CREATE SEQUENCE文で作成することができます。またテーブル作成時、データ型に「serial」を指定した場合も同じくシーケンスとなります。シーケンスは自動で1から採番され、＋1ずつされます。
-            String sql = "insert into usertable (scheduleuser, pass, roll, mail) values (?, ?, ?::integer, ?)";
+            String sql = "insert into usertable (name, pass, roll, mail) values (?, ?, ?::integer, ?)";
 
-            // pstmt = conn.prepareStatement(sql);
+            // PostgresSQLは、Statement生成時に、Statement.RETURN_GENERATED_KEYSを指定するとStatement#getGeneratedKeysでそのテーブルの全カラムの情報が取得される。
+
+           //  pstmt = conn.prepareStatement(sql);
+
             pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-            pstmt.setString(1, userBean.getScheduleUser());
-            pstmt.setString(2, userBean.getPass());
-            pstmt.setInt(3, userBean.getRoll());
-            pstmt.setString(4, userBean.getMail());
+             // insertする時は、主キーは自動採番 PostgreSQLで serial としてるので、書かないでも大丈夫
+            pstmt.setString(1, name);
+            pstmt.setString(2, pass);
+            pstmt.setInt(3, roll);
+            pstmt.setString(4, mail);
+            // generateKeyを取得したい 解決策：追加 Statement.RETURN_GENERATED_KEYS でもつけるとエラー文法的に
+            pstmt.executeUpdate();  // ここに引数を入れてはいけません
 
             // executeUpdateメソッドの戻り値は、更新された行数を表します
-            int result = pstmt.executeUpdate();
-            if (result != 1) {
-                return false; // 失敗したら false返す
+//            int result = pstmt.executeUpdate();
+//            if (result != 1) {
+//                return null; // 失敗したら null返す
+//            }
+            // 取れるかな自動生成した主キーの値
+            rs = pstmt.getGeneratedKeys();  // この Statement オブジェクトを実行した結果として作成された自動生成キーを取得します。この Statement オブジェクトがキーを生成しなかった場合は、空の ResultSet オブジェクトが返されます。
+
+            if(rs.next()) {
+                 pstmt.getMetaData().getColumnCount();
+
+                int id = rs.getInt(1);  // 引数は 先頭なので 1を指定する  注: 自動生成キーを表す列が指定されなかった場合、JDBC ドライバ実装では、自動生成キーを表すのに最適な列を判断します。
+   // JDBC ドライバがこのメソッドgetGeneratedKeys() をサポートしない場合例外発生します PostgreSQLはサポートしてます
+             //   String name = rs.getString("name");
+             //   String pass = rs.getString("pass");
+              //  int roll = rs.getInt("roll");
+              //  String mail = rs.getString("mail");
+
+                // これできないかな
+                userBean = new UserBean(id, name, pass, roll, mail );  // idが取得できれば、これできそうだな
             }
 
         } catch (SQLException | ClassNotFoundException e) {
             // データベース接続やSQL実行失敗時の処理
             // JDBCドライバが見つからなかったときの処理
             e.printStackTrace();
-            return false; // 失敗したら false返す
+            return null; // 失敗したら false返す
         } finally {
             // PrepareStatementインスタンスのクローズ処理
             if (pstmt != null) {
@@ -67,7 +91,7 @@ public class UserDao {
                 } catch (SQLException e) {
                     // クローズ処理失敗時の処理
                     e.printStackTrace();
-                    return false; // 失敗したら false返す
+                    return null; // 失敗したら false返す
                 }
             }
             // データベース切断
@@ -77,17 +101,17 @@ public class UserDao {
                 } catch (SQLException e) {
                     // データベース切断失敗時の処理
                     e.printStackTrace();
-                    return false; // 失敗したら false返す
+                    return null; // 失敗したら false返す
                 }
             }
         }
-        return true;
+        return userBean;
 
     }
 
     // 一番最後のユーザの主キーidの値を取得する データベースで何らかのエラーがあった時は 0 を返す
     public int getNewId() {
-
+   // これはソルトが必要なので
         int newId = 0; // 0で初期化してる
         Connection conn = null;
         PreparedStatement pstmt = null;

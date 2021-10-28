@@ -18,7 +18,7 @@ public class UserBean implements Serializable {
 
     private int id;  // 主キーでオートインクリメント(自動採番)なので 新規に作成する時には、INSERTで値を入れなくとも、自動で採番されるカラムです
     // idカラムには さらにインデックスもついてる
-    private String scheduleUser;  // ユーザー名  カラム名は全て小文字 scheduleuser  です
+    private String name;  // ユーザー名
 
     // passカラムには、ハッシュ化された 67文字の文字列をデータベースに保存します f6e2e52bc7b6565928e2d0d18d1b074d5c21571da95d4ec250bc3168ddd37bd2  など
     private String pass;  // パスワード 暗号化は、ハッシュ関数と呼ばれる、ある文字列から復元不可能な文字列を生成するしくみを使います。
@@ -33,19 +33,21 @@ public class UserBean implements Serializable {
 
 // id以外のカラム引数にして 新規登録の時に使う シーケンス（データ型のserial）とは シーケンスとはINSERTで値を入れなくとも、自動で採番されるカラムなので、
     // 引数にidは要らない 引数4つ
-    public UserBean(String scheduleUser, String pass, int roll, String mail) {
+    public UserBean(String name, String pass, int roll, String mail) {
         super();
-        this.scheduleUser = scheduleUser;
+        this.name = name;
         this.pass = pass;
         this.roll = roll;
         this.mail = mail;
     }
 
+
     // ログインの時に、UserBeanインスタンスをセッションスコープに保存するのために使うコンストラクタは、引数が５つ
-    public UserBean(int id, String scheduleUser, String pass, int roll, String mail) {
+
+    public UserBean(int id, String name, String pass, int roll, String mail) {
         super();
         this.id = id;
-        this.scheduleUser = scheduleUser;
+        this.name = name;
         this.pass = pass;
         this.roll = roll;
         this.mail = mail;
@@ -55,9 +57,8 @@ public class UserBean implements Serializable {
         return id;
     }
 
-
-    public String getScheduleUser() {
-        return scheduleUser;
+    public String getName() {
+        return name;
     }
 
     public String getPass() {
@@ -76,8 +77,8 @@ public class UserBean implements Serializable {
         this.id = id;
     }
 
-    public void setScheduleUser(String scheduleUser) {
-        this.scheduleUser = scheduleUser;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setPass(String pass) {
