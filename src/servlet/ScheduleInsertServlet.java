@@ -3,6 +3,8 @@ package servlet;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -55,6 +57,11 @@ public class ScheduleInsertServlet extends HttpServlet {
         int year = 0;
         int month = 0;
         int day = 0;
+        int s_hour = 0;
+        int s_minute = 0;
+        int e_hour = 0;
+        int e_minute = 0;
+
         LocalDate scheduleDate = null;
         LocalTime startTime = null;
         LocalTime endTime = null;
@@ -63,22 +70,55 @@ public class ScheduleInsertServlet extends HttpServlet {
 
         // 削除の時には、渡って来ないので、例外発生を防ぐためにifが必要
         // time_schedule.jspの新規と編集のフォーム からの送信で送られてきたのを取得する
+
         if(action.equals("add") || action.equals("edit")) {
              userId =  Integer.parseInt(request.getParameter("userId"));
              year = Integer.parseInt(request.getParameter("year"));
              month = Integer.parseInt(request.getParameter("month"));
              day = Integer.parseInt(request.getParameter("day"));
-            int s_hour = Integer.parseInt(request.getParameter("s_hour"));
-            int s_minute = Integer.parseInt(request.getParameter("s_minute"));
-            int e_hour = Integer.parseInt(request.getParameter("e_hour"));
-            int e_minute = Integer.parseInt(request.getParameter("e_minute"));
+             s_hour = Integer.parseInt(request.getParameter("s_hour"));
+             s_minute = Integer.parseInt(request.getParameter("s_minute"));
+            e_hour = Integer.parseInt(request.getParameter("e_hour"));
+             e_minute = Integer.parseInt(request.getParameter("e_minute"));
             schedule = request.getParameter("schedule");
             scheduleMemo = request.getParameter("scheduleMemo");
 
              scheduleDate = LocalDate.of(year, month, day);
             startTime = LocalTime.of(s_hour, s_minute);
              endTime = LocalTime.of(e_hour, e_minute);
+
+
         }
+
+        // action が "add" "edit"の時だけ入力チェックする バリデーションする
+
+     // バリデーションのエラーリストのインスタンスを newで確保
+        List<String> errMsgList = new ArrayList<String>(); // エラーなければ、空のリスト  [] と表示されます
+        // フォームの s_hour   e_hour  は intなので比較する Javascriptで、s_hourを選択した時に e_hourがそれ以降の時間だけoptionタグを生成するようにしてもいい
+        if(s_hour < e_hour) {
+            errMsgList.add("開始時間と終了時間が違います。");
+        }
+        if(s_hour == e_hour && s_minute < e_minute) {
+            errMsgList.add("開始時間と終了時間が違います。");
+        }
+
+
+        //  scheduleとscheduleMemoのカラムは PostgreSQL でデータ型は varchar(67) にしてる これだと、日本語の漢字だと、66文字まで保存できます
+       // scheduleMemoは、nullを許可する PostgreSQL でデータ型は varchar(67) にしてる これだと、日本語の漢字だと、66文字まで保存できます
+        if(schedule == null || schedule.length() == 0) {
+            errMsgList.add("スケジュールの件名を入力してください");
+        } else if (schedule.length() > 66){
+            errMsgList.add("スケジュールの件名は66文字までで入力してください");
+        }
+
+        if(scheduleMemo.length() > 66) {
+            errMsgList.add("メモは66文字までで入力してください");
+        }
+
+        // ここで、エラーリストに入ってればtime_schedule.jspへ戻すreturnする
+        // そうでなければ、elseで囲んで最後まで囲んで、処理を進めるように書く
+
+
 
         ScheduleDao scheDao = new ScheduleDao();
 
@@ -94,10 +134,17 @@ public class ScheduleInsertServlet extends HttpServlet {
 
             // データベースに新規登録
             success = scheDao.add(scheBean); // addメソッドの戻り値は boolean型です
-            if(success == false) {  // falseだったら失敗
+            if(success == false) {  // falseだったら失敗 失敗のメッセージ 、time_schedule.jspで表示するフォワードする
                 msg = year + "年" + month + "月" + day + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールを新規登録できませんでした。";
+             // できなかったら、time_schedule.jspへ戻すこと、入力をしたものを表示できるようにリクエストスコープに保存をしてから
+                // フォワードをして、returnを書くこと
+
+
+
+            } else { // 成功のメッセージ 成功したら、リダイレクトをするので、下でセッションスコープに入れている
+                msg = year + "年" + month + "月" + day + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() +  "のスケジュールを新規登録しました。";
+
             }
-            msg = year + "年" + month + "月" + day + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() +  "のスケジュールを新規登録しました。";
             break; // switch文を抜ける
         case "edit":
             // 編集の時には、id 主キーの値が必要 hiddenフィールドから取得したので idを元に検索する
@@ -110,23 +157,32 @@ public class ScheduleInsertServlet extends HttpServlet {
             scheBean.setScheduleMemo(scheduleMemo);
             // データベース更新
             success = scheDao.update(scheBean); // updateメソッドの戻り値は boolean型です
-            if (success == false) {
+            if (success == false) { // 失敗のメッセージ これは、time_schedule.jspに表示をする
                 msg = year + "年" + month + "月" + day + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールを更新できませんでした。";
+           // できなかったら、time_schedule.jspへ戻すこと、入力をしたものを表示できるようにリクエストスコープに保存をしてから
+                // フォワードをして、returnを書くこと
+
+
+            } else { // 成功のメッセージ 成功したら、リダイレクトをするので、下でセッションスコープへ入れている
+                msg = year + "年" + month + "月" + day + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールを更新しました。";
             }
-            msg = year + "年" + month + "月" + day + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールを更新しました。";
             break; // switch文を抜ける
         case "delete":
             // 削除の時には、id の値が必要 削除が成功したらリダイレクト後は、削除した月を表示する
-            // 削除した後や削除に失敗したあと、削除をした月(削除しようとした月)の表示をするため
+            // 削除成功した後や削除をした月(削除しようとした月)の表示をするため
             // 削除の前に idからインスタンスを取得しておくそれからセッションに保存しておく
             scheBean = scheDao.find(id);  // 削除しようとした月を表示するためにセッションにおく
 
             // このインスタンスをデータベースから削除する
             success = scheDao.delete(id); // updateメソッドの戻り値は boolean型です
             if(success == false) {  // 削除に失敗
+                 // できなかったら、time_schedule.jspへ戻すこと、入力をしたものを表示できるようにリクエストスコープに保存をしてから
+                // フォワードをして、returnを書くこと
                 msg = scheBean.getScheduleDate().getYear() + "年" + scheBean.getScheduleDate().getMonthValue() + "月" + scheBean.getScheduleDate().getDayOfMonth() + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールの削除に失敗しました。";
+            } else {
+                // 成功のメッセージ 成功したら、リダイレクトをするので、下でセッションスコープへ入れている
+                msg = scheBean.getScheduleDate().getYear() + "年" + scheBean.getScheduleDate().getMonthValue() + "月" + scheBean.getScheduleDate().getDayOfMonth() + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールを削除しました。";
             }
-            msg = scheBean.getScheduleDate().getYear() + "年" + scheBean.getScheduleDate().getMonthValue() + "月" + scheBean.getScheduleDate().getDayOfMonth() + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールを削除しました。";
             break; // switch文を抜ける
         }
 

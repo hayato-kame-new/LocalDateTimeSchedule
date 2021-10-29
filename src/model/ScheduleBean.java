@@ -17,12 +17,13 @@ public class ScheduleBean implements Serializable {
     private int id;    // データベースでは主キー 自動採番  さらにインデックスもついてる
     // 主キーでオートインクリメント(自動採番)なので 新規に作成する時には、INSERTで値を入れなくとも、自動で採番されるカラムです
 
-    private int userId;  // PostgreSQLでは、 カラム名が全て小文字になっています userid です
-    private LocalDate scheduleDate; // scheduledate
-    private LocalTime startTime;  // starttime
-    private LocalTime endTime; // endtime
-    private String schedule;
-    private String scheduleMemo; // schedulememo
+    private int userId;  // ユーザの idです usertableの主キーの idカラムとリレーションがある PostgreSQLでは、 カラム名が全て小文字になっています userid です
+    private LocalDate scheduleDate; // 年月日  scheduledate  PostgreSQLでは、 カラム名が全て小文字
+    private LocalTime startTime;  // 開始時間と分  starttime   PostgreSQLでは、 カラム名が全て小文字
+    private LocalTime endTime; // 終了時間と分  endtime  PostgreSQLでは、 カラム名が全て小文字
+
+    private String schedule;  //  件名  PostgreSQL でデータ型は varchar(67) にしてる これだと、日本語の漢字だと、66文字まで保存できます
+    private String scheduleMemo; // メモ schedulememo  nullを許可する  PostgreSQL でデータ型は varchar(67) にしてる これだと、日本語の漢字だと、66文字まで保存できます
 
 
     public ScheduleBean() {

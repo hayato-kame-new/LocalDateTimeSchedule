@@ -35,7 +35,7 @@ String s_minute =  "";
 String e_hour = "";
 String e_minute =  "";
 // ここ新規の時は null なので、実行しようとすると NullPointerException発生する 新規では null回避する
-if(!action.equals("add")) { // null対策
+if(!action.equals("add")) { // null対策    新規以外のときに使うから
  s_hour = String.valueOf(startTime.getHour());  // 開始時間の時間
  s_minute = String.format("%02d", startTime.getMinute());  // 開始時間の分
  e_hour = String.valueOf(endTime.getHour());  // 終了時間の時間
@@ -138,8 +138,6 @@ p{font-size:0.75em;}
       <%
       for (int i = year-1 ; i <= year+1 ; i++){
         if(i == year) {
-          // その年を記憶
-
       %>
       <option value=<%=i %> selected><%=i %>
       <% } else { %>
@@ -184,8 +182,12 @@ p{font-size:0.75em;}
     <td nowrap>時刻</td>
     <td>
     <select name="s_hour">
-    <% if (s_hour.equals("")) {%>
-      <option value="" selected>--時
+    <!-- disabled属性が存在する場合、そのoption要素は無効になる 選択できなくなる -->
+   <%
+    if (s_hour.equals("")) {
+  //  "add"の時だけs_hourが""になってますので
+    %>
+      <option disabled value="" >--時
     <% } %>
     <% for (int i = 0 ; i <= 23 ; i++){
        if( s_hour != null && !s_hour.equals("") &&  Integer.parseInt(s_hour) == i ) {
@@ -200,24 +202,31 @@ p{font-size:0.75em;}
     </select>
 
     <select name="s_minute">
-    <% if (s_minute.equals("")) {%>
-      <option value="" selected>--分
+  <% if (s_minute.equals("")) {
+    // "add" の時だけs_minuteが "" になってる
+  %>
+  <!-- disabled属性が存在する場合、そのoption要素は無効になる 選択できなくなる -->
+      <option disabled value="" >--分
       <option value="0">00分
       <option value="30">30分
-    <% } else if ( s_minute != null && !s_minute.equals("") && s_minute.equals("00")){ %>
-      <option value="" >--分
+      <% } %>
+    <%  if ( s_minute != null && !s_minute.equals("") && s_minute.equals("00")){ %>
+   <!--    <option value="" >--分 -->
       <option value="0" selected>00分
       <option value="30">30分
     <% } else if ( s_minute != null &&  !s_minute.equals("") && s_minute.equals("30")){ %>
-      <option value="" >--分
+    <!--   <option value="" >--分 -->
       <option value="0" >00分
       <option value="30" selected>30分
       <% } %>
-    </select>
+    </select><small>〜</small><br />
 
     <select name="e_hour">
-    <% if (e_hour.equals("")) {%>
-      <option value="" selected>--時
+ <% if (e_hour.equals("")) {
+  // "add" の時だけe_hourが "" になってる
+ %>
+  <!-- disabled属性が存在する場合、そのoption要素は無効になる 選択できなくなる -->
+      <option disabled value="" >--時
     <% } %>
     <% for (int i = 0 ; i <= 23 ; i++){
        if( e_hour != null && !e_hour.equals("") && Integer.parseInt(e_hour) == i ) {
@@ -233,23 +242,24 @@ p{font-size:0.75em;}
 
 
     <select name="e_minute">
-    <% if (e_minute.equals("")) {%>
-      <option value="" selected>--分
+   <% if (e_minute.equals("")) {%>
+      <option disabled value="" >--分
       <option value="0" >00分
       <option value="30">30分
-    <% } else if ( e_minute != null && !e_minute.equals("") && e_minute.equals("00")){ %>
-      <option value="" >--分
+      <% } %>
+    <% if ( e_minute != null && !e_minute.equals("") && e_minute.equals("00")){ %>
+    <!--   <option value="" >--分 -->
       <option value="0" selected>00分
       <option value="30">30分
     <% } else if ( e_minute != null &&  !e_minute.equals("") && e_minute.equals("30")){ %>
-      <option value="" >--分
+     <!--  <option value="" >--分 -->
       <option value="0" >00分
       <option value="30" selected>30分
       <% } %>
     </select>
 
   <tr>
-    <td nowrap>予定</td>
+    <td nowrap>件名</td>
     <td><input type="text" name="schedule" value="<%=formScheBean.getSchedule() %>" size="30" maxlength="70">
     </td>
   </tr>
