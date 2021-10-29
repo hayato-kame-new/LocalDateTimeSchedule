@@ -43,7 +43,7 @@ public class ScheduleFormServlet extends HttpServlet {
 
         ScheduleDao scheDao = new ScheduleDao();
 
-        ScheduleBean formScheBean = null;
+        ScheduleBean scheBean = null;
         LocalDate localDate = null;
         switch(action) {
         case "add":
@@ -56,7 +56,7 @@ public class ScheduleFormServlet extends HttpServlet {
             // LocalDate型にする
              localDate = LocalDate.of(year, month, day);
             // コンストラクタは引数6つのを呼び出す
-            formScheBean = new ScheduleBean(userId, localDate , null, null, null, null);
+             scheBean = new ScheduleBean(userId, localDate , null, null, null, null);
             // このインスタンスをフォームに送って表示させる
             break;  // switch文から抜ける
         case "edit":
@@ -65,14 +65,14 @@ public class ScheduleFormServlet extends HttpServlet {
             // 入力フォームに表示するために 渡ってきたidから、インスタンスを取得する
             // するとuserIdも取得できる
 
-            formScheBean = scheDao.find(id);  // 主キーで検索する
+            scheBean = scheDao.find(id);  // 主キーで検索する
 
-            localDate = formScheBean.getScheduleDate();
+            localDate = scheBean.getScheduleDate();
 
             break;  // switch文から抜ける
         }
      // そのユーザの指定した日の一日分のスケジュールのリスト取得
-        List<ScheduleBean> oneDayScheduleList = scheDao.GetOneDaySchedule(formScheBean.getUserId(), localDate);
+        List<ScheduleBean> oneDayScheduleList = scheDao.GetOneDaySchedule(scheBean.getUserId(), localDate);
 
         // ビューを作るためのクラス TimeScheduleView からメソッドを呼び出し
         LinkedList<String> timeStack = TimeScheduleView.makeTimeStack();
@@ -82,7 +82,7 @@ public class ScheduleFormServlet extends HttpServlet {
         //  そのユーザーのその一日のスケジュールをリクエストスコープに格納
         request.setAttribute("oneDayScheduleList", oneDayScheduleList);
         request.setAttribute("timeStack", timeStack);
-        request.setAttribute("formScheBean", formScheBean);
+        request.setAttribute("scheBean", scheBean);
         request.setAttribute("action", action);
 
    //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く

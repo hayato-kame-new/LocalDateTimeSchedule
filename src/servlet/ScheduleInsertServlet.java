@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -47,7 +48,15 @@ public class ScheduleInsertServlet extends HttpServlet {
         // 文字化け対策  今回はフィルターを作ったので、書かなくても大丈夫だが
         request.setCharacterEncoding("UTF-8");
 
-        // actionの値が hiddenフィールドで送られてくる "add" か "edit" か "delete" 入ってる
+        HttpSession session = request.getSession(); // 引数なしは 引数にtrueと同じ
+        // セッションから取り出したものは、バリデーションエラーなどで、time_schedule.jspにフォワードする時に、リクエストスコープへ保存して使う
+        List<ScheduleBean> oneDayScheduleList = (List<ScheduleBean>)session.getAttribute("oneDayScheduleList");
+        LinkedList<String> timeStack = (LinkedList<String>)session.getAttribute("timeStack");
+        // セッションから取り出したら、セッションスコープから削除をしておく
+        session.removeAttribute("oneDayScheduleList");
+        session.removeAttribute("timeStack");
+
+        // actionの値が hiddenフィールドで送られてくる "add" か "edit" か "delete" "re_enter" 入ってる
         // 削除 "delete"　の時には、フォームからは action と id だけしか 送ってこない
         String action = request.getParameter("action");
         // 編集と削除の時に使う新規では、主キーidの値は int型の規定値(デフォルト値)の 0  編集  削除 では、主キーの値が入ってる hiddenフィールドで送られてくる
@@ -69,9 +78,8 @@ public class ScheduleInsertServlet extends HttpServlet {
         String scheduleMemo = null;
 
         // 削除の時には、渡って来ないので、例外発生を防ぐためにifが必要
-        // time_schedule.jspの新規と編集のフォーム からの送信で送られてきたのを取得する
-
-        if(action.equals("add") || action.equals("edit")) {
+        // time_schedule.jspの 新規"add"と編集"edit" 再入力"re_enter"のフォーム からの送信で送られてきたのを取得する
+        if(action.equals("add") || action.equals("edit") || action.equals("re_enter")) {
              userId =  Integer.parseInt(request.getParameter("userId"));
              year = Integer.parseInt(request.getParameter("year"));
              month = Integer.parseInt(request.getParameter("month"));
@@ -87,39 +95,55 @@ public class ScheduleInsertServlet extends HttpServlet {
             startTime = LocalTime.of(s_hour, s_minute);
              endTime = LocalTime.of(e_hour, e_minute);
 
+             // action が "add" "edit" "re_enter" の時だけ入力チェックする バリデーションする
+             // バリデーションのエラーリストのインスタンスを newで確保
+          List<String> errMsgList = new ArrayList<String>(); // エラーなければ、空のリスト  [] と表示されます
+             // フォームの s_hour   e_hour  は intなので比較する Javascriptで、s_hourを選択した時に e_hourがそれ以降の時間だけoptionタグを生成するようにしてもいい
+             if(s_hour > e_hour) {
+                 errMsgList.add("開始時間と終了時間を確認してください");
+             }
+             if(s_hour == e_hour && s_minute > e_minute) {
+                 errMsgList.add("開始時間と終了時間を確認してください");
+             }
+             //  scheduleとscheduleMemoのカラムは PostgreSQL でデータ型は varchar(67) にしてる これだと、日本語の漢字だと、66文字まで保存できます
+             // scheduleMemoは、nullを許可する PostgreSQL でデータ型は varchar(67) にしてる これだと、日本語の漢字だと、66文字まで保存できます
+             if(schedule == null || schedule.length() == 0) {
+                 errMsgList.add("スケジュールの件名を入力してください");
+             } else if (schedule.length() > 66){
+                 errMsgList.add("スケジュールの件名は66文字までで入力してください");
+             }
 
+             if(scheduleMemo.length() > 66) {
+                 errMsgList.add("メモは66文字までで入力してください");
+             }
+
+             // ここで、エラーリストに入ってればtime_schedule.jspへ戻すreturnする
+             if(errMsgList.size() > 0) {  // エラーがあった
+                // リクエストスコープへ保存する
+                 request.setAttribute("errMsgList", errMsgList);  // エラーリストを送ります
+                 request.setAttribute("scheduleFailureMsg", "スケジュールを登録できませんでした");
+                 // 入力値を表示したいので、リスエストスコープへ保存する
+                 request.setAttribute("id", id);
+                 request.setAttribute("userId", userId);
+                 request.setAttribute("year", year);
+                 request.setAttribute("month", month);
+                 request.setAttribute("day", day);
+                 request.setAttribute("s_hour", s_hour);
+                 request.setAttribute("s_minute", s_minute);
+                 request.setAttribute("e_hour", e_hour);
+                 request.setAttribute("e_minute", e_minute);
+                 // 上でセッションスコープから取得した、oneDayScheduleList  timeStack もリクエストスコープに保存して送らないといけない
+                 request.setAttribute("oneDayScheduleList", oneDayScheduleList);
+                 request.setAttribute("timeStack", timeStack);
+
+                 // 再入力の キーaction 値re_enter もリクエストスコープに送る
+                 request.setAttribute("action", "re_enter");
+                 // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと  index.jspなら  /  だけでも大丈夫
+                 request.getRequestDispatcher("/WEB-INF/jsp/time_schedule.jsp").forward(request, response);
+                return;
+             }
         }
-
-        // action が "add" "edit"の時だけ入力チェックする バリデーションする
-
-     // バリデーションのエラーリストのインスタンスを newで確保
-        List<String> errMsgList = new ArrayList<String>(); // エラーなければ、空のリスト  [] と表示されます
-        // フォームの s_hour   e_hour  は intなので比較する Javascriptで、s_hourを選択した時に e_hourがそれ以降の時間だけoptionタグを生成するようにしてもいい
-        if(s_hour < e_hour) {
-            errMsgList.add("開始時間と終了時間が違います。");
-        }
-        if(s_hour == e_hour && s_minute < e_minute) {
-            errMsgList.add("開始時間と終了時間が違います。");
-        }
-
-
-        //  scheduleとscheduleMemoのカラムは PostgreSQL でデータ型は varchar(67) にしてる これだと、日本語の漢字だと、66文字まで保存できます
-       // scheduleMemoは、nullを許可する PostgreSQL でデータ型は varchar(67) にしてる これだと、日本語の漢字だと、66文字まで保存できます
-        if(schedule == null || schedule.length() == 0) {
-            errMsgList.add("スケジュールの件名を入力してください");
-        } else if (schedule.length() > 66){
-            errMsgList.add("スケジュールの件名は66文字までで入力してください");
-        }
-
-        if(scheduleMemo.length() > 66) {
-            errMsgList.add("メモは66文字までで入力してください");
-        }
-
-        // ここで、エラーリストに入ってればtime_schedule.jspへ戻すreturnする
-        // そうでなければ、elseで囲んで最後まで囲んで、処理を進めるように書く
-
-
-
+    //  バリデーションでエラーが無かったので処理を進める
         ScheduleDao scheDao = new ScheduleDao();
 
 
@@ -178,6 +202,8 @@ public class ScheduleInsertServlet extends HttpServlet {
             if(success == false) {  // 削除に失敗
                  // できなかったら、time_schedule.jspへ戻すこと、入力をしたものを表示できるようにリクエストスコープに保存をしてから
                 // フォワードをして、returnを書くこと
+
+
                 msg = scheBean.getScheduleDate().getYear() + "年" + scheBean.getScheduleDate().getMonthValue() + "月" + scheBean.getScheduleDate().getDayOfMonth() + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールの削除に失敗しました。";
             } else {
                 // 成功のメッセージ 成功したら、リダイレクトをするので、下でセッションスコープへ入れている
@@ -194,7 +220,7 @@ public class ScheduleInsertServlet extends HttpServlet {
          * クラス型のインスタンスは置けるが、自分で作ったクラスのインスタンスをスコープへ置けるようにするには、Beanとして作らないといけない。Beanを作るルール
          */
 
-          HttpSession session = request.getSession(true);
+         //  HttpSession session = request.getSession(true);
          session.setAttribute("msg", msg);
          // この ScheduleBeanのインスタンスは、再度月を表示する際に、表示する年月日を情報として、送りたいので、これをセッションに保存してる
          // リダイレクト後は、変更したことを確認するために、変更したスケジュールの月を表示するようにしてる

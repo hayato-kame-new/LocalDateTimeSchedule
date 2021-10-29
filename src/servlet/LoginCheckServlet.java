@@ -138,7 +138,7 @@ public class LoginCheckServlet extends HttpServlet {
                      // 再入力の キーaction 値re_enter もリクエストスコープに送る
                      request.setAttribute("action", "re_enter");
                      // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと  index.jspなら  /  だけでも大丈夫
-                     request.getRequestDispatcher("/WEB-INF/jsp/index.jsp").forward(request, response);
+                     request.getRequestDispatcher("/index.jsp").forward(request, response);
                      // request.getRequestDispatcher("./").forward(request, response);  // index.jspならこのパスでも良い
                     return;
                 }

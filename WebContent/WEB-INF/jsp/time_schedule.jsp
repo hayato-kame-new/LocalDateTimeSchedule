@@ -9,24 +9,43 @@ java.time.LocalDate, java.time.temporal.TemporalAdjusters, java.time.LocalTime" 
 // 文字化け対策
 request.setCharacterEncoding("UTF-8");
 // NewScheduleServletサーブレットでリクエストスコープに保存してるので  リクエストスコープから取り出す 表示に必要
-String action = (String)request.getAttribute("action");
-String title = action.equals("add") ? "新規登録" : "編集";
+// action には "re_enter" も渡ってきます
+
+String action = (String)request.getAttribute("action");  //  "action" "edit" "re_enter" "delete"　削除に失敗しても、ここでメッセージ出すので
+String title = action.equals("add") ? "新規登録" : "編集"; // ここ直す　3つの分岐にすること
+
 // リクエストスコープから フォーム用のインスタンスを取り出して
-//  action が "add"の時の、formScheBeanインスタンスは、ユーザIDだけ入ってるあとは、データ型の規定値になってます int型なら 0 参照型なら null が入ってます
-ScheduleBean formScheBean = (ScheduleBean)request.getAttribute("formScheBean");
-int id = formScheBean.getId();  // 新規では、 int型の規定値の 0 が入ってる  編集では、主キーの値がきちんと入ってる
+//  action が "add"の時の、ScheduleBeanインスタンスは、ユーザIDだけ入ってるあとは、データ型の規定値になってます int型なら 0 参照型なら null が入ってます
+ScheduleBean scheBean = (ScheduleBean)request.getAttribute("scheBean");  // "re_enter"再入力の時にはリクエストパラメータで渡って来ない
+// もし、再入力の時には、リクエストパラメータで、scheBeanは渡って来ないので nullになってるから null回避する
+int id = 0;
+int userId = 0;
+String schedule = "";
+String scheduleMemo = "";
+LocalDate scheduleDate = null;
+int year = 0;
+int month = 0;
+int day = 0;
+int thisMonthlastDay = 0;  // その月が何日あるのか
+LocalTime startTime = null;
+LocalTime endTime = null;
 
-LocalDate scheduleDate = formScheBean.getScheduleDate(); // 新規の時も 年月日はある NewScheduleServletサーブレットでLocalDateの値は、きちんと入ってる
 
-int year =  scheduleDate.getYear(); // 新規のは   scheduleDate は入ってる
-int month =  scheduleDate.getMonthValue();
-int day =  scheduleDate.getDayOfMonth();
-// その月が何日あるのか
-int thisMonthlastDay = LocalDate.of(year, month, day).with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+if(scheBean != null) {
+id = scheBean.getId();  // 新規では、 int型の規定値の 0 が入ってる  編集では、主キーの値がきちんと入ってる
+userId = scheBean.getUserId();
+scheduleDate = scheBean.getScheduleDate(); // 新規の時も 年月日はある NewScheduleServletサーブレットでLocalDateの値は、きちんと入ってる
+year =  scheduleDate.getYear(); // 新規のは   scheduleDate は入ってる
+month =  scheduleDate.getMonthValue();
+day =  scheduleDate.getDayOfMonth();
+//その月が何日あるのか
+thisMonthlastDay = LocalDate.of(year, month, day).with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+startTime = scheBean.getStartTime();  // 新規の時は null
+endTime = scheBean.getEndTime(); // 新規の時は null
+schedule = scheBean.getSchedule(); // 新規の時は null
+scheduleMemo = scheBean.getScheduleMemo(); // 新規の時は null
 
-
-LocalTime startTime = formScheBean.getStartTime();  // 新規の時は null
-LocalTime endTime = formScheBean.getEndTime(); // 新規の時は null
+}
 
 
 // 時間と分に分けておく
@@ -34,8 +53,9 @@ String s_hour = "";
 String s_minute =  "";
 String e_hour = "";
 String e_minute =  "";
-// ここ新規の時は null なので、実行しようとすると NullPointerException発生する 新規では null回避する
-if(!action.equals("add")) { // null対策    新規以外のときに使うから
+
+
+if(action.equals("edit") || action.equals("delete")) { // null対策 新規の時は null  削除の時にもフォームに再表示するから
  s_hour = String.valueOf(startTime.getHour());  // 開始時間の時間
  s_minute = String.format("%02d", startTime.getMinute());  // 開始時間の分
  e_hour = String.valueOf(endTime.getHour());  // 終了時間の時間
@@ -46,7 +66,31 @@ if(!action.equals("add")) { // null対策    新規以外のときに使うか�
 List<ScheduleBean> oneDayScheduleList = (List<ScheduleBean>)request.getAttribute("oneDayScheduleList");
 LinkedList<String> timeStack = (LinkedList<String>)request.getAttribute("timeStack");
 
+// 再入力でフォワードしてくるときに、上の oneDayScheduleList timeStack も必要となるため、セッションスコープに保存しています。
+// インスタンスは inputタグのhiddenでは送れないため、
+session.setAttribute("oneDayScheduleList", oneDayScheduleList);
+session.setAttribute("timeStack" , timeStack);
 
+// "re_enter" の時は バリデーションエラーメッセージを表示して 前にフォームに入力したのを表示する
+String scheduleFailureMsg = "";
+List<String> errMsgList = null;
+if(action != null && action.equals("re_enter")) {
+ // 失敗した時のメッセージ UserServletから、フォワードしてくる時にリクエストスコープに保存したので、取得する
+   scheduleFailureMsg = (String)request.getAttribute("scheduleFailureMsg");
+ // バリデーションエラーメッセージのリストをリクエストスコープから取得する
+ errMsgList = (List<String>)request.getAttribute("errMsgList");  // バリデーションに引っかかったエラーのメッセージが入ってる
+ // 前に入力したのをフォームに表示するので リクエストスコープから取得する
+ id = (Integer)request.getAttribute("id");
+ userId = (Integer)request.getAttribute("userId");
+ year = (Integer)request.getAttribute("year");
+ month = (Integer)request.getAttribute("month");
+ day = (Integer)request.getAttribute("day");
+ s_hour = String.valueOf((Integer)request.getAttribute("s_hour"));
+ s_minute = String.format("%02d", (Integer)request.getAttribute("s_minute"));
+ e_hour = String.valueOf((Integer)request.getAttribute("e_hour"));
+ e_minute = String.format("%02d", (Integer)request.getAttribute("e_minute"));
+
+}
 %>
 <!DOCTYPE html>
 <html>
@@ -127,9 +171,10 @@ p{font-size:0.75em;}
 <form method="post" action="ScheduleInsertServlet">
   <input type="hidden" name="action" value="<%=action %>" />
  <!--  新規登録の時に必要なuserId -->
-  <input type="hidden" name="userId" value="<%=formScheBean.getUserId() %>" />
+  <input type="hidden" name="userId" value="<%=userId %>" />
   <!-- 編集では、主キーの値が必要 -->
   <input type="hidden" name="id" value="<%=id %>" />
+
   <table>
     <tr>
       <td nowrap>日付</td>
@@ -260,13 +305,13 @@ p{font-size:0.75em;}
 
   <tr>
     <td nowrap>件名</td>
-    <td><input type="text" name="schedule" value="<%=formScheBean.getSchedule() %>" size="30" maxlength="70">
+    <td><input type="text" name="schedule" value="<%=schedule %>" size="30" maxlength="70">
     </td>
   </tr>
 
   <tr>
     <td valign="top" nowrap>メモ</td>
-    <td><textarea name="scheduleMemo" cols="30" rows="8" wrap="virtual"><%=formScheBean.getScheduleMemo() %></textarea></td>
+    <td><textarea name="scheduleMemo" cols="30" rows="8" wrap="virtual"><%=scheduleMemo %></textarea></td>
   </tr>
   </table>
 
