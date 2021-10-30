@@ -11,8 +11,9 @@ request.setCharacterEncoding("UTF-8");
 // NewScheduleServletサーブレットでリクエストスコープに保存してるので  リクエストスコープから取り出す 表示に必要
 // action には "re_enter" も渡ってきます
 
-String action = (String)request.getAttribute("action");  //  "action" "edit" "re_enter" "delete"　削除に失敗しても、ここでメッセージ出すので
+String action = (String)request.getAttribute("action");  //  "action" "edit" "delete"
 String title = action.equals("add") ? "新規登録" : "編集"; // ここ直す　3つの分岐にすること
+String re_enter = (String)request.getAttribute("re_enter");
 
 // リクエストスコープから フォーム用のインスタンスを取り出して
 //  action が "add"の時の、ScheduleBeanインスタンスは、ユーザIDだけ入ってるあとは、データ型の規定値になってます int型なら 0 参照型なら null が入ってます
@@ -33,7 +34,7 @@ LocalTime endTime = null;
 
 if(scheBean != null) {
 id = scheBean.getId();  // 新規では、 int型の規定値の 0 が入ってる  編集では、主キーの値がきちんと入ってる
-userId = scheBean.getUserId();
+userId = scheBean.getUserId();  // 新規では？
 scheduleDate = scheBean.getScheduleDate(); // 新規の時も 年月日はある NewScheduleServletサーブレットでLocalDateの値は、きちんと入ってる
 year =  scheduleDate.getYear(); // 新規のは   scheduleDate は入ってる
 month =  scheduleDate.getMonthValue();
@@ -55,7 +56,8 @@ String e_hour = "";
 String e_minute =  "";
 
 
-if(action.equals("edit") || action.equals("delete")) { // null対策 新規の時は null  削除の時にもフォームに再表示するから
+//if(action.equals("edit") || action.equals("delete")) { // null対策 新規の時は null  削除の時にもフォームに再表示するから
+  if( action.equals("delete")) { // null対策 新規の時は null  削除の時にもフォームに再表示するから
  s_hour = String.valueOf(startTime.getHour());  // 開始時間の時間
  s_minute = String.format("%02d", startTime.getMinute());  // 開始時間の分
  e_hour = String.valueOf(endTime.getHour());  // 終了時間の時間
@@ -66,6 +68,7 @@ if(action.equals("edit") || action.equals("delete")) { // null対策 新規の�
 List<ScheduleBean> oneDayScheduleList = (List<ScheduleBean>)request.getAttribute("oneDayScheduleList");
 LinkedList<String> timeStack = (LinkedList<String>)request.getAttribute("timeStack");
 
+// セッションに保存
 // 再入力でフォワードしてくるときに、上の oneDayScheduleList timeStack も必要となるため、セッションスコープに保存しています。
 // インスタンスは inputタグのhiddenでは送れないため、
 session.setAttribute("oneDayScheduleList", oneDayScheduleList);
@@ -74,7 +77,7 @@ session.setAttribute("timeStack" , timeStack);
 // "re_enter" の時は バリデーションエラーメッセージを表示して 前にフォームに入力したのを表示する
 String scheduleFailureMsg = "";
 List<String> errMsgList = null;
-if(action != null && action.equals("re_enter")) {
+if(re_enter != null && re_enter.equals("re_enter")) {
  // 失敗した時のメッセージ UserServletから、フォワードしてくる時にリクエストスコープに保存したので、取得する
    scheduleFailureMsg = (String)request.getAttribute("scheduleFailureMsg");
  // バリデーションエラーメッセージのリストをリクエストスコープから取得する
@@ -89,6 +92,8 @@ if(action != null && action.equals("re_enter")) {
  s_minute = String.format("%02d", (Integer)request.getAttribute("s_minute"));
  e_hour = String.valueOf((Integer)request.getAttribute("e_hour"));
  e_minute = String.format("%02d", (Integer)request.getAttribute("e_minute"));
+schedule = (String)request.getAttribute("schedule");
+scheduleMemo = (String)request.getAttribute("scheduleMemo");
 
 }
 %>
@@ -118,6 +123,8 @@ p{font-size:0.75em;}
 #contents:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
 #contents span {color: darkgreen; font-weight:bold;}
 .memo {color:#444;}
+.err {color:red;}
+
 </style>
 <script src="../js/jquery-3.6.0.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -149,7 +156,7 @@ p{font-size:0.75em;}
        if(timeStack.get(i).equals(oneDayScheduleList.get(j).createStrStartTime() )){
    %>
   [<%= oneDayScheduleList.get(j).createStrStartTime()%>-<%= oneDayScheduleList.get(j).createStrEndTime()%>]
-  <a href="/LocalDateTimeSchedule/NewScheduleServlet?action=edit&id=<%=oneDayScheduleList.get(j).getId() %>"><small class="schedule"><span><%= oneDayScheduleList.get(j).getSchedule() %></span></small></a><br />
+  <a href="/LocalDateTimeSchedule/ScheduleFormServlet?action=edit&id=<%=oneDayScheduleList.get(j).getId() %>"><small class="schedule"><span><%= oneDayScheduleList.get(j).getSchedule() %></span></small></a><br />
   <small class="memo">メモ: <%= oneDayScheduleList.get(j).getScheduleMemo() %></small><br />
   <%
   }
@@ -167,11 +174,28 @@ p{font-size:0.75em;}
 
 <!-- フォーム表示 -->
 <div id="right">
-<h3>スケジュールを<%=title %>します</h3>
+<h3>スケジュール入力フォーム</h3>
+<%
+  if(scheduleFailureMsg != null) {
+%>
+ <p class="err"><%= scheduleFailureMsg%></p>
+<% } %>
+ <%
+    if(errMsgList != null) {
+    for(String errMsg : errMsgList) {
+  %>
+    [&nbsp;<span ><%=errMsg %>&ensp;</span>&nbsp;]
+  <%
+    }
+    }
+  %>
 <form method="post" action="ScheduleInsertServlet">
   <input type="hidden" name="action" value="<%=action %>" />
  <!--  新規登録の時に必要なuserId -->
   <input type="hidden" name="userId" value="<%=userId %>" />
+
+  <p>ユーザID:<%=userId %></p>
+
   <!-- 編集では、主キーの値が必要 -->
   <input type="hidden" name="id" value="<%=id %>" />
 

@@ -100,7 +100,9 @@ if(action != null && action.equals("re_enter")) {
                <option value="0" >一般</option>
                <option value="1" selected>管理者</option>
               <% } else {%>
-               <option value="-1" >選択してください</option>
+               <!-- <option value="-1" >選択してください</option> -->
+               <!-- disabled属性をつけた optionタグは選択できないようになる -->
+               <option disabled value="" >選択してください</option>
                <option value="0" >一般</option>
                <option value="1" >管理者</option>
                <% } %>

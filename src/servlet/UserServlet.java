@@ -70,14 +70,21 @@ public class UserServlet extends HttpServlet {
         if (name == null || name.length() == 0) {  // nullチェックを先に書く
             errMsgList.add("名前が入力されていません");
         }
+
         if (flat_password == null || flat_password.length() == 0) {
             errMsgList.add("パスワードが入力されていません");
         } else if (!PATTERN_FLAT_PASSWORD.matcher(flat_password).matches()) {
             errMsgList.add("パスワードは6文字以上、10文字以下の半角英数字で入力してください");
         }
-        if (roll == -1) {
-            errMsgList.add("一般 または 管理者 のどちらかを選択してください");
-        }
+        // optionタグに disabled属性を付けて選択できなくしたので大丈夫
+//        if (roll == -1) {
+//            errMsgList.add("一般 または 管理者 のどちらかを選択してください");
+//        }
+
+
+
+        // さらにメルアドはユニークであるため他のユーザとの同じメルアドはできないようにバリデーションする
+
         if (mail == null || mail.length() == 0) {
             errMsgList.add("メールアドレスが入力されていません");
         } else if (!PATTERN_MAIL.matcher(mail).matches()) {
@@ -162,7 +169,7 @@ public class UserServlet extends HttpServlet {
                         return;
                     } else {
                         session.setAttribute("userBean", userBean); // 新規に登録してから、これでログインをしてることと同じになる
-
+                        session.setAttribute("userAddMsg", "ユーザー新規登録しました。");
                         // 新規登録成功 welcome.jspにフォワード
                         request.getRequestDispatcher("/WEB-INF/jsp/welcome.jsp").forward(request, response);
 

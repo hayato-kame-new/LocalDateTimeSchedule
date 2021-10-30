@@ -68,7 +68,18 @@ public class LoginCheckFilter implements Filter {
 
         // doFilterメソッドの 引数が  ServletRequest request, ServletResponse responseなので、「HttpServletRequest」型へのキャストが必要となります
 
-        HttpSession session = ((HttpServletRequest) request).getSession(false); // 既存のセッションがあったら、継続するため falseを引数にする
+
+        // 10月30日に付け足したけどこの破棄の処理を 大丈夫かな？
+        // まず、破棄をすべきじゃないか？？？
+        // 既存のセッションスコープを取得getSession() は　getSession(true) と同じ
+//        HttpSession session = ((HttpServletRequest) request).getSession();
+//        // セッションスコープを破棄
+//        session.invalidate();
+        // ここまでセッションの破棄を付け足した 10月30日に
+
+
+
+         HttpSession session = ((HttpServletRequest) request).getSession(false); // 既存のセッションがあったら、継続するため falseを引数にする
         // セッションおよびログインのチェック
         if (session == null) {  // セッションが存在しない
           // index.jsp へ フォワード

@@ -56,7 +56,7 @@ public class ScheduleInsertServlet extends HttpServlet {
         session.removeAttribute("oneDayScheduleList");
         session.removeAttribute("timeStack");
 
-        // actionの値が hiddenフィールドで送られてくる "add" か "edit" か "delete" "re_enter" 入ってる
+        // actionの値が hiddenフィールドで送られてくる "add" か "edit" か "delete" 入ってる
         // 削除 "delete"　の時には、フォームからは action と id だけしか 送ってこない
         String action = request.getParameter("action");
         // 編集と削除の時に使う新規では、主キーidの値は int型の規定値(デフォルト値)の 0  編集  削除 では、主キーの値が入ってる hiddenフィールドで送られてくる
@@ -78,9 +78,10 @@ public class ScheduleInsertServlet extends HttpServlet {
         String scheduleMemo = null;
 
         // 削除の時には、渡って来ないので、例外発生を防ぐためにifが必要
-        // time_schedule.jspの 新規"add"と編集"edit" 再入力"re_enter"のフォーム からの送信で送られてきたのを取得する
-        if(action.equals("add") || action.equals("edit") || action.equals("re_enter")) {
+        // time_schedule.jspの 新規"add"と編集"edit" フォーム からの送信で送られてきたのを取得する
+        if(action.equals("add") || action.equals("edit")) {
              userId =  Integer.parseInt(request.getParameter("userId"));
+
              year = Integer.parseInt(request.getParameter("year"));
              month = Integer.parseInt(request.getParameter("month"));
              day = Integer.parseInt(request.getParameter("day"));
@@ -132,40 +133,63 @@ public class ScheduleInsertServlet extends HttpServlet {
                  request.setAttribute("s_minute", s_minute);
                  request.setAttribute("e_hour", e_hour);
                  request.setAttribute("e_minute", e_minute);
+                 request.setAttribute("schedule", schedule);
+                 request.setAttribute("scheduleMemo", scheduleMemo);
                  // 上でセッションスコープから取得した、oneDayScheduleList  timeStack もリクエストスコープに保存して送らないといけない
                  request.setAttribute("oneDayScheduleList", oneDayScheduleList);
                  request.setAttribute("timeStack", timeStack);
 
-                 // 再入力の キーaction 値re_enter もリクエストスコープに送る
-                 request.setAttribute("action", "re_enter");
+                 // 再入力の もリクエストスコープに送る
+                 request.setAttribute("re_enter", "re_enter");
+                 request.setAttribute("action", action);
                  // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと  index.jspなら  /  だけでも大丈夫
                  request.getRequestDispatcher("/WEB-INF/jsp/time_schedule.jsp").forward(request, response);
-                return;
+                return;// returnでここから先は実行されない
              }
         }
     //  バリデーションでエラーが無かったので処理を進める
         ScheduleDao scheDao = new ScheduleDao();
-
-
         String msg = "";
-        boolean success = true; // trueならデータベース処理が成功
+
         ScheduleBean scheBean = null;
+        boolean success = false;
 
         switch(action) {
         case "add":
-            // 新規登録の時だけ使うコンストラクタ(6つの引数のコンストラクタ)を使う  新規登録の時には、主キーの idの値は、データベースに登録される時に、自動採番で生成して登録されますので、idが引数には要りません
-            scheBean = new ScheduleBean( userId, scheduleDate, startTime, endTime, schedule, scheduleMemo);
-
-            // データベースに新規登録
-            success = scheDao.add(scheBean); // addメソッドの戻り値は boolean型です
-            if(success == false) {  // falseだったら失敗 失敗のメッセージ 、time_schedule.jspで表示するフォワードする
+            // データベースに新規登録  戻り値は、 主キーの値がきちんと入っているuserBeanインスタンスです
+            // 新規登録の時には、主キーの idの値は、serialで、データベースに登録される時に、自動採番で生成して登録されますので、idが引数には要りません
+            scheBean = scheDao.add(userId, scheduleDate, startTime, endTime, schedule, scheduleMemo);
+            if(scheBean == null) {  // nullだったら失敗 失敗のメッセージ 、time_schedule.jspで表示するフォワードする
                 msg = year + "年" + month + "月" + day + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールを新規登録できませんでした。";
-             // できなかったら、time_schedule.jspへ戻すこと、入力をしたものを表示できるようにリクエストスコープに保存をしてから
+             // できなかったら、time_schedule.jspへ戻すこと、
+                // 失敗のメッセージと actionも必要 あと、表示用の 上でセッションスコープから取得した、oneDayScheduleList  timeStack もリクエストスコープに保存して送らないといけない
+                // 入力をしたものを表示できるようにリクエストスコープに保存をしてから
                 // フォワードをして、returnを書くこと
+                request.setAttribute("scheduleFailureMsg", "スケジュールを登録できませんでした");
+                // 入力値を表示したいので、リスエストスコープへ保存する
+                request.setAttribute("id", id);
+                request.setAttribute("userId", userId);
+                request.setAttribute("year", year);
+                request.setAttribute("month", month);
+                request.setAttribute("day", day);
+                request.setAttribute("s_hour", s_hour);
+                request.setAttribute("s_minute", s_minute);
+                request.setAttribute("e_hour", e_hour);
+                request.setAttribute("e_minute", e_minute);
+                request.setAttribute("schedule", schedule);
+                request.setAttribute("scheduleMemo", scheduleMemo);
+                // 上でセッションスコープから取得した、oneDayScheduleList  timeStack もリクエストスコープに保存して送らないといけない
+                request.setAttribute("oneDayScheduleList", oneDayScheduleList);
+                request.setAttribute("timeStack", timeStack);
 
+                request.setAttribute("re_enter", "re_enter");
+                request.setAttribute("action", action);
+                // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと  index.jspなら  /  だけでも大丈夫
+                request.getRequestDispatcher("/WEB-INF/jsp/time_schedule.jsp").forward(request, response);
+               return;// returnでここから先は実行されない
 
-
-            } else { // 成功のメッセージ 成功したら、リダイレクトをするので、下でセッションスコープに入れている
+            } else {
+                // 新規登録成功のメッセージ 成功したら、リダイレクトをするので、下でセッションスコープに入れている
                 msg = year + "年" + month + "月" + day + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() +  "のスケジュールを新規登録しました。";
 
             }
@@ -174,17 +198,40 @@ public class ScheduleInsertServlet extends HttpServlet {
             // 編集の時には、id 主キーの値が必要 hiddenフィールドから取得したので idを元に検索する
             scheBean = scheDao.find(id);
             // scheBeanの idとuserId以外の 5つのフィールド をフォームの値で更新してから、そのインスタンスをデータベースを更新する
+            // セッターを使って更新した 変更後のUserBeanインスタンスをセッションに保存すること（下でやってる) 変更後の月を表示するために必要
             scheBean.setScheduleDate(scheduleDate);
             scheBean.setStartTime(startTime);
             scheBean.setEndTime(endTime);
             scheBean.setSchedule(schedule);
-            scheBean.setScheduleMemo(scheduleMemo);
+            scheBean.setScheduleMemo(scheduleMemo);  // セッターで
             // データベース更新
             success = scheDao.update(scheBean); // updateメソッドの戻り値は boolean型です
             if (success == false) { // 失敗のメッセージ これは、time_schedule.jspに表示をする
                 msg = year + "年" + month + "月" + day + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールを更新できませんでした。";
            // できなかったら、time_schedule.jspへ戻すこと、入力をしたものを表示できるようにリクエストスコープに保存をしてから
                 // フォワードをして、returnを書くこと
+                request.setAttribute("scheduleFailureMsg", "スケジュールを更新できませんでした");
+                // 前にフォームに入力した時の入力値を表示したいので、リスエストスコープへ保存する
+                request.setAttribute("id", id);
+                request.setAttribute("userId", userId);
+                request.setAttribute("year", year);
+                request.setAttribute("month", month);
+                request.setAttribute("day", day);
+                request.setAttribute("s_hour", s_hour);
+                request.setAttribute("s_minute", s_minute);
+                request.setAttribute("e_hour", e_hour);
+                request.setAttribute("e_minute", e_minute);
+                request.setAttribute("schedule", schedule);
+                request.setAttribute("scheduleMemo", scheduleMemo);
+                // 上でセッションスコープから取得した、oneDayScheduleList  timeStack もリクエストスコープに保存して送らないといけない
+                request.setAttribute("oneDayScheduleList", oneDayScheduleList);
+                request.setAttribute("timeStack", timeStack);
+
+                request.setAttribute("re_enter", "re_enter");
+                request.setAttribute("action", action);
+                // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと  index.jspなら  /  だけでも大丈夫
+                request.getRequestDispatcher("/WEB-INF/jsp/time_schedule.jsp").forward(request, response);
+               return;// returnでここから先は実行されない
 
 
             } else { // 成功のメッセージ 成功したら、リダイレクトをするので、下でセッションスコープへ入れている
@@ -202,9 +249,29 @@ public class ScheduleInsertServlet extends HttpServlet {
             if(success == false) {  // 削除に失敗
                  // できなかったら、time_schedule.jspへ戻すこと、入力をしたものを表示できるようにリクエストスコープに保存をしてから
                 // フォワードをして、returnを書くこと
+                 msg = scheBean.getScheduleDate().getYear() + "年" + scheBean.getScheduleDate().getMonthValue() + "月" + scheBean.getScheduleDate().getDayOfMonth() + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールの削除に失敗しました。";
+                // 入力値を表示したいので、リスエストスコープへ保存する
+                request.setAttribute("id", id);
+                request.setAttribute("userId", userId);
+                request.setAttribute("year", year);
+                request.setAttribute("month", month);
+                request.setAttribute("day", day);
+                request.setAttribute("s_hour", s_hour);
+                request.setAttribute("s_minute", s_minute);
+                request.setAttribute("e_hour", e_hour);
+                request.setAttribute("e_minute", e_minute);
+                request.setAttribute("schedule", schedule);
+                request.setAttribute("scheduleMemo", scheduleMemo);
+                // 上でセッションスコープから取得した、oneDayScheduleList  timeStack もリクエストスコープに保存して送らないといけない
+                request.setAttribute("oneDayScheduleList", oneDayScheduleList);
+                request.setAttribute("timeStack", timeStack);
 
+                request.setAttribute("re_enter", "re_enter");
+                request.setAttribute("action", action);
+                // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと  index.jspなら  /  だけでも大丈夫
+                request.getRequestDispatcher("/WEB-INF/jsp/time_schedule.jsp").forward(request, response);
+               return;// returnでここから先は実行されない
 
-                msg = scheBean.getScheduleDate().getYear() + "年" + scheBean.getScheduleDate().getMonthValue() + "月" + scheBean.getScheduleDate().getDayOfMonth() + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールの削除に失敗しました。";
             } else {
                 // 成功のメッセージ 成功したら、リダイレクトをするので、下でセッションスコープへ入れている
                 msg = scheBean.getScheduleDate().getYear() + "年" + scheBean.getScheduleDate().getMonthValue() + "月" + scheBean.getScheduleDate().getDayOfMonth() + "日" + "開始時間" + scheBean.createStrStartTime() + "終了時間" + scheBean.createStrEndTime() + "のスケジュールを削除しました。";
@@ -213,6 +280,7 @@ public class ScheduleInsertServlet extends HttpServlet {
         }
 
         /*
+         * 成功なら
          * MonthDisplayServletへリダイレクトします。リダイレクトの際に、year month dayの情報が必要なので、ScheduleBeanインスタンスをセッションスコープに保存します。
          * リダイレクトの時には、リクエストスコープ使えないので、セッションスコープを使う
          * セッションは、requestから呼び出します。 サーブレットでは、セッションは明示的に破棄することが大切 (情報:SpringBootだと自動でフレームワークが行ってくれてるが、明示的に破棄することが大切)
@@ -226,11 +294,15 @@ public class ScheduleInsertServlet extends HttpServlet {
          // リダイレクト後は、変更したことを確認するために、変更したスケジュールの月を表示するようにしてる
          session.setAttribute("scheBean", scheBean);
 
+         // 付け足し
+         session.setAttribute("oneDayScheduleList", oneDayScheduleList);
+         session.setAttribute("timeStack", timeStack);
+
          session.setAttribute("mon", "scheduleResult");  // switch文で必要どの月を表示するのかcaseで切り替えるのに必要
 
          response.sendRedirect("/LocalDateTimeSchedule/MonthDisplayServlet");
          // クエリーパラメータとして、クエリー文字列を送ってもいい
-         // response.sendRedirect("/MonthDisplayServlet?year=year&month=month&day=day&mon=scheduleResult");
+         // 例：response.sendRedirect("/MonthDisplayServlet?year=year&month=month&day=day&mon=scheduleResult");
 
 
     }

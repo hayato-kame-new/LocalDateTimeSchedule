@@ -53,8 +53,10 @@ public class UserDao {
             pstmt.setString(2, pass);
             pstmt.setInt(3, roll);
             pstmt.setString(4, mail);
+
             // generateKeyを取得したい 解決策：追加 Statement.RETURN_GENERATED_KEYS でもつけるとエラー文法的に
-            pstmt.executeUpdate();  // ここに引数を入れてはいけません
+            // executeUpdate() 注意  戻り値を取得するような書き方をするとエラーになります！！
+            pstmt.executeUpdate();  // ここに引数を入れてはいけません 戻り値は変更したデータの数
 
             // 取れる自動生成した主キーの値
             rs = pstmt.getGeneratedKeys();  // この Statement オブジェクトを実行した結果として作成された自動生成キーを取得します。この Statement オブジェクトがキーを生成しなかった場合は、空の ResultSet オブジェクトが返されます。
@@ -63,9 +65,9 @@ public class UserDao {
                  pstmt.getMetaData().getColumnCount();
 
                 int id = rs.getInt(1);  // 引数は 先頭なので 1を指定する  注: 自動生成キーを表す列が指定されなかった場合、JDBC ドライバ実装では、自動生成キーを表すのに最適な列を判断します。
-   //  PostgreSQLはサポートしてます  JDBC ドライバがこのメソッドgetGeneratedKeys() をサポートしない場合例外発生します PostgreSQLはサポートしてます
-             //   String name = rs.getString("name");
-             //   String pass = rs.getString("pass");
+   //  PostgreSQLはgetGeneratedKeys()メソッドをサポートしてます  JDBC ドライバがこのメソッドgetGeneratedKeys() をサポートしない場合例外発生します PostgreSQLはサポートしてます
+             //   String name = rs.getString("name");  // 取ることも可能です
+             //   String pass = rs.getString("pass");  // 取ることも可能です
               //  int roll = rs.getInt("roll");
               //  String mail = rs.getString("mail");
 

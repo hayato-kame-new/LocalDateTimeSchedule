@@ -52,10 +52,12 @@ public class MonthDisplayServlet extends HttpServlet {
 
            List<ScheduleBean> monthScheduleList = new ArrayList<ScheduleBean>(); // まずnewして確保  そのユーザのその月にあるスケジュール一覧リスト
            MonthBean monthBean = null;
-            ScheduleBean scheBean = null;
+       //     ScheduleBean scheBean = null;
            HttpSession session = request.getSession(true);  // 引数のセッション生成フラグにtrueを指定すると、現在セッションが存在しない場合は、生成して返します 注意nullを代入しちゃだめ　なくなってしまうから
            if(session.getAttribute("mon") != null) {
             mon = (String)session.getAttribute("mon");
+            // 取り出したら、すぐに消しておく 何かのエラーで途中でプログラムが止まった時に、前のセッションが残ってしまうので取り出して、その後すぐにセッションから消すことが大切
+            session.removeAttribute("mon");
            }
            int userId = 0;  // 新規との時は使わない
            String msg = "";
@@ -137,7 +139,8 @@ public class MonthDisplayServlet extends HttpServlet {
         case "scheduleResult": // リダイレクト後
             // スケージュール登録や編集 削除後にリダイレクトしてきたら、ScheduleInsertServletから リダイレクトしてくるので、登録や編集をした月を表示する
             // ScheduleInsertServletで、セッションスコープに保存したので セッションスコープから取得する
-             scheBean = (ScheduleBean) session.getAttribute("scheBean") ;
+             ScheduleBean scheBean = (ScheduleBean) session.getAttribute("scheBean") ;  // 新規登録のあとnullでエラー
+
             userId = scheBean.getUserId();  // これが必要
               //  mon = (String) session.getAttribute("mon");  // "scheduleResult"が入ってる
                 msg = (String) session.getAttribute("msg");
@@ -145,7 +148,7 @@ public class MonthDisplayServlet extends HttpServlet {
 
              // 取り出したら、消しておくセッションから
                 session.removeAttribute("scheBean");
-                session.removeAttribute("mon");
+              //   session.removeAttribute("mon"); // 取り出した場所のすぐ後ろで消しておく
                 session.removeAttribute("msg");
 
             // 削除した年月日を取得してる ScheduleBeanの 削除をした後に、再度表示する月は削除した月なので

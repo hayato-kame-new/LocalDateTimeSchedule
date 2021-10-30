@@ -27,39 +27,30 @@ public class ScheduleDao {
     final String DB_USER = "postgres";
     final String DB_PASS = "postgres";
 
-    /**
-     * ScheduleBeanインスタンスを新規登録
-     * @param scheBean
-     * @return @return true 成功<br> false 失敗
-     */
-    public boolean add(ScheduleBean scheBean) {
+ // 戻り値は、主キーの値がきちんと入った ScheduleBeanインスタンス
+    public ScheduleBean add(int userId, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime, String schedule, String scheduleMemo) {
 
+        ScheduleBean scheBean = null;
         Connection conn = null;
         PreparedStatement pstmt = null;
-
-        try {
+        ResultSet rs = null;
+       try {
             // JDBCドライバを読み込み
             Class.forName(DRIVER_NAME);
             // データベースへ接続
             conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
             // PostgreSQLだと、全部小文字でカラム名やテーブル名を書くこと id は、自動採番なので、書かない
             String sql = "insert into schedule (userid, scheduledate, starttime, endtime, schedule, schedulememo) values (?::integer, ?::date, ?::time, ?::time, ?, ?)";
-
-            // pstmt = conn.prepareStatement(sql);
+         // PostgresSQLは、Statement生成時に、Statement.RETURN_GENERATED_KEYSを指定するとStatement#getGeneratedKeysでそのテーブルの全カラムの情報が取得される。
+            // pstmt = conn.prepareStatement(sql);  // これじゃなくて下を
             pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-            int userId = scheBean.getUserId();
-
             // LocalDate を java.sql.Dateに変換する
-            java.sql.Date sqlScheduleDate = java.sql.Date.valueOf(scheBean.getScheduleDate());
+            java.sql.Date sqlScheduleDate = java.sql.Date.valueOf(scheduleDate);
             // LocalDateTime を java.sql.Timeに変換する   java.sql.Timeには、LocalTimeとの間で変換を行うメソッドがあります
             // ただ、これらメソッドは秒までしか対象にしておらず、ミリ秒が破棄されています 今回はやらないが LocalDateTimeなどを経由させて変換することによって、ミリ秒を維持したまま変換できます
-            java.sql.Time sqlStartTime = java.sql.Time.valueOf(scheBean.getStartTime());
-            java.sql.Time sqlEndTime = java.sql.Time.valueOf(scheBean.getEndTime());
-
-            String schedule = scheBean.getSchedule();
-            String scheduleMemo = scheBean.getScheduleMemo();
-
+            java.sql.Time sqlStartTime = java.sql.Time.valueOf(startTime);
+            java.sql.Time sqlEndTime = java.sql.Time.valueOf(endTime);
             // ? のパラメータにセットする
             pstmt.setInt(1, userId);
             pstmt.setDate(2, sqlScheduleDate);
@@ -68,17 +59,33 @@ public class ScheduleDao {
             pstmt.setString(5, schedule);
             pstmt.setString(6, scheduleMemo);
 
-            // executeUpdateメソッドの戻り値は、更新された行数を表します
-            int result = pstmt.executeUpdate();
-            if (result != 1) {
-                return false; // 失敗したら false返す
-            }
+            // Statement.RETURN_GENERATED_KEYS を　prepareStatementメソッドの第2引数に入れた時は  この書き方をするとエラーです 戻り値を得ないやり方にしてください
+            // executeUpdateメソッドの戻り値は、更新された行数を表しますが、今回は戻り値を得るとエラーです！！
+//            int result = pstmt.executeUpdate(); // 引数を入れてはいけません  戻り値も得る書き方だとエラーです！！
+//            if (result != 1) {
+//                return null; // 失敗したら false返す
+//            }
+
+            pstmt.executeUpdate();  // 引数なし 戻り値なし にしてくださいz
+            // 取れる自動生成した主キーの値
+            rs = pstmt.getGeneratedKeys();  // この Statement オブジェクトを実行した結果として作成された自動生成キーを取得します。この Statement オブジェクトがキーを生成しなかった場合は、空の ResultSet オブジェクトが返されます。
+
+            if(rs.next()) {  // １件なので、whileじゃなくて ifでいい
+                pstmt.getMetaData().getColumnCount();
+                // ResultSetから 自動採番された 主キーの値が取れます
+               int id = rs.getInt(1);  // 引数は 先頭なので 1を指定する  注: 自動生成キーを表す列が指定されなかった場合、JDBC ドライバ実装では、自動生成キーを表すのに最適な列を判断します。
+  //  PostgreSQLはgetGeneratedKeys()メソッドをサポートしてます  JDBC ドライバがこのメソッドgetGeneratedKeys() をサポートしない場合例外発生します PostgreSQLはサポートしてます
+            // 他のフィールドを取ることもできます
+            //   int userId = rs.getInt("userId");  // 取ることもできる
+
+              scheBean = new ScheduleBean(id, userId, scheduleDate, startTime, endTime, schedule, scheduleMemo );
+           }
 
         } catch (SQLException | ClassNotFoundException e) {
             // データベース接続やSQL実行失敗時の処理
             // JDBCドライバが見つからなかったときの処理
             e.printStackTrace();
-            return false; // 失敗したら false返す
+            return null; // 失敗したら false返す
         } finally {
             // PrepareStatementインスタンスのクローズ処理
             if (pstmt != null) {
@@ -87,7 +94,7 @@ public class ScheduleDao {
                 } catch (SQLException e) {
                     // クローズ処理失敗時の処理
                     e.printStackTrace();
-                    return false; // 失敗したら false返す
+                    return null; // 失敗したら false返す
                 }
             }
             // データベース切断
@@ -97,11 +104,11 @@ public class ScheduleDao {
                 } catch (SQLException e) {
                     // データベース切断失敗時の処理
                     e.printStackTrace();
-                    return false; // 失敗したら false返す
+                    return null; // 失敗したら false返す
                 }
             }
         }
-        return true;
+        return scheBean;
     }
 
 

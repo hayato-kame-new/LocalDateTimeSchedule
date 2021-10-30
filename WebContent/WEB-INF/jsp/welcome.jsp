@@ -7,7 +7,10 @@
 <%
 /* LoginCheckServlet で ユーザの名前とパスワードが会ってれば、このwelcome.jsp ページにくる */
   // セッションスコープからログインユーザ情報を取得  フィルターで判断するために必要 セッションスコープから取り出す
+ //  ユーザ新規登録した後も、リダイレクトしてくるので セッションから取得します
   UserBean userBean = (UserBean) session.getAttribute("userBean");
+
+String userAddMsg = (String)session.getAttribute("userAddMsg");
 %>
 <html>
 <head>
@@ -18,6 +21,9 @@
 <h2>スケジュール帳へようこそ</h2>
 <hr>
 <% if( userBean != null ) { %>
+  <% if (userAddMsg != null) { %>
+   <p><%=userAddMsg %></p>
+   <% } %>
   <p>ログインに成功しました。</p>
   <p>ようこそ<%= userBean.getName() %>さん</p>
 
