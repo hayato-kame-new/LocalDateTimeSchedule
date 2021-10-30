@@ -8,7 +8,7 @@
 // UserServletから、セッションがなかった時にこのindex.jspに戻ってくるときのエラーメッセージをリクエストスコープから取得する
   String userRegistFailureMsg =  (String) request.getAttribute("userRegistFailureMsg");
 
-//もし、action が "re_enter"  なら  再入力を行うようにします フォームに入力してあったものを表示する
+//エラーなら 再入力を行うようにします フォームに入力してあったものを表示する
 // LoginCheckServletでエラー発生の時 このindex.jspへ戻ってくる エラーメッセージをリクエストスコープから取得する
 String action = (String)request.getAttribute("action");
 String loginFailureMsg = "";

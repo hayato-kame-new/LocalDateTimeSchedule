@@ -96,7 +96,7 @@ public class ScheduleInsertServlet extends HttpServlet {
             startTime = LocalTime.of(s_hour, s_minute);
              endTime = LocalTime.of(e_hour, e_minute);
 
-             // action が "add" "edit" "re_enter" の時だけ入力チェックする バリデーションする
+             // action が "add" "edit" 時入力チェックする バリデーションする
              // バリデーションのエラーリストのインスタンスを newで確保
           List<String> errMsgList = new ArrayList<String>(); // エラーなければ、空のリスト  [] と表示されます
              // フォームの s_hour   e_hour  は intなので比較する Javascriptで、s_hourを選択した時に e_hourがそれ以降の時間だけoptionタグを生成するようにしてもいい
@@ -288,7 +288,6 @@ public class ScheduleInsertServlet extends HttpServlet {
          * クラス型のインスタンスは置けるが、自分で作ったクラスのインスタンスをスコープへ置けるようにするには、Beanとして作らないといけない。Beanを作るルール
          */
 
-         //  HttpSession session = request.getSession(true);
          session.setAttribute("msg", msg);
          // この ScheduleBeanのインスタンスは、再度月を表示する際に、表示する年月日を情報として、送りたいので、これをセッションに保存してる
          // リダイレクト後は、変更したことを確認するために、変更したスケジュールの月を表示するようにしてる
@@ -301,10 +300,8 @@ public class ScheduleInsertServlet extends HttpServlet {
          session.setAttribute("mon", "scheduleResult");  // switch文で必要どの月を表示するのかcaseで切り替えるのに必要
 
          response.sendRedirect("/LocalDateTimeSchedule/MonthDisplayServlet");
-         // クエリーパラメータとして、クエリー文字列を送ってもいい
+         // クエリーパラメータとして、クエリー文字列を送ってもいいただし文字列だけできる
          // 例：response.sendRedirect("/MonthDisplayServlet?year=year&month=month&day=day&mon=scheduleResult");
-
-
     }
 
 }

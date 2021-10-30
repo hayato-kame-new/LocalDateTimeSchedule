@@ -3,25 +3,32 @@
 <%@ page import="model.UserBean, java.util.List" %>
 
 <%
+String action = (String)request.getAttribute("action");  // "add" "edit"  が入ってる
+String re_enter = (String)request.getAttribute("re_enter");
+
+String title = action.equals("add") ? "新規登録" : "編集";
 //  request も session も、JSPで使える暗黙オブジェクトです
-// UserFormサーブレットでは、セッションスコープに、UserBean空のインスタンス(各フィールドは、各データ型の規定値になってる) が保存されてますので
+// 新規ではUserFormサーブレットでは、セッションスコープに、UserBean空のインスタンス(各フィールドは、各データ型の規定値になってる) が保存されてます
+// 編集では、セッションスコープに、UserBeanインスタンスがあるので、それを使う
 // セッションスコープから、取り出して、フォームに使う セッションスコープにUserBeanインスタンスがあることで、フィルターでindex.jspへ転送されない
 
- UserBean userBean = (UserBean)session.getAttribute("userBean");
-
-
-String action = (String)request.getAttribute("action");  // "add" "edit" "re_enter"  が入ってる
-
-// 後で actionによって title h4 を切り替えるようにすること
-
-// もし、action が "re_enter"  なら  再入力を行うようにします
+// もし、バリデーションエラーや、データベースエラーの時  再入力を行うようにします
 String form_msg = "";
 String name = "";
 Integer str_roll = 0;
-int roll = -1;  // 初期値
+int roll = 0;  // 初期値
 String mail = "";
+int id = 0;
+ UserBean userBean = (UserBean)session.getAttribute("userBean");
+if(action.equals("add") || action.equals("edit")) {
+  name = userBean.getName();
+  roll = userBean.getRoll();
+  mail = userBean.getMail();
+  id = userBean.getId();
+}
+
 List<String> errMsgList = null;
-if(action != null && action.equals("re_enter")) {
+if(re_enter != null && re_enter.equals("re_enter")) {
   // 失敗した時のメッセージ UserServletから、フォワードしてくる時にリクエストスコープに保存したので、取得する
    form_msg = (String)request.getAttribute("form_msg");
   // 失敗した時にフォームに入力してあったのを表示
@@ -31,7 +38,8 @@ if(action != null && action.equals("re_enter")) {
    roll = str_roll.intValue();
   mail = (String)request.getAttribute("mail");
   errMsgList = (List<String>)request.getAttribute("errMsgList");  // バリデーションに引っかかったエラーのメッセージが入ってる
-
+  action = (String)request.getAttribute("action");
+  id = (Integer)request.getAttribute("id");
 }
 
 
@@ -40,7 +48,7 @@ if(action != null && action.equals("re_enter")) {
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ユーザ新規登録</title>
+<title>ユーザ<%=title %></title>
 <style>
 .err {
   color: red;
@@ -50,7 +58,7 @@ if(action != null && action.equals("re_enter")) {
 <body>
 
    <div >
-  <h4>ユーザ登録画面</h4>
+  <h4>ユーザ<%=title %>画面</h4>
   <%
     if (form_msg != null) {
   %>
@@ -70,6 +78,7 @@ if(action != null && action.equals("re_enter")) {
     <form action="/LocalDateTimeSchedule/UserServlet" method="post">
 
       <input type="hidden" name="action" value="<%=action %>" />
+      <input type="hidden" name="id" value="<%=id %>" />
       <table>
         <tr>
           <th >ユーザ名</th>

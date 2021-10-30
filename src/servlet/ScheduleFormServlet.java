@@ -63,12 +63,8 @@ public class ScheduleFormServlet extends HttpServlet {
             // 編集の時には ScheduleBeanインスタンスを取得するための主キーで id(プライマリーキー)の値が aリンクの ?以降のクエリーパラメータで送られてくる
             int id = Integer.parseInt(request.getParameter("id"));
             // 入力フォームに表示するために 渡ってきたidから、インスタンスを取得する
-            // するとuserIdも取得できる
-
             scheBean = scheDao.find(id);  // 主キーで検索する
-
             localDate = scheBean.getScheduleDate();
-
             break;  // switch文から抜ける
         }
      // そのユーザの指定した日の一日分のスケジュールのリスト取得
@@ -88,9 +84,7 @@ public class ScheduleFormServlet extends HttpServlet {
    //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/time_schedule.jsp");
         dispatcher.forward(request, response);
-
     }
-
 
     /**
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)

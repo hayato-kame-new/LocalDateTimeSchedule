@@ -47,15 +47,18 @@ public class UserFormServlet extends HttpServlet {
             return;
         } else {
 
+             UserBean userBean = null;
             switch (action) {
             case "add":
                 // 空の(フィールドが規定値のままの)userBeanをセッションに置く これがセッションスコープにない nullだと、フィルターが効くので index.jspへ転送されてしまう
-                UserBean userBean = new UserBean(); // 空のインスタンス生成(各フィールドの値は、各データ型の既定値になっています)にしておけばいい nullじゃなければいいので nullだと、フィルターの作用でindex.jspへ転送されてしまう
+                 userBean = new UserBean(); // 空のインスタンス生成(各フィールドの値は、各データ型の既定値になっています)にしておけばいい nullじゃなければいいので nullだと、フィルターの作用でindex.jspへ転送されてしまう
                 // セッションスコープに保存する これがセッションスコープにあれば、フィルターで戻されない
                 session.setAttribute("userBean", userBean);
 
                 break;
             case "edit":
+                // userBean = (UserBean)session.getAttribute("userBean");
+
                 // 自分のUserBeanインスタンスの内容を更新するので、セッションから取り出せます
                 // 主キーから、UserBeanインスタンスを取得する welcome.jspのaリンクのクエリー文字列から取得できる
 //  こんなことしなくてもセッションスコープから取り出せばいいのでは？？？  idパラメータ要らなかった

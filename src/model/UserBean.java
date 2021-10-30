@@ -28,11 +28,17 @@ public class UserBean implements Serializable {
 
     public UserBean() {
         super();
-        // TODO 自動生成されたコンストラクター・スタブ
     }
 
-// id以外のカラム引数にして 新規登録の時に使う シーケンス（データ型のserial）とは シーケンスとはINSERTで値を入れなくとも、自動で採番されるカラムなので、
-    // 引数にidは要らない 引数4つ
+    /**
+     * コンストラクタ
+     * id以外のカラム引数にして 新規登録の時に使う シーケンス（データ型のserial）とは シーケンスとはINSERTで値を入れなくとも、自動で採番されるカラムなので、
+     * INSERTの時に引数にidは要らない 引数4つ
+     * @param name
+     * @param pass
+     * @param roll
+     * @param mail
+     */
     public UserBean(String name, String pass, int roll, String mail) {
         super();
         this.name = name;
@@ -41,9 +47,15 @@ public class UserBean implements Serializable {
         this.mail = mail;
     }
 
-
-    // ログインの時に、UserBeanインスタンスをセッションスコープに保存するのために使うコンストラクタは、引数が５つ
-
+    /**
+     * コンストラクタ
+     * ログインの時に、UserBeanインスタンスをセッションスコープに保存するのために使うコンストラクタは、引数が５つ
+     * @param id
+     * @param name
+     * @param pass
+     * @param roll
+     * @param mail
+     */
     public UserBean(int id, String name, String pass, int roll, String mail) {
         super();
         this.id = id;

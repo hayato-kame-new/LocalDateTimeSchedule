@@ -27,7 +27,18 @@ public class ScheduleDao {
     final String DB_USER = "postgres";
     final String DB_PASS = "postgres";
 
- // 戻り値は、主キーの値がきちんと入った ScheduleBeanインスタンス
+
+    /**
+     * スケジュール新規登録
+     * 戻り値は、主キーの値がきちんと入った ScheduleBeanインスタンス
+     * @param userId
+     * @param scheduleDate
+     * @param startTime
+     * @param endTime
+     * @param schedule
+     * @param scheduleMemo
+     * @return scheBean
+     */
     public ScheduleBean add(int userId, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime, String schedule, String scheduleMemo) {
 
         ScheduleBean scheBean = null;
@@ -370,7 +381,7 @@ public class ScheduleDao {
 
 
     /**
-     * ScheduleBeanインスタンスを更新する
+     * スケジュール更新
      * @param scheBean
      * @return @return true 成功<br> false 失敗
      */
@@ -432,7 +443,11 @@ public class ScheduleDao {
         return true;
     }
 
-    // 削除
+    /**
+     * スケジュール削除
+     * @param id
+     * @return true 成功<br>false 失敗
+     */
     public boolean delete(int id) {
 
           Connection conn = null;

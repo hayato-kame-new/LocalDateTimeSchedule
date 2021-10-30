@@ -56,8 +56,8 @@ String e_hour = "";
 String e_minute =  "";
 
 
-//if(action.equals("edit") || action.equals("delete")) { // null対策 新規の時は null  削除の時にもフォームに再表示するから
-  if( action.equals("delete")) { // null対策 新規の時は null  削除の時にもフォームに再表示するから
+if(re_enter == null && (action.equals("edit") || action.equals("delete"))) { // null対策 新規の時は null  削除の時にもフォームに再表示するから
+ // if( action.equals("delete")) { // null対策 新規の時は null  削除の時にもフォームに再表示するから
  s_hour = String.valueOf(startTime.getHour());  // 開始時間の時間
  s_minute = String.format("%02d", startTime.getMinute());  // 開始時間の分
  e_hour = String.valueOf(endTime.getHour());  // 終了時間の時間
@@ -94,7 +94,8 @@ if(re_enter != null && re_enter.equals("re_enter")) {
  e_minute = String.format("%02d", (Integer)request.getAttribute("e_minute"));
 schedule = (String)request.getAttribute("schedule");
 scheduleMemo = (String)request.getAttribute("scheduleMemo");
-
+oneDayScheduleList = (List<ScheduleBean>)request.getAttribute("oneDayScheduleList");
+timeStack = (LinkedList<String>)request.getAttribute("timeStack");
 }
 %>
 <!DOCTYPE html>

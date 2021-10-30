@@ -23,6 +23,14 @@ public class UserDao {
     final String DB_USER = "postgres";
     final String DB_PASS = "postgres";
 
+    /**
+     * ユーザー新規登録
+     * @param name
+     * @param pass
+     * @param roll
+     * @param mail
+     * @return userBean
+     */
     public UserBean add(String name, String pass, int roll, String mail) {
  // 戻り値の　UserBeanインスタンスには、主キーがちゃんと入ってるのをリターンする。そして、それを、セッションスコープに保存をしてログインした状態とする
        UserBean userBean = null;  // 主キーもきちんと入ってる完全形のUserBean これを後でセッションスコープに置きます
@@ -105,7 +113,12 @@ public class UserDao {
 
     }
 
-    // 一番最後のユーザの主キーidの値を取得する データベースで何らかのエラーがあった時は 0 を返す
+
+    /**
+     * ソルトのために取得する
+     * 一番最後のユーザの主キーidの値を取得する データベースで何らかのエラーがあった時は 0 を返す
+     * @return
+     */
     public int getNewId() {
    // これはソルトが必要なので
         int newId = 0; // 0で初期化してる
@@ -167,7 +180,13 @@ public class UserDao {
         return newId;
     }
 
-    // ログイン時はメルアドでまず検索する　UserBeanが返る メルアドはユニーク(一意制約つけたカラムなので検索できる)
+
+    /**
+     * ログイン時はメルアドでまず検索する メルアドはユニーク(一意制約つけたカラムなので検索できる)
+     *
+     * @param mail
+     * @return userBean
+     */
     public UserBean loginFind(String mail) {
         UserBean userBean = null;
         Connection conn = null;
@@ -229,7 +248,12 @@ public class UserDao {
         return userBean;
     }
 
-    // 主キーから検索する
+
+    /**
+     * 主キーからユーザー検索する
+     * @param id
+     * @return userBean
+     */
     public UserBean findById(int id) {
 
         UserBean userBean = null;
@@ -284,6 +308,158 @@ public class UserDao {
             }
         }
         return userBean;
-
     }
+
+    /**
+     * ユーザ新規の時にだけ使うバリデーション用
+     * @param id
+     * @param mail
+     * @return
+     */
+    public boolean newMailCheck( String mail) {
+        String getMail = "";
+        boolean used = false;  // すでに使われているかどうか
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            // JDBCドライバを読み込み
+            Class.forName(DRIVER_NAME);
+            // データベースへ接続
+            conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+            // 新規ではこれでいい
+          String sql = "select mail from usertable where mail = ?";
+
+          // 編集時だったら、
+            // パスワード変更の時は 自分自身のパスワード以外で同じものがあったらだめ、にしないといけないので
+       // 例:  select mail from usertable where id != 1 and  mail = 'root@root.com';
+// 編集だったらこれ
+        //    String sql = "select mail from usertable where id != ?::integer and  mail = ?";
+
+          pstmt = conn.prepareStatement(sql);
+          pstmt.setString(1,mail);
+
+          // 編集だったらこれ
+//            pstmt.setInt(1,id);
+//            pstmt.setString(2, mail);
+            rs = pstmt.executeQuery();
+            while(rs.next()) {  // ユニークなカラムだから whileじゃなくて ifでもいい
+                getMail = rs.getString("mail");
+                if(getMail.equals(mail)) {  // whileを抜ける条件
+                    used = true;  // すでに使われている
+                    break;  // whileを抜ける
+                } else {
+                    used = false;  // まだ使われていない
+                    break; // whileを抜ける
+                }
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+         //   return null; // エラーの時は、nullを返すようにする。
+        } finally {
+            if (rs != null) { //close()する順番は、逆からする
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                   // return null; // エラーの時は、nullを返すようにする。
+                }
+            }
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                  //  return null; // エラーの時は、nullを返すようにする。
+                }
+            }
+            // データベース切断
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                  //  return null; // エラーの時は、nullを返すようにする。
+                }
+            }
+        }
+        return used;
+}
+
+
+
+    /**
+     * ユーザ編集の時だけ使うバリデーション用
+     * メールアドレスが、同じものがあるかどうか バリデーションチェックする ユニークなカラムmail
+     * @param mail
+     * @param id
+     * @return true:もうすでに登録されているので使用できない<br /> false:まだ使われていない
+     */
+    public boolean editMailCheck(int id, String mail) {  // 第1引数は、自分のid
+        String getMail = "";
+        boolean used = false;  // すでに使われているかどうか
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            // JDBCドライバを読み込み
+            Class.forName(DRIVER_NAME);
+            // データベースへ接続
+            conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+          //  String sql = "select mail from usertable where mail = ?"; //これじゃだめ
+            // パスワード変更の時は 自分自身のパスワード以外で同じものがあったらだめ、にしないといけないので
+       // 例:  select mail from usertable where id != 1 and  mail = 'root@root.com';
+
+            String sql = "select mail from usertable where id != ?::integer and  mail = ?";
+            pstmt = conn.prepareStatement(sql);
+
+            pstmt.setInt(1,id);
+            pstmt.setString(2, mail);
+            rs = pstmt.executeQuery();
+            while(rs.next()) {  // ユニークなカラムだから whileじゃなくて ifでもいい
+                getMail = rs.getString("mail");
+                if(getMail.equals(mail)) {  // whileを抜ける条件
+                    used = true;  // すでに使われている
+                    break;  // whileを抜ける
+                } else {
+                    used = false;  // まだ使われていない
+                    break; // whileを抜ける
+                }
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+         //   return null; // エラーの時は、nullを返すようにする。
+        } finally {
+            if (rs != null) { //close()する順番は、逆からする
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                   // return null; // エラーの時は、nullを返すようにする。
+                }
+            }
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                  //  return null; // エラーの時は、nullを返すようにする。
+                }
+            }
+            // データベース切断
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                  //  return null; // エラーの時は、nullを返すようにする。
+                }
+            }
+        }
+        return used;
+}
 }
