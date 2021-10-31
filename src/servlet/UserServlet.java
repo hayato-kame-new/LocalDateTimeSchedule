@@ -237,11 +237,21 @@ public class UserServlet extends HttpServlet {
 
             case "delete":
                  // 主キーで削除する
-                 success = userDao.delete(id);
-                 if(success == false) { // 失敗
-                      // 失敗のメッセージ そしてユーザ登録画面へ戻る フォームに入力した値をフォワード先に送って表示させる
+                 String str = userDao.delete(id);
+
+                 if(str.equals("failure")) {
                      form_msg = "ユーザー情報を削除できませんでした";
+                 } else if(str.equals("relationFailure")) {
+                     form_msg = "このユーザには登録してあるスケジュールが存在するため、ユーザー情報を削除できませんでした";
+
+                 }
+
+
+                 if(str.equals("failure") || str.equals("relationFailure")) { // 失敗
+                      // 失敗のメッセージ そしてユーザ登録画面へ戻る フォームに入力した値をフォワード先に送って表示させる
+
                      request.setAttribute("form_msg", form_msg);
+
                      // リクエストスコープへ、保存します UserBeanにはしないで、バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
                      request.setAttribute("name", name);
                      //      request.setAttribute("flat_password",flat_password);  // パスワードはセキュリティのため表示させない
@@ -256,7 +266,7 @@ public class UserServlet extends HttpServlet {
                      request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(request, response);
                      return; // リターンを書く return で、即終了させる　この行以降は実行されない
 
-                 } else {
+                 } else {  // 成功
                      // 削除をしたら、セッションスコープ自体を破棄してログアウトします
                      // ログアウトするには
                      // 既存のセッションスコープを取得getSession() は　getSession(true) と同じ

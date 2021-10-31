@@ -14,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.postgresql.util.PSQLException;
+
 import model.UserBean;
 
 public class UserDao {
@@ -116,7 +118,7 @@ public class UserDao {
     /**
      * ソルトのために取得する
      * 一番最後のユーザの主キーidの値を取得する データベースで何らかのエラーがあった時は 0 を返す
-     * @return
+     * @return newId
      */
     public int getNewId() {
         // これはソルトが必要なので
@@ -311,7 +313,7 @@ public class UserDao {
      * ユーザ新規の時にだけ使うバリデーション用
      * @param id
      * @param mail
-     * @return
+     * @return true 成功<br> false 失敗
      */
     public boolean newMailCheck(String mail) {
         String getMail = "";
@@ -517,9 +519,10 @@ public class UserDao {
     /**
      * ユーザ削除 親テーブルでリレーションが子テーブルのscheduleなので、紐づいているscheduleのデータがあれば、エラーで削除できない
      * @param id
-     * @return
+     * @return "ok":成功<br />  "failure":データベースなどの失敗<br />  "relationFailure": リレーションがあるので削除できなかった時の返り値
      */
-    public boolean delete(int id) {
+    public String delete(int id) {
+
 
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -533,14 +536,22 @@ public class UserDao {
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             // 成功したら、executeUpdateメソッドの戻り値は、更新された行数を表します。
-            int result = pstmt.executeUpdate();
-            if(result != 1) {
-                return false;
+            int result = pstmt.executeUpdate();  // リレーションのあるユーザを削除しようとすると、ここで、org.postgresql.util.PSQLExceptionエラー発生
+//            update or delete on table "usertable" violates foreign key constraint "schedule_userid_fkey" on table "schedule"
+//            詳細: Key (id)=(22) is still referenced from table "schedule".
+
+            if(result != 1) {  // 失敗
+
+                return "failure";   // ここでメソッドが即終了し、引数の strを呼び出し元へ返す
             }
-            // 1 だったら成功
+            // 更新された行が結果1 だったら成功
+        } catch (PSQLException e) {
+            // リレーションのあるユーザを削除しようとすると、エラーになるのでここでキャッチして処理する
+            //  "relationFailure" を返すようにします
+            return "relationFailure";  // ここでメソッドが即終了し、引数の strを呼び出し元へ返す
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-            return false;
+            return "failure";
         } finally {
             // PrepareStatementインスタンスのクローズ処理
             if (pstmt != null) {
@@ -548,7 +559,7 @@ public class UserDao {
                     pstmt.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    return false;
+                    return "failure";
                 }
             }
          // データーベース切断
@@ -557,10 +568,10 @@ public class UserDao {
                     conn.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    return false;
+                    return "failure";
                 }
             }
         }
-        return true;
+        return "ok";
     }
 }

@@ -51,6 +51,9 @@ if(re_enter != null && re_enter.equals("re_enter")) {
 }
 
 
+if(form_msg.equals("このユーザには登録してあるスケジュールが存在するため、ユーザー情報を削除できませんでした")) {
+
+}
 %>
 <!DOCTYPE html>
 <html>
@@ -72,9 +75,10 @@ if(re_enter != null && re_enter.equals("re_enter")) {
   %>
   <p><%= form_msg %></p>
   <%
-    }
+    }if(form_msg.equals("このユーザには登録してあるスケジュールが存在するため、ユーザー情報を削除できませんでした")) {
   %>
-  <%
+  <p><a href="">スケジュール全件を確認する</a></p>
+  <% }
     if(errMsgList != null) {
     for(String errMsg : errMsgList) {
   %>
