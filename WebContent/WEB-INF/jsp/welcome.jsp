@@ -11,6 +11,8 @@
   UserBean userBean = (UserBean) session.getAttribute("userBean");
 
 String userAddMsg = (String)session.getAttribute("userAddMsg");
+String userEditMsg = (String)session.getAttribute("userEditMsg");
+
 %>
 <html>
 <head>
@@ -21,26 +23,27 @@ String userAddMsg = (String)session.getAttribute("userAddMsg");
 <h2>スケジュール帳へようこそ</h2>
 <hr>
 <% if( userBean != null ) { %>
+
   <% if (userAddMsg != null) { %>
    <p><%=userAddMsg %></p>
+   <% } %>
+    <% if (userEditMsg != null) { %>
+   <p><%=userEditMsg %></p>
    <% } %>
   <p>ログインに成功しました。</p>
   <p>ようこそ<%= userBean.getName() %>さん</p>
 
  <!--  自分が登録したスケジュールだけ見れるようにする ?以降はクエリー文字列です aリンクはGETアクセスなのでクエリー文字列で遅れます
     クエリー文字列でユーザーの 主キーidを送ります-->
-  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current&id=<%=userBean.getId() %>" >今月表示へ</a><br />
+  <a href="/LocalDateTimeSchedule/MonthDisplayServlet?mon=current&id=<%=userBean.getId() %>" >今月表示</a><br />
 
 
 <!-- ユーザ編集画面へ 編集の時には、もうすでにセッションに自分のUserBeanインスタンスが保存されてるので(ログインの時に保存されてるし、新規登録の時にも保存されてる)
 クエリー文字列にユーザの idは必要なし-->
- <%--  <a href="/LocalDateTimeSchedule/UserFormServlet?action=edit&id=<%=userBean.getId() %>" >ユーザー情報編集画面へ</a> --%>
- <a href="/LocalDateTimeSchedule/UserFormServlet?action=edit" >ユーザー情報編集画面へ</a>
 
-  <!-- 本人であれば、ユーザアカウントを表示して、indexでみたり、
-  パスワード以外を  編集したり、パスワードを変更したり  パスワードだけは、別のフォームでそれだけを変更する使用にする
-  削除して　退会みたいな処理をしたり、管理者であれば、ユーザ一覧をみれたり、変更ができたり、パスワード以外の変更ができたり、削除できたり、新規に管理画面で
-  登録できたり、する機能をつけること -->
+ <a href="/LocalDateTimeSchedule/UserFormServlet?action=edit" >ユーザー情報編集</a>
+
+<a href="/LocalDateTimeSchedule/UserFormServlet?action=delete" >ユーザー情報削除</a>
 <% } %>
 </body>
 </html>

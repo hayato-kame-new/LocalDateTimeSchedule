@@ -47,11 +47,11 @@ public class UserFormServlet extends HttpServlet {
             return;
         } else {
 
-             UserBean userBean = null;
+            UserBean userBean = null;
             switch (action) {
             case "add":
                 // 空の(フィールドが規定値のままの)userBeanをセッションに置く これがセッションスコープにない nullだと、フィルターが効くので index.jspへ転送されてしまう
-                 userBean = new UserBean(); // 空のインスタンス生成(各フィールドの値は、各データ型の既定値になっています)にしておけばいい nullじゃなければいいので nullだと、フィルターの作用でindex.jspへ転送されてしまう
+                userBean = new UserBean(); // 空のインスタンス生成(各フィールドの値は、各データ型の既定値になっています)にしておけばいい nullじゃなければいいので nullだと、フィルターの作用でindex.jspへ転送されてしまう
                 // セッションスコープに保存する これがセッションスコープにあれば、フィルターで戻されない
                 session.setAttribute("userBean", userBean);
 
@@ -61,25 +61,28 @@ public class UserFormServlet extends HttpServlet {
 
                 // 自分のUserBeanインスタンスの内容を更新するので、セッションから取り出せます
                 // 主キーから、UserBeanインスタンスを取得する welcome.jspのaリンクのクエリー文字列から取得できる
-//  こんなことしなくてもセッションスコープから取り出せばいいのでは？？？  idパラメータ要らなかった
+                //  こんなことしなくてもセッションスコープから取り出せばいいのでは？？？  idパラメータ要らなかった
                 //                int id = Integer.parseInt(request.getParameter("id"));
-//                userBean = userDao.findById(id);
-//                if(userBean == null) { // 失敗
-//                	// 失敗のメッセージを
-//                	// リターン
-//                }
+                //                userBean = userDao.findById(id);
+                //                if(userBean == null) { // 失敗
+                //                	// 失敗のメッセージを
+                //                	// リターン
+                //                }
                 // UserBeanインスタンスを取得できたら
-               //  userBean = (UserBean)session.getAttribute("userBean");
-                 // 何もしなくていいので、もうログインしてるし、ここは経由せずに、welcomeからフォワードで
+                //  userBean = (UserBean)session.getAttribute("userBean");
+                // 何もしなくていいので、もうログインしてるし、ここは経由せずに、welcomeからフォワードで
                 // user_formに行ってもいいのじゃないか？？
+
+                break;
+            case "delete":
 
                 break;
             }
 
             // リクエストスコープに保存する フォワード先で取得できる (リダイレクトでは渡せない)
-            request.setAttribute("action", action); // "add" または "edit"を送ってる
+            request.setAttribute("action", action); // "add" または "edit" "delete"を送ってる
 
-            // このサーブレットでは、登録画面にフォワードするだけです
+            // このサーブレットでは、登録 編集 削除 画面にフォワードするだけです
             //   フォワードする 直接HTTPのURLを打ち込んでも、アクセスされないようにするにはWEB-INF配下にする WEB-INFの直下にjspフォルダを自分で作ってその中にフォワード先のjspファイルを置く
             // 現在は、フィルターをかけてるので、直接リクエストはされませんが
             RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp");

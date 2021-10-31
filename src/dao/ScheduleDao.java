@@ -383,7 +383,7 @@ public class ScheduleDao {
     /**
      * スケジュール更新
      * @param scheBean
-     * @return @return true 成功<br> false 失敗
+     * @return true 成功<br> false 失敗
      */
     public boolean update(ScheduleBean scheBean) {
         Connection conn = null;

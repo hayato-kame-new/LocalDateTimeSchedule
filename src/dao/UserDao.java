@@ -32,8 +32,8 @@ public class UserDao {
      * @return userBean
      */
     public UserBean add(String name, String pass, int roll, String mail) {
- // 戻り値の　UserBeanインスタンスには、主キーがちゃんと入ってるのをリターンする。そして、それを、セッションスコープに保存をしてログインした状態とする
-       UserBean userBean = null;  // 主キーもきちんと入ってる完全形のUserBean これを後でセッションスコープに置きます
+        // 戻り値の　UserBeanインスタンスには、主キーがちゃんと入ってるのをリターンする。そして、それを、セッションスコープに保存をしてログインした状態とする
+        UserBean userBean = null; // 主キーもきちんと入ってる完全形のUserBean これを後でセッションスコープに置きます
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -52,11 +52,11 @@ public class UserDao {
 
             // PostgresSQLは、Statement生成時に、Statement.RETURN_GENERATED_KEYSを指定するとStatement#getGeneratedKeysでそのテーブルの全カラムの情報が取得される。
 
-           //  pstmt = conn.prepareStatement(sql);
+            //  pstmt = conn.prepareStatement(sql);
 
             pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-             // insertする時は、主キーは自動採番 PostgreSQLで serial としてるので、書かないでも大丈夫
+            // insertする時は、主キーは自動採番 PostgreSQLで serial としてるので、書かないでも大丈夫
             pstmt.setString(1, name);
             pstmt.setString(2, pass);
             pstmt.setInt(3, roll);
@@ -64,22 +64,22 @@ public class UserDao {
 
             // generateKeyを取得したい 解決策：追加 Statement.RETURN_GENERATED_KEYS でもつけるとエラー文法的に
             // executeUpdate() 注意  戻り値を取得するような書き方をするとエラーになります！！
-            pstmt.executeUpdate();  // ここに引数を入れてはいけません 戻り値は変更したデータの数
+            pstmt.executeUpdate(); // ここに引数を入れてはいけません 戻り値は変更したデータの数
 
             // 取れる自動生成した主キーの値
-            rs = pstmt.getGeneratedKeys();  // この Statement オブジェクトを実行した結果として作成された自動生成キーを取得します。この Statement オブジェクトがキーを生成しなかった場合は、空の ResultSet オブジェクトが返されます。
+            rs = pstmt.getGeneratedKeys(); // この Statement オブジェクトを実行した結果として作成された自動生成キーを取得します。この Statement オブジェクトがキーを生成しなかった場合は、空の ResultSet オブジェクトが返されます。
 
-            if(rs.next()) {
-                 pstmt.getMetaData().getColumnCount();
+            if (rs.next()) {
+                pstmt.getMetaData().getColumnCount();
 
-                int id = rs.getInt(1);  // 引数は 先頭なので 1を指定する  注: 自動生成キーを表す列が指定されなかった場合、JDBC ドライバ実装では、自動生成キーを表すのに最適な列を判断します。
-   //  PostgreSQLはgetGeneratedKeys()メソッドをサポートしてます  JDBC ドライバがこのメソッドgetGeneratedKeys() をサポートしない場合例外発生します PostgreSQLはサポートしてます
-             //   String name = rs.getString("name");  // 取ることも可能です
-             //   String pass = rs.getString("pass");  // 取ることも可能です
-              //  int roll = rs.getInt("roll");
-              //  String mail = rs.getString("mail");
+                int id = rs.getInt(1); // 引数は 先頭なので 1を指定する  注: 自動生成キーを表す列が指定されなかった場合、JDBC ドライバ実装では、自動生成キーを表すのに最適な列を判断します。
+                //  PostgreSQLはgetGeneratedKeys()メソッドをサポートしてます  JDBC ドライバがこのメソッドgetGeneratedKeys() をサポートしない場合例外発生します PostgreSQLはサポートしてます
+                //   String name = rs.getString("name");  // 取ることも可能です
+                //   String pass = rs.getString("pass");  // 取ることも可能です
+                //  int roll = rs.getInt("roll");
+                //  String mail = rs.getString("mail");
 
-                userBean = new UserBean(id, name, pass, roll, mail );  // idが取得できれば、これできそうだな
+                userBean = new UserBean(id, name, pass, roll, mail); // idが取得できれば、これできそうだな
             }
 
         } catch (SQLException | ClassNotFoundException e) {
@@ -113,14 +113,13 @@ public class UserDao {
 
     }
 
-
     /**
      * ソルトのために取得する
      * 一番最後のユーザの主キーidの値を取得する データベースで何らかのエラーがあった時は 0 を返す
      * @return
      */
     public int getNewId() {
-   // これはソルトが必要なので
+        // これはソルトが必要なので
         int newId = 0; // 0で初期化してる
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -179,7 +178,6 @@ public class UserDao {
         }
         return newId;
     }
-
 
     /**
      * ログイン時はメルアドでまず検索する メルアドはユニーク(一意制約つけたカラムなので検索できる)
@@ -248,7 +246,6 @@ public class UserDao {
         return userBean;
     }
 
-
     /**
      * 主キーからユーザー検索する
      * @param id
@@ -316,9 +313,9 @@ public class UserDao {
      * @param mail
      * @return
      */
-    public boolean newMailCheck( String mail) {
+    public boolean newMailCheck(String mail) {
         String getMail = "";
-        boolean used = false;  // すでに使われているかどうか
+        boolean used = false; // すでに使われているかどうか
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -329,42 +326,42 @@ public class UserDao {
             // データベースへ接続
             conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
             // 新規ではこれでいい
-          String sql = "select mail from usertable where mail = ?";
+            String sql = "select mail from usertable where mail = ?";
 
-          // 編集時だったら、
+            // 編集時だったら、
             // パスワード変更の時は 自分自身のパスワード以外で同じものがあったらだめ、にしないといけないので
-       // 例:  select mail from usertable where id != 1 and  mail = 'root@root.com';
-// 編集だったらこれ
-        //    String sql = "select mail from usertable where id != ?::integer and  mail = ?";
+            // 例:  select mail from usertable where id != 1 and  mail = 'root@root.com';
+            // 編集だったらこれ
+            //    String sql = "select mail from usertable where id != ?::integer and  mail = ?";
 
-          pstmt = conn.prepareStatement(sql);
-          pstmt.setString(1,mail);
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, mail);
 
-          // 編集だったらこれ
-//            pstmt.setInt(1,id);
-//            pstmt.setString(2, mail);
+            // 編集だったらこれ
+            //            pstmt.setInt(1,id);
+            //            pstmt.setString(2, mail);
             rs = pstmt.executeQuery();
-            while(rs.next()) {  // ユニークなカラムだから whileじゃなくて ifでもいい
+            while (rs.next()) { // ユニークなカラムだから whileじゃなくて ifでもいい
                 getMail = rs.getString("mail");
-                if(getMail.equals(mail)) {  // whileを抜ける条件
-                    used = true;  // すでに使われている
-                    break;  // whileを抜ける
+                if (getMail.equals(mail)) { // whileを抜ける条件
+                    used = true; // すでに使われている
+                    break; // whileを抜ける
                 } else {
-                    used = false;  // まだ使われていない
+                    used = false; // まだ使われていない
                     break; // whileを抜ける
                 }
             }
 
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-         //   return null; // エラーの時は、nullを返すようにする。
+            //   return null; // エラーの時は、nullを返すようにする。
         } finally {
             if (rs != null) { //close()する順番は、逆からする
                 try {
                     rs.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                   // return null; // エラーの時は、nullを返すようにする。
+                    // return null; // エラーの時は、nullを返すようにする。
                 }
             }
             if (pstmt != null) {
@@ -372,7 +369,7 @@ public class UserDao {
                     pstmt.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                  //  return null; // エラーの時は、nullを返すようにする。
+                    //  return null; // エラーの時は、nullを返すようにする。
                 }
             }
             // データベース切断
@@ -381,14 +378,12 @@ public class UserDao {
                     conn.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                  //  return null; // エラーの時は、nullを返すようにする。
+                    //  return null; // エラーの時は、nullを返すようにする。
                 }
             }
         }
         return used;
-}
-
-
+    }
 
     /**
      * ユーザ編集の時だけ使うバリデーション用
@@ -397,9 +392,9 @@ public class UserDao {
      * @param id
      * @return true:もうすでに登録されているので使用できない<br /> false:まだ使われていない
      */
-    public boolean editMailCheck(int id, String mail) {  // 第1引数は、自分のid
+    public boolean editMailCheck(int id, String mail) { // 第1引数は、自分のid
         String getMail = "";
-        boolean used = false;  // すでに使われているかどうか
+        boolean used = false; // すでに使われているかどうか
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -409,37 +404,37 @@ public class UserDao {
             Class.forName(DRIVER_NAME);
             // データベースへ接続
             conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
-          //  String sql = "select mail from usertable where mail = ?"; //これじゃだめ
+            //  String sql = "select mail from usertable where mail = ?"; //これじゃだめ
             // パスワード変更の時は 自分自身のパスワード以外で同じものがあったらだめ、にしないといけないので
-       // 例:  select mail from usertable where id != 1 and  mail = 'root@root.com';
+            // 例:  select mail from usertable where id != 1 and  mail = 'root@root.com';
 
             String sql = "select mail from usertable where id != ?::integer and  mail = ?";
             pstmt = conn.prepareStatement(sql);
 
-            pstmt.setInt(1,id);
+            pstmt.setInt(1, id);
             pstmt.setString(2, mail);
             rs = pstmt.executeQuery();
-            while(rs.next()) {  // ユニークなカラムだから whileじゃなくて ifでもいい
+            while (rs.next()) { // ユニークなカラムだから whileじゃなくて ifでもいい
                 getMail = rs.getString("mail");
-                if(getMail.equals(mail)) {  // whileを抜ける条件
-                    used = true;  // すでに使われている
-                    break;  // whileを抜ける
+                if (getMail.equals(mail)) { // whileを抜ける条件
+                    used = true; // すでに使われている
+                    break; // whileを抜ける
                 } else {
-                    used = false;  // まだ使われていない
+                    used = false; // まだ使われていない
                     break; // whileを抜ける
                 }
             }
 
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-         //   return null; // エラーの時は、nullを返すようにする。
+            //   return null; // エラーの時は、nullを返すようにする。
         } finally {
             if (rs != null) { //close()する順番は、逆からする
                 try {
                     rs.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                   // return null; // エラーの時は、nullを返すようにする。
+                    // return null; // エラーの時は、nullを返すようにする。
                 }
             }
             if (pstmt != null) {
@@ -447,7 +442,7 @@ public class UserDao {
                     pstmt.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                  //  return null; // エラーの時は、nullを返すようにする。
+                    //  return null; // エラーの時は、nullを返すようにする。
                 }
             }
             // データベース切断
@@ -456,10 +451,65 @@ public class UserDao {
                     conn.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                  //  return null; // エラーの時は、nullを返すようにする。
+                    //  return null; // エラーの時は、nullを返すようにする。
                 }
             }
         }
         return used;
-}
+    }
+
+    /**
+     * ユーザー情報を編集
+     * @param userBean
+     * @return true 成功<br> false 失敗
+     */
+    public boolean update(UserBean userBean) {
+
+         Connection conn = null;
+         PreparedStatement pstmt = null;
+         try {
+             Class.forName(DRIVER_NAME);
+             conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+
+            String sql = "update usertable set (name, pass, mail) = (?, ?, ?) where id = ?::integer";
+             pstmt = conn.prepareStatement(sql);
+
+             pstmt.setString(1, userBean.getName());
+             pstmt.setString(2, userBean.getPass());
+             pstmt.setString(3, userBean.getMail());
+
+            int result = pstmt.executeUpdate();  // 更新に成功した件数が返る
+            if(result != 1) {  // where句で 主キーで検索してるので、返る件数は成功したら、１件 whileでもいいけど ifでもいい
+                return false;  // 失敗したらfalseを返す
+            }
+
+         }catch (SQLException | ClassNotFoundException e) {
+             // データベース接続やSQL実行失敗時の処理
+             // JDBCドライバが見つからなかったときの処理
+             e.printStackTrace();
+             return false; // 失敗した時に、falseを返す
+         } finally {
+             // PrepareStatementインスタンスのクローズ処理 順番は逆からクローズする
+             if (pstmt != null) {
+                 try {
+                     pstmt.close();
+                 } catch (SQLException e) {
+                     // クローズ処理失敗時の処理
+                     e.printStackTrace();
+                     return false; // 失敗した時に、falseを返す
+                 }
+             }
+             // データベース切断
+             if (conn != null) {
+                 try {
+                     conn.close();
+                 } catch (SQLException e) {
+                     // データベース切断失敗時の処理
+                     e.printStackTrace();
+                     return false; // 失敗した時に、falseを返す
+                 }
+             }
+         }
+         return true;
+     }
 }

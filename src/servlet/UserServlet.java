@@ -60,7 +60,7 @@ public class UserServlet extends HttpServlet {
         //新規に登録して登録が成功したら、セッションスコープに UserBeanインスタンスを保存して上書きおきます。セッションスコープには空のUserBeanインスタンスがあるので上書きする
         request.setCharacterEncoding("UTF-8");
 
-        String action = request.getParameter("action");
+        String action = request.getParameter("action"); // "add" "edit" "delete"
 
         // バリデーションのエラーリストのインスタンスを newで確保
         List<String> errMsgList = new ArrayList<String>(); // エラーなければ、空のリスト  [] と表示されます
@@ -69,9 +69,11 @@ public class UserServlet extends HttpServlet {
         String flat_password = request.getParameter("flat_password"); // 平のパスワード
         int roll = Integer.parseInt(request.getParameter("roll")); // 0 か 1     1 は管理者    選択しない時は -1が渡ってくるので、バリデーションにしてエラーにする
         String mail = request.getParameter("mail");
-        int id = Integer.parseInt(request.getParameter("id"));
+        int id = Integer.parseInt(request.getParameter("id")); // 編集と削除の時使える
 
-        // 入力チェックする バリデーションです
+        // 新規と編集の時だけ 削除の時には、スルーする 入力チェックする バリデーションです
+        UserDao userDao = new UserDao();
+        if(!action.equals("delete")) {
         if (name == null || name.length() == 0) { // nullチェックを先に書く
             errMsgList.add("名前が入力されていません");
         }
@@ -89,7 +91,6 @@ public class UserServlet extends HttpServlet {
             errMsgList.add("メールアドレス形式で入力をしてください");
         }
 
-        UserDao userDao = new UserDao();
         boolean used = false;
         if(action.equals("add")) {
              used = userDao.newMailCheck(mail);
@@ -102,6 +103,7 @@ public class UserServlet extends HttpServlet {
             if (used == true) {
                 errMsgList.add("そのメールアドレスはすでに使用されています");
             }
+        }
         }
 
         String form_msg = ""; // user_form.jspに表示する
@@ -126,6 +128,8 @@ public class UserServlet extends HttpServlet {
             return; // リターンを書く return で、即終了させる　この行以降は実行されない
         } else {
             // エラーリストの要素が 0個の時は、処理を進めます。
+            boolean success = false;
+             HttpSession session = request.getSession(); // 引数なしは 引数 trueと同じ
 
             switch (action) {
             case "add":
@@ -175,7 +179,7 @@ public class UserServlet extends HttpServlet {
                         return; // リターンを書く return で、即終了させる　この行以降は実行されない
                     } else { // 成功したらセッションスコープにUserBeanインスタンスを保存しておく フィルターのために
                         // このUserBeanインスタンス  が セッションスコープにあるかぎり、あればログインしてることになるから
-                        HttpSession session = request.getSession(); // 引数なしは 引数 trueと同じ
+                     //    HttpSession session = request.getSession(); // 引数なしは 引数 trueと同じ
                         // セッションスコープのチェック 必要
                         if (session == null) {
                             // セッションがなかったら index.jspへ フォワードするので、リクエストスコープに保存する
@@ -193,7 +197,62 @@ public class UserServlet extends HttpServlet {
 
                 break;
             case "edit":
+                // 主キーで探す
+                UserBean userBean = userDao.findById(id);
+                //セッターを使うフィールドを上書きする
+                userBean.setName(name);
+                String pass = PasswordUtil.getSafetyPassword(flat_password, Integer.toString(id));
+                userBean.setPass(pass);
+                userBean.setMail(mail);
+                userBean.setRoll(roll);
+                // セッターで更新したUserBeanインスタンスをデータベースに更新する
+                success = userDao.update(userBean);
+                if(success == false) { // 失敗
 
+                      // 失敗のメッセージ そしてユーザ登録画面へ戻る フォームに入力した値をフォワード先に送って表示させる
+                    form_msg = "ユーザー情報編集に失敗しました。";
+                    request.setAttribute("form_msg", form_msg);
+                    // リクエストスコープへ、保存します UserBeanにはしないで、バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
+                    request.setAttribute("name", name);
+                    //      request.setAttribute("flat_password",flat_password);  // パスワードはセキュリティのため表示させない
+                    request.setAttribute("roll", roll); // intだけど大丈夫？ 自動でIntegerのラッパークラスにボクシングするか？？
+                    request.setAttribute("mail", mail);
+                    request.setAttribute("action", action);
+                    request.setAttribute("id", id);
+
+                    request.setAttribute("re_enter", "re_enter");
+
+                    // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと
+                    request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(request, response);
+                    return; // リターンを書く return で、即終了させる　この行以降は実行されない
+
+                } else { // 成功したら
+                    session.setAttribute("userBean", userBean); // 編集したUserBeanをセッションスコープへ置いて上書きしておく すでに、セッションスコープにはUserBeanが保存してあるので
+                    session.setAttribute("userEditMsg", "ユーザー情報を変更しました。");
+                    // 編集成功したら welcome.jspにフォワード
+                    request.getRequestDispatcher("/WEB-INF/jsp/welcome.jsp").forward(request, response);
+                }
+
+                break;
+
+            case "delete":
+                 // 主キーで探す
+                 userBean = userDao.findById(id);
+                 success = userDao.delete(userBean);
+                 if(success == false) { // 失敗
+
+                 } else {
+                     // 削除をしたら、セッションスコープ自体を破棄してログアウトします
+                     // ログアウトするには
+                     // 既存のセッションスコープを取得getSession() は　getSession(true) と同じ
+                     session = request.getSession();
+                    // セッションスコープを破棄
+                    session.invalidate();
+                    request.setAttribute("userDeleteMsg", "ユーザーを削除しました");
+                    // ログアウト画面 logout.jsp にフォワードする WebContentからの ルート相対パスで指定する
+                 // フォワード処理
+                    request.getRequestDispatcher("/WEB-INF/jsp/logout.jsp").forward(request, response);
+                 }
                 break;
             }
 
