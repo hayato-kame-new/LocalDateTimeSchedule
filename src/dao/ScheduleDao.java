@@ -444,7 +444,7 @@ public class ScheduleDao {
     }
 
     /**
-     * スケジュール削除
+     * スケジュール削除 子テーブルのデータなので削除できる
      * @param id
      * @return true 成功<br>false 失敗
      */

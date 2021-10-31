@@ -477,6 +477,7 @@ public class UserDao {
              pstmt.setString(1, userBean.getName());
              pstmt.setString(2, userBean.getPass());
              pstmt.setString(3, userBean.getMail());
+             pstmt.setInt(4, userBean.getId());
 
             int result = pstmt.executeUpdate();  // 更新に成功した件数が返る
             if(result != 1) {  // where句で 主キーで検索してるので、返る件数は成功したら、１件 whileでもいいけど ifでもいい
@@ -512,4 +513,54 @@ public class UserDao {
          }
          return true;
      }
+
+    /**
+     * ユーザ削除 親テーブルでリレーションが子テーブルのscheduleなので、紐づいているscheduleのデータがあれば、エラーで削除できない
+     * @param id
+     * @return
+     */
+    public boolean delete(int id) {
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            Class.forName(DRIVER_NAME);
+            conn = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASS);
+
+         // 注意 PostgreSQLではテーブル名カラム名全て小文字で  whereをつけ忘れないように
+
+           String sql = "delete from usertable where id = ?::integer";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
+            // 成功したら、executeUpdateメソッドの戻り値は、更新された行数を表します。
+            int result = pstmt.executeUpdate();
+            if(result != 1) {
+                return false;
+            }
+            // 1 だったら成功
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            // PrepareStatementインスタンスのクローズ処理
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+         // データーベース切断
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

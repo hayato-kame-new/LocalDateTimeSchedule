@@ -12,7 +12,17 @@ request.setCharacterEncoding("UTF-8");
 // action には "re_enter" も渡ってきます
 
 String action = (String)request.getAttribute("action");  //  "action" "edit" "delete"
-String title = action.equals("add") ? "新規登録" : "編集"; // ここ直す　3つの分岐にすること
+
+/* String title = action.equals("add") ? "新規登録" : "編集"; // ここ直す　3つの分岐にすること */
+String title = "";
+if(action.equals("add")) {
+  title = "新規";
+} else if(action.equals("edit")) {
+  title = "編集";
+} else if(action.equals("delete")) {
+  title = "削除";
+}
+
 String re_enter = (String)request.getAttribute("re_enter");
 
 // リクエストスコープから フォーム用のインスタンスを取り出して
@@ -175,7 +185,7 @@ p{font-size:0.75em;}
 
 <!-- フォーム表示 -->
 <div id="right">
-<h3>スケジュール入力フォーム</h3>
+<h3>スケジュール<%=title %></h3>
 <%
   if(scheduleFailureMsg != null) {
 %>

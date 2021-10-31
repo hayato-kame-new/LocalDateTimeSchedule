@@ -162,7 +162,7 @@ public class UserServlet extends HttpServlet {
                     if (userBean == null) { // 失敗
 
                         // 失敗のメッセージ そしてユーザ登録画面へ戻る フォームに入力した値をフォワード先に送って表示させる
-                        form_msg = "ユーザー新規登録に失敗しました。";
+                        form_msg = "ユーザー新規登録できませんでした。";
                         request.setAttribute("form_msg", form_msg);
                         // リクエストスコープへ、保存します UserBeanにはしないで、バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
                         request.setAttribute("name", name);
@@ -183,7 +183,7 @@ public class UserServlet extends HttpServlet {
                         // セッションスコープのチェック 必要
                         if (session == null) {
                             // セッションがなかったら index.jspへ フォワードするので、リクエストスコープに保存する
-                            request.setAttribute("userRegistFailureMsg", "ユーザ新規登録に失敗しました。もう一度入力してください。");
+                            request.setAttribute("userRegistFailureMsg", "ユーザ新規登録できませんでした");
                             request.getRequestDispatcher("./").forward(request, response);
                             return;
                         } else {
@@ -210,7 +210,7 @@ public class UserServlet extends HttpServlet {
                 if(success == false) { // 失敗
 
                       // 失敗のメッセージ そしてユーザ登録画面へ戻る フォームに入力した値をフォワード先に送って表示させる
-                    form_msg = "ユーザー情報編集に失敗しました。";
+                    form_msg = "ユーザー情報を編集できませんでした。";
                     request.setAttribute("form_msg", form_msg);
                     // リクエストスコープへ、保存します UserBeanにはしないで、バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
                     request.setAttribute("name", name);
@@ -236,17 +236,32 @@ public class UserServlet extends HttpServlet {
                 break;
 
             case "delete":
-                 // 主キーで探す
-                 userBean = userDao.findById(id);
-                 success = userDao.delete(userBean);
+                 // 主キーで削除する
+                 success = userDao.delete(id);
                  if(success == false) { // 失敗
+                      // 失敗のメッセージ そしてユーザ登録画面へ戻る フォームに入力した値をフォワード先に送って表示させる
+                     form_msg = "ユーザー情報を削除できませんでした";
+                     request.setAttribute("form_msg", form_msg);
+                     // リクエストスコープへ、保存します UserBeanにはしないで、バラで送ります、平たいパスワードだから インスタンスじゃないとスコープにはおけない 参照型でないと置けない Object型のサブクラスのインスタンスじゃないとだめ
+                     request.setAttribute("name", name);
+                     //      request.setAttribute("flat_password",flat_password);  // パスワードはセキュリティのため表示させない
+                     request.setAttribute("roll", roll); // intだけど大丈夫？ 自動でIntegerのラッパークラスにボクシングするか？？
+                     request.setAttribute("mail", mail);
+                     request.setAttribute("action", action);
+                     request.setAttribute("id", id);
+
+                     request.setAttribute("re_enter", "re_enter");
+
+                     // フォワードする WebContentからの ルート相対パス  初め/ を書いておくこと
+                     request.getRequestDispatcher("/WEB-INF/jsp/user_form.jsp").forward(request, response);
+                     return; // リターンを書く return で、即終了させる　この行以降は実行されない
 
                  } else {
                      // 削除をしたら、セッションスコープ自体を破棄してログアウトします
                      // ログアウトするには
                      // 既存のセッションスコープを取得getSession() は　getSession(true) と同じ
                      session = request.getSession();
-                    // セッションスコープを破棄
+                    // セッションスコープを破棄  セッションスコープ自体を破棄する
                     session.invalidate();
                     request.setAttribute("userDeleteMsg", "ユーザーを削除しました");
                     // ログアウト画面 logout.jsp にフォワードする WebContentからの ルート相対パスで指定する

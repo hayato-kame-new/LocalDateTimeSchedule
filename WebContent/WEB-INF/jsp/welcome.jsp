@@ -41,7 +41,7 @@ String userEditMsg = (String)session.getAttribute("userEditMsg");
 <!-- ユーザ編集画面へ 編集の時には、もうすでにセッションに自分のUserBeanインスタンスが保存されてるので(ログインの時に保存されてるし、新規登録の時にも保存されてる)
 クエリー文字列にユーザの idは必要なし-->
 
- <a href="/LocalDateTimeSchedule/UserFormServlet?action=edit" >ユーザー情報編集</a>
+ <a href="/LocalDateTimeSchedule/UserFormServlet?action=edit" >ユーザー情報編集</a><br />
 
 <a href="/LocalDateTimeSchedule/UserFormServlet?action=delete" >ユーザー情報削除</a>
 <% } %>
